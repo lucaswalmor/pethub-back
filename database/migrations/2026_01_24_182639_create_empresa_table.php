@@ -19,7 +19,10 @@ return new class extends Migration
             $table->string('email');                    // Email da empresa
             $table->string('telefone');                // Telefone principal
             $table->string('cnpj')->unique();          // CNPJ (único)
+            $table->string('path_logo')->nullable();   // Caminho da logo no storage
+            $table->string('path_banner')->nullable(); // Caminho do banner no storage
             $table->foreignId('nicho_id')->constrained('nichos_empresa');
+            $table->boolean('cadastro_completo')->default(false); // Indica se o cadastro está completo
             $table->boolean('ativo')->default(true);   // Ativo ou inativo
             $table->timestamps();
             $table->softDeletes();

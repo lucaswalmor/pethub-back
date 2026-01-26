@@ -11,6 +11,12 @@ class EmpresaFormasPagamentos extends Model
 
     protected $table = 'empresa_formas_pagamentos';
 
+    protected $fillable = [
+        'empresa_id',
+        'forma_pagamento_id',
+        'ativo',
+    ];
+
     // Relação com empresa
     public function empresa()
     {

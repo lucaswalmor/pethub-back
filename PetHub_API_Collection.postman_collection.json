@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "12345678-1234-1234-1234-123456789012",
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
 		"name": "PetHub API",
 		"description": "Coleção de endpoints da API PetHub para gerenciamento de empresas pet",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12345678"
 	},
 	"item": [
 		{
@@ -21,10 +22,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"usuario@email.com\",\n  \"password\": \"32329585\"\n}"
+							"raw": "{\n  \"email\": \"lucaswsb52@gmail.com\",\n  \"password\": \"32329585\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/login",
+							"raw": "{{base_url}}/api/login",
 							"host": [
 								"{{base_url}}"
 							],
@@ -32,10 +33,8 @@
 								"api",
 								"login"
 							]
-						},
-						"description": "Realizar login do usuário"
-					},
-					"response": []
+						}
+					}
 				},
 				{
 					"name": "Logout",
@@ -48,7 +47,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/logout",
+							"raw": "{{base_url}}/api/logout",
 							"host": [
 								"{{base_url}}"
 							],
@@ -56,62 +55,8 @@
 								"api",
 								"logout"
 							]
-						},
-						"description": "Realizar logout do usuário autenticado"
-					},
-					"response": []
-				},
-				{
-					"name": "Informações do Usuário",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/user",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"user"
-							]
-						},
-						"description": "Obter informações do usuário autenticado"
-					},
-					"response": []
-				},
-				{
-					"name": "Teste - Login com Usuário da Empresa",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"email\": \"lucaswsb52@gmail.com\",\n  \"password\": \"32329585\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/login",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"login"
-							]
-						},
-						"description": "Login de teste com o usuário administrador criado junto com a empresa"
-					},
-					"response": []
+						}
+					}
 				}
 			]
 		},
@@ -129,7 +74,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/empresa",
+							"raw": "{{base_url}}/api/empresa",
 							"host": [
 								"{{base_url}}"
 							],
@@ -137,10 +82,8 @@
 								"api",
 								"empresa"
 							]
-						},
-						"description": "Listar todas as empresas do usuário autenticado"
-					},
-					"response": []
+						}
+					}
 				},
 				{
 					"name": "Criar Empresa",
@@ -158,10 +101,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"razao_social\": \"PetShop do Lucas Ltda\",\n  \"nome_fantasia\": \"PetShop do Lucas\",\n  \"email\": \"lucaswsb52@gmail.com\",\n  \"telefone\": \"(11) 99999-9999\",\n  \"cnpj\": \"12.345.678/0001-90\",\n  \"nicho_id\": 1,\n  \"ativo\": true,\n  \"endereco\": {\n    \"logradouro\": \"Rua das Flores\",\n    \"numero\": \"123\",\n    \"complemento\": \"Sala 2\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"São Paulo\",\n    \"estado\": \"SP\",\n    \"cep\": \"01234-567\",\n    \"ponto_referencia\": \"Próximo ao Shopping\",\n    \"observacoes\": \"Entrada pelos fundos\"\n  },\n  \"usuario_admin\": {\n    \"name\": \"Lucas Silva\",\n    \"email\": \"lucaswsb52@gmail.com\",\n    \"password\": \"32329585\",\n    \"password_confirmation\": \"32329585\",\n    \"permissao_id\": 1\n  }\n}"
+							"raw": "{\n  \"razao_social\": \"PetShop do Lucas Ltda\",\n  \"nome_fantasia\": \"PetShop do Lucas\",\n  \"email\": \"lucaswsb52@gmail.com\",\n  \"telefone\": \"(11) 99999-9999\",\n  \"cnpj\": \"12.345.678/0001-90\",\n  \"nicho_id\": 1,\n  \"ativo\": true,\n  \"endereco\": {\n    \"logradouro\": \"Rua das Flores\",\n    \"numero\": \"123\",\n    \"complemento\": \"Sala 2\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"São Paulo\",\n    \"estado\": \"SP\",\n    \"cep\": \"01234-567\",\n    \"ponto_referencia\": \"Próximo ao Shopping\",\n    \"observacoes\": \"Entrada pelos fundos\"\n  },\n  \"usuario_admin\": {\n    \"nome\": \"Lucas Silva\",\n    \"email\": \"lucaswsb52@gmail.com\",\n    \"password\": \"32329585\",\n    \"password_confirmation\": \"32329585\",\n    \"permissao_id\": 1,\n    \"telefone\": \"(34) 99202-1394\"\n  }\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/empresa",
+							"raw": "{{base_url}}/api/empresa",
 							"host": [
 								"{{base_url}}"
 							],
@@ -169,10 +112,8 @@
 								"api",
 								"empresa"
 							]
-						},
-						"description": "Criar uma nova empresa com usuário administrador (cadastro inicial)"
-					},
-					"response": []
+						}
+					}
 				},
 				{
 					"name": "Exibir Empresa",
@@ -185,7 +126,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/empresa/{{empresa_id}}",
+							"raw": "{{base_url}}/api/empresa/{{empresa_id}}",
 							"host": [
 								"{{base_url}}"
 							],
@@ -194,40 +135,8 @@
 								"empresa",
 								"{{empresa_id}}"
 							]
-						},
-						"description": "Exibir detalhes completos de uma empresa específica com todos os relacionamentos"
-					},
-					"response": []
-				},
-				{
-					"name": "Exibir Empresa (Básica)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/empresa/{{empresa_id}}?basic=true",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"empresa",
-								"{{empresa_id}}"
-							],
-							"query": [
-								{
-									"key": "basic",
-									"value": "true"
-								}
-							]
-						},
-						"description": "Exibir apenas informações básicas da empresa (sem relacionamentos)"
-					},
-					"response": []
+						}
+					}
 				},
 				{
 					"name": "Atualizar Empresa",
@@ -245,10 +154,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"nome_fantasia\": \"PetShop do Lucas Atualizado\",\n  \"email\": \"lucaswsb52@gmail.com\",\n  \"telefone\": \"(34) 99202-1394\",\n  \"ativo\": true\n}"
+							"raw": "{\n  \"nome_fantasia\": \"PetShop do Lucas Atualizado\",\n  \"email\": \"lucaswsb52@gmail.com\",\n  \"telefone\": \"(34) 99202-1394\",\n  \"ativo\": true,\n  \"empresa_endereco\": {\n    \"rua\": \"Rua das Flores\",\n    \"numero\": \"123\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"Uberlândia\",\n    \"estado\": \"MG\",\n    \"cep\": \"38400-000\",\n    \"ponto_referencia\": null,\n    \"observacoes\": null\n  },\n  \"configuracoes\": {\n    \"faz_entrega\": true,\n    \"faz_retirada\": true,\n    \"valor_entrega_padrao\": 15.00,\n    \"telefone_comercial\": \"(34) 99202-1394\",\n    \"instagram\": \"https://instagram.com/petshop\"\n  },\n  \"horarios\": [\n    {\n      \"dia_semana\": \"segunda\",\n      \"horario_inicio\": \"08:00\",\n      \"horario_fim\": \"18:00\"\n    }\n  ],\n  \"formas_pagamento\": [\n    {\n      \"forma_pagamento_id\": 1,\n      \"ativo\": true\n    }\n  ],\n  \"bairros_entrega\": [\n    {\n      \"bairro_id\": 1,\n      \"valor_entrega\": 10.00,\n      \"valor_entrega_minimo\": 25.00,\n      \"ativo\": true\n    },\n    {\n      \"bairro_id\": 2,\n      \"valor_entrega\": 15.00,\n      \"valor_entrega_minimo\": 30.00,\n      \"ativo\": true\n    }\n  ]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/empresa/{{empresa_id}}",
+							"raw": "{{base_url}}/api/empresa/{{empresa_id}}",
 							"host": [
 								"{{base_url}}"
 							],
@@ -258,12 +167,153 @@
 								"{{empresa_id}}"
 							]
 						},
-						"description": "Atualizar dados de uma empresa específica (todos os campos são opcionais)"
-					},
-					"response": []
+						"description": "Atualizar dados da empresa apenas com JSON (sem imagens)"
+					}
 				},
 				{
-					"name": "Atualizar Apenas Configurações",
+					"name": "Atualizar Imagens Empresa",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "banner",
+									"type": "file",
+									"src": [],
+									"description": "Arquivo do banner (máx. 5MB)"
+								},
+								{
+									"key": "logo",
+									"type": "file",
+									"src": [],
+									"description": "Arquivo da logo (máx. 2MB)"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/empresa/{{empresa_id}}/upload-image",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"empresa",
+								"{{empresa_id}}",
+								"upload-image"
+							]
+						},
+						"description": "Upload de logo e/ou banner da empresa. Pode enviar apenas um dos arquivos ou ambos."
+					}
+				},
+				{
+					"name": "Excluir Empresa",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/empresa/{{empresa_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"empresa",
+								"{{empresa_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Usuários",
+			"item": [
+				{
+					"name": "Cadastrar Usuário",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"João Silva\",\n  \"email\": \"joao.silva@email.com\",\n  \"password\": \"senha123\",\n  \"telefone\": \"34999999999\",\n  \"permissao_id\": null,\n  \"empresa_id\": null,\n  \"endereco\": {\n    \"cep\": \"38400-000\",\n    \"rua\": \"Rua das Flores\",\n    \"numero\": \"123\",\n    \"complemento\": \"Apto 45\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"Uberlândia\",\n    \"estado\": \"MG\",\n    \"ponto_referencia\": \"Próximo ao shopping\",\n    \"observacoes\": \"Cliente preferencial\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/usuarios",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"usuarios"
+							]
+						},
+						"description": "Cadastra um novo usuário. Para cliente: deixe empresa_id e permissao_id como null e inclua endereco. Para funcionário: defina empresa_id e permissao_id (se necessário) e remova o campo endereco."
+					}
+				},
+				{
+					"name": "Listar Usuários",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/usuarios",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"usuarios"
+							]
+						}
+					}
+				},
+				{
+					"name": "Obter Usuário por ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/usuarios/{{usuario_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"usuarios",
+								"{{usuario_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Atualizar Usuário",
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -278,24 +328,24 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"configuracoes\": {\n    \"faz_entrega\": true,\n    \"faz_retirada\": true,\n    \"valor_entrega_padrao\": 10.50,\n    \"telefone_comercial\": \"(34) 99202-1394\",\n    \"instagram\": \"https://instagram.com/petshop\"\n  }\n}"
+							"raw": "{\n  \"nome\": \"João Silva Atualizado\",\n  \"telefone\": \"34999999999\",\n  \"ativo\": true\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/empresa/{{empresa_id}}",
+							"raw": "{{base_url}}/api/usuarios/{{usuario_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"empresa",
-								"{{empresa_id}}"
+								"api",
+								"usuarios",
+								"{{usuario_id}}"
 							]
 						},
-						"description": "Atualizar apenas as configurações da empresa (exemplo de atualização parcial)"
-					},
-					"response": []
+						"description": "Atualiza dados do usuário. Campos opcionais. Usuários master não podem ter permissões alteradas."
+					}
 				},
 				{
-					"name": "Excluir Empresa",
+					"name": "Deletar Usuário",
 					"request": {
 						"method": "DELETE",
 						"header": [
@@ -305,47 +355,25 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/empresa/{{empresa_id}}",
+							"raw": "{{base_url}}/api/usuarios/{{usuario_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
-								"empresa",
-								"{{empresa_id}}"
+								"usuarios",
+								"{{usuario_id}}"
 							]
-						},
-						"description": "Excluir uma empresa específica"
-					},
-					"response": []
+						}
+					}
 				}
 			]
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
 		}
 	],
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://127.0.0.1:8000/api",
+			"value": "http://127.0.0.1:8000",
 			"type": "string"
 		},
 		{
@@ -355,6 +383,11 @@
 		},
 		{
 			"key": "empresa_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "usuario_id",
 			"value": "",
 			"type": "string"
 		}

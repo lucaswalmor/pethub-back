@@ -11,6 +11,14 @@ class EmpresaBairrosEntregas extends Model
 
     protected $table = 'empresa_bairros_entregas';
 
+    protected $fillable = [
+        'empresa_id',
+        'bairro_id',
+        'valor_entrega',
+        'valor_entrega_minimo',
+        'ativo',
+    ];
+
     // Relação com empresa
     public function empresa()
     {

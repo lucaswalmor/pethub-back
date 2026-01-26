@@ -11,6 +11,20 @@ class UsuarioEnderecos extends Model
 
     protected $table = 'usuarios_enderecos';
 
+    protected $fillable = [
+        'usuario_id',
+        'cep',
+        'rua',
+        'numero',
+        'complemento',
+        'bairro',
+        'cidade',
+        'estado',
+        'ponto_referencia',
+        'observacoes',
+        'ativo',
+    ];
+
     // Relação com usuário
     public function usuario()
     {

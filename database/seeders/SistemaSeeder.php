@@ -143,6 +143,11 @@ class SistemaSeeder extends Seeder
             ]);
         }
 
+        // -----------------------------
+        // Bairros de Uberlândia-MG
+        // -----------------------------
+        $this->call(UberlandiaBairrosSeeder::class);
+
         $this->command->info('✓ Seeder inicial do sistema executado com sucesso!');
     }
 }

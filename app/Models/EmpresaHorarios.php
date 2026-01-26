@@ -11,6 +11,15 @@ class EmpresaHorarios extends Model
 
     protected $table = 'empresa_horarios';
 
+    protected $fillable = [
+        'empresa_id',
+        'dia_semana',
+        'slug',
+        'horario_inicio',
+        'horario_fim',
+        'padrao',
+    ];
+
     // Relação com empresa
     public function empresa()
     {

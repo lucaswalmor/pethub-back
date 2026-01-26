@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('telefone');
             $table->boolean('ativo')->default(true);
+            $table->boolean('is_master')->default(false); // Identifica se é usuário master da empresa
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();

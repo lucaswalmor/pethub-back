@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\FormatHelper;
 
 class UberlandiaBairrosSeeder extends Seeder
 {
@@ -27,7 +28,7 @@ class UberlandiaBairrosSeeder extends Seeder
             'Daniel Fonseca',
             'Nossa Senhora das Graças',
             'São José',
-            
+
             // ZONA NORTE
             'Jardim das Palmeiras',
             'Luizote de Freitas',
@@ -44,13 +45,13 @@ class UberlandiaBairrosSeeder extends Seeder
             'Monte Hebron',
             'Residencial Pequis',
             'Morada Nova',
-            
+
             // ZONA OESTE
             'Jaraguá',
             'Planalto',
             'Chácaras Tubalina',
             'Chácaras Panorama',
-            
+
             // ZONA SUL
             'Patrimônio',
             'Copacabana',
@@ -67,7 +68,7 @@ class UberlandiaBairrosSeeder extends Seeder
             'Morada da Colina',
             'Laranjeiras',
             'Jardim Botânico',
-            
+
             // ZONA LESTE
             'Santa Mônica',
             'Tibery',
@@ -86,14 +87,14 @@ class UberlandiaBairrosSeeder extends Seeder
             'Portal do Vale',
             'Granja Marileusa',
             'Grand Ville',
-            
+
             // DISTRITOS
             'Cruzeiro dos Peixotos',
             'Martinésia',
             'Tapuirama',
             'Miraporanga',
             'Miranda',
-            
+
             // OUTROS BAIRROS
             'Santa Luzia',
             'Esperança',
@@ -106,9 +107,11 @@ class UberlandiaBairrosSeeder extends Seeder
 
         $dados = array_map(function($bairro) use ($timestamp) {
             return [
-                'bairro' => $bairro,
+                'nome' => $bairro,
+                'slug' => FormatHelper::formatSlug($bairro),
                 'cidade' => 'Uberlândia',
                 'estado' => 'MG',
+                'ativo' => true,
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
             ];

@@ -11,6 +11,11 @@ class UsuarioEmpresas extends Model
 
     protected $table = 'usuarios_empresas';
 
+    protected $fillable = [
+        'usuario_id',
+        'empresa_id',
+    ];
+
     // Relação com usuario
     public function usuario()
     {

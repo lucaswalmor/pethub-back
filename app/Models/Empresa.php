@@ -18,7 +18,10 @@ class Empresa extends Model
         'email',
         'telefone',
         'cnpj',
+        'path_logo',
+        'path_banner',
         'nicho_id',
+        'cadastro_completo',
         'ativo',
     ];
 

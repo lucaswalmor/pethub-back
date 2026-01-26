@@ -27,6 +27,7 @@ class User extends Authenticatable
         'password',
         'telefone',
         'ativo',
+        'is_master',
     ];
 
     /**
@@ -76,6 +77,12 @@ class User extends Authenticatable
         return $this->hasMany(Pedido::class, 'usuario_id');
     }
 
+    // Relação com empresas (através da tabela usuario_empresas)
+    public function usuarioEmpresas()
+    {
+        return $this->hasMany(UsuarioEmpresas::class, 'usuario_id');
+    }
+
     // Verifica se o usuário é administrador
     public function isAdmin()
     {
@@ -98,5 +105,11 @@ class User extends Authenticatable
     public function isCliente()
     {
         return $this->permissao->slug === 'cliente';
+    }
+
+    // Verifica se o usuário é master da empresa
+    public function isMaster()
+    {
+        return $this->is_master;
     }
 }

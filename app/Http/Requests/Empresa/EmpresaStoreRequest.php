@@ -16,6 +16,28 @@ class EmpresaStoreRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        // Se for FormData, precisamos converter arrays aninhados
+        if ($this->isMethod('post') && !$this->hasHeader('Content-Type', 'application/json')) {
+            $data = $this->all();
+
+            // Converter arrays de formulário para arrays PHP
+            if (isset($data['endereco']) && is_array($data['endereco'])) {
+                $this->merge(['endereco' => $data['endereco']]);
+            }
+
+            if (isset($data['usuario_admin']) && is_array($data['usuario_admin'])) {
+                $this->merge(['usuario_admin' => $data['usuario_admin']]);
+            }
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -30,6 +52,8 @@ class EmpresaStoreRequest extends FormRequest
             'email' => 'required|email|max:255',
             'telefone' => 'required|string|max:20',
             'cnpj' => 'required|string|regex:/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/|unique:empresas,cnpj',
+            'path_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'path_banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
             'nicho_id' => 'required|integer|exists:nichos_empresa,id',
             'ativo' => 'boolean',
 
@@ -133,6 +157,14 @@ class EmpresaStoreRequest extends FormRequest
             'cnpj.required' => 'O CNPJ da empresa é obrigatório.',
             'cnpj.regex' => 'O CNPJ deve ter o formato XX.XXX.XXX/XXXX-XX.',
             'cnpj.unique' => 'Este CNPJ já está sendo usado por outra empresa.',
+
+            'path_logo.image' => 'A logo deve ser uma imagem válida.',
+            'path_logo.mimes' => 'A logo deve ser um arquivo do tipo: jpeg, png, jpg, gif.',
+            'path_logo.max' => 'A logo não pode ter mais que 2MB.',
+
+            'path_banner.image' => 'O banner deve ser uma imagem válida.',
+            'path_banner.mimes' => 'O banner deve ser um arquivo do tipo: jpeg, png, jpg, gif.',
+            'path_banner.max' => 'O banner não pode ter mais que 5MB.',
 
             'nicho_id.required' => 'O nicho da empresa é obrigatório.',
             'nicho_id.integer' => 'O nicho deve ser um número inteiro.',
@@ -275,9 +307,9 @@ class EmpresaStoreRequest extends FormRequest
             'usuario_admin.required' => 'Os dados do usuário administrador são obrigatórios.',
             'usuario_admin.array' => 'Os dados do usuário administrador devem ser um objeto válido.',
 
-            'usuario_admin.name.required' => 'O nome do usuário administrador é obrigatório.',
-            'usuario_admin.name.string' => 'O nome do usuário administrador deve ser um texto válido.',
-            'usuario_admin.name.max' => 'O nome do usuário administrador não pode ter mais que 255 caracteres.',
+            'usuario_admin.nome.required' => 'O nome do usuário administrador é obrigatório.',
+            'usuario_admin.nome.string' => 'O nome do usuário administrador deve ser um texto válido.',
+            'usuario_admin.nome.max' => 'O nome do usuário administrador não pode ter mais que 255 caracteres.',
 
             'usuario_admin.telefone.required' => 'O telefone do usuário administrador é obrigatório.',
             'usuario_admin.telefone.string' => 'O telefone do usuário administrador deve ser um texto válido.',

@@ -11,6 +11,19 @@ class EmpresaEndereco extends Model
 
     protected $table = 'empresa_endereco';
 
+    protected $fillable = [
+        'empresa_id',
+        'logradouro',
+        'numero',
+        'complemento',
+        'bairro',
+        'cidade',
+        'estado',
+        'cep',
+        'ponto_referencia',
+        'observacoes',
+    ];
+
     // Relação com empresa
     public function empresa()
     {

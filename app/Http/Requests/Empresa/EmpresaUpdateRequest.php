@@ -15,6 +15,53 @@ class EmpresaUpdateRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        // Se for FormData, precisamos converter arrays aninhados
+        if ($this->isMethod('put') && !$this->hasHeader('Content-Type', 'application/json')) {
+            $data = $this->all();
+
+            // Converter arrays de formulário para arrays PHP
+            if (isset($data['empresa_endereco']) && is_array($data['empresa_endereco'])) {
+                $enderecoData = $data['empresa_endereco'];
+                // Mapear 'rua' para 'logradouro' se necessário
+                if (isset($enderecoData['rua']) && !isset($enderecoData['logradouro'])) {
+                    $enderecoData['logradouro'] = $enderecoData['rua'];
+                    unset($enderecoData['rua']);
+                }
+                $this->merge(['endereco' => $enderecoData]);
+            }
+            if (isset($data['endereco']) && is_array($data['endereco'])) {
+                $this->merge(['endereco' => $data['endereco']]);
+            }
+
+            if (isset($data['configuracoes']) && is_array($data['configuracoes'])) {
+                $this->merge(['configuracoes' => $data['configuracoes']]);
+            }
+
+            if (isset($data['horarios']) && is_array($data['horarios'])) {
+                $this->merge(['horarios' => $data['horarios']]);
+            }
+
+            if (isset($data['assinatura']) && is_array($data['assinatura'])) {
+                $this->merge(['assinatura' => $data['assinatura']]);
+            }
+
+            if (isset($data['formas_pagamento']) && is_array($data['formas_pagamento'])) {
+                $this->merge(['formas_pagamento' => $data['formas_pagamento']]);
+            }
+
+            if (isset($data['bairros_entrega']) && is_array($data['bairros_entrega'])) {
+                $this->merge(['bairros_entrega' => $data['bairros_entrega']]);
+            }
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -31,6 +78,8 @@ class EmpresaUpdateRequest extends FormRequest
             'email' => 'sometimes|email|max:255',
             'telefone' => 'sometimes|string|max:20',
             'cnpj' => 'sometimes|string|regex:/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/|unique:empresas,cnpj,' . $empresaId,
+            'path_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'path_banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
             'nicho_id' => 'sometimes|integer|exists:nichos_empresa,id',
             'ativo' => 'sometimes|boolean',
 
@@ -121,6 +170,14 @@ class EmpresaUpdateRequest extends FormRequest
 
             'cnpj.regex' => 'O CNPJ deve ter o formato XX.XXX.XXX/XXXX-XX.',
             'cnpj.unique' => 'Este CNPJ já está sendo usado por outra empresa.',
+
+            'path_logo.image' => 'A logo deve ser uma imagem válida.',
+            'path_logo.mimes' => 'A logo deve ser um arquivo do tipo: jpeg, png, jpg, gif.',
+            'path_logo.max' => 'A logo não pode ter mais que 2MB.',
+
+            'path_banner.image' => 'O banner deve ser uma imagem válida.',
+            'path_banner.mimes' => 'O banner deve ser um arquivo do tipo: jpeg, png, jpg, gif.',
+            'path_banner.max' => 'O banner não pode ter mais que 5MB.',
 
             'nicho_id.integer' => 'O nicho deve ser um número inteiro.',
             'nicho_id.exists' => 'O nicho selecionado não existe.',

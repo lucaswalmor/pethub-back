@@ -22,9 +22,9 @@ class EmpresaResource extends JsonResource
             'email' => $this->email,
             'telefone' => $this->telefone,
             'cnpj' => $this->cnpj,
+            'path_logo' => $this->path_logo ? asset('storage/' . $this->path_logo) : null,
+            'path_banner' => $this->path_banner ? asset('storage/' . $this->path_banner) : null,
             'ativo' => $this->ativo,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
 
             // Relacionamentos
             'nicho' => $this->whenLoaded('nicho', function () {
@@ -136,15 +136,15 @@ class EmpresaResource extends JsonResource
             'usuarios' => $this->whenLoaded('usuarios', function () {
                 return $this->usuarios->map(function ($usuario) {
                     return [
-                        'id' => $usuario->id,
-                        'nome' => $usuario->nome,
-                        'email' => $usuario->email,
-                        'ativo' => $usuario->ativo,
-                        'permissao' => [
-                            'id' => $usuario->permissao->id,
-                            'nome' => $usuario->permissao->nome,
-                            'slug' => $usuario->permissao->slug,
-                        ],
+                        'id' => $usuario->usuario->id,
+                        'nome' => $usuario->usuario->nome,
+                        'email' => $usuario->usuario->email,
+                        'ativo' => $usuario->usuario->ativo,
+                        'permissao' => $usuario->usuario->permissao ? [
+                            'id' => $usuario->usuario->permissao->id,
+                            'nome' => $usuario->usuario->permissao->nome,
+                            'slug' => $usuario->usuario->permissao->slug,
+                        ] : null,
                     ];
                 });
             }),

@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Empresa\EmpresaStoreRequest;
 use App\Http\Requests\Empresa\EmpresaUpdateRequest;
+use App\Http\Requests\Empresa\EmpresaUploadImageRequest;
 use App\Http\Resources\EmpresaResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Empresa;
 use App\Models\User;
 use App\Helpers\FormatHelper;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class EmpresaController extends Controller
@@ -19,7 +22,17 @@ class EmpresaController extends Controller
      */
     public function index()
     {
-        //
+        $usuario = Auth::user();
+
+        $empresas = $usuario->usuarioEmpresas()
+            ->with(['empresa'])
+            ->get()
+            ->pluck('empresa');
+
+        return response()->json([
+            'success' => true,
+            'empresas' => EmpresaResource::collection($empresas)
+        ]);
     }
 
     /**
@@ -31,7 +44,14 @@ class EmpresaController extends Controller
             DB::beginTransaction();
 
             // Prepara os dados da empresa
-            $dadosEmpresa = $request->all();
+            $dadosEmpresa = $request->only([
+                'razao_social',
+                'nome_fantasia',
+                'email',
+                'telefone',
+                'cnpj',
+                'nicho_id'
+            ]);
 
             // Gera o slug automaticamente baseado no nome fantasia ou razão social
             $textoParaSlug = $dadosEmpresa['nome_fantasia'] ?? $dadosEmpresa['razao_social'];
@@ -42,14 +62,18 @@ class EmpresaController extends Controller
             $empresa = Empresa::create($dadosEmpresa);
 
             // Prepara os dados do usuário administrador
-            $dadosUsuario = $dadosEmpresa['usuario_admin'];
+            $dadosUsuario = $request->input('usuario_admin');
 
             // Criptografa a senha e formata o telefone (remove caracteres especiais)
             $dadosUsuario['password'] = Hash::make($dadosUsuario['password']);
             $dadosUsuario['telefone'] = FormatHelper::formatOnlyNumbers($dadosUsuario['telefone']);
+            $dadosUsuario['is_master'] = true; // Usuário criado junto com empresa é master
 
             // Cria o usuário administrador
             $usuario = User::create($dadosUsuario);
+
+            // Associa o usuário à empresa
+            $usuario->empresas()->attach($empresa->id);
 
             DB::commit();
 
@@ -65,13 +89,84 @@ class EmpresaController extends Controller
     }
 
     /**
+     * Upload ou atualização de logo/banner da empresa
+     */
+    public function uploadImage(EmpresaUploadImageRequest $request, string $id)
+    {
+        try {
+            $empresa = Empresa::findOrFail($id);
+            $tipo = $request->query('tipo'); // 'banner' ou 'logo'
+            $dadosAtualizacao = [];
+
+            if ($tipo === 'banner' && $request->hasFile('banner')) {
+                // Remove banner anterior se existir
+                if ($empresa->path_banner) {
+                    Storage::disk('public')->delete($empresa->path_banner);
+                }
+
+                $bannerPath = $request->file('banner')->store("empresas/banners/{$id}", 'public');
+                $dadosAtualizacao['path_banner'] = $bannerPath;
+            } elseif ($tipo === 'logo' && $request->hasFile('logo')) {
+                // Remove logo anterior se existir
+                if ($empresa->path_logo) {
+                    Storage::disk('public')->delete($empresa->path_logo);
+                }
+
+                $logoPath = $request->file('logo')->store("empresas/logos/{$id}", 'public');
+                $dadosAtualizacao['path_logo'] = $logoPath;
+            } elseif (!$tipo) {
+                // Upload de ambos se nenhum tipo específico foi informado
+                if ($request->hasFile('banner')) {
+                    if ($empresa->path_banner) {
+                        Storage::disk('public')->delete($empresa->path_banner);
+                    }
+                    $dadosAtualizacao['path_banner'] = $request->file('banner')->store("empresas/banners/{$id}", 'public');
+                }
+
+                if ($request->hasFile('logo')) {
+                    if ($empresa->path_logo) {
+                        Storage::disk('public')->delete($empresa->path_logo);
+                    }
+                    $dadosAtualizacao['path_logo'] = $request->file('logo')->store("empresas/logos/{$id}", 'public');
+                }
+            }
+
+            if (!empty($dadosAtualizacao)) {
+                $empresa->update($dadosAtualizacao);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Imagem(ns) atualizada(s) com sucesso',
+                    'empresa' => new EmpresaResource($empresa)
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Nenhuma imagem foi enviada'
+            ], 400);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Empresa não encontrada'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Erro interno do servidor',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Display the specified resource.
      */
     public function show(Request $request, string $id)
     {
         try {
             // Verifica se deve retornar apenas dados básicos, enviar via query param na url
-            $basic = $request->query('basic', false);
+            $basic = filter_var($request->query('basic', false), FILTER_VALIDATE_BOOLEAN);
 
             if ($basic) {
                 // Retorna apenas informações básicas da empresa
@@ -103,14 +198,13 @@ class EmpresaController extends Controller
                 'assinatura.plano',
                 'formasPagamentos.formaPagamento',
                 'bairrosEntregas.bairro',
-                'usuarios.permissao'
+                'usuarios.usuario.permissao'
             ])->findOrFail($id);
 
             return response()->json([
                 'success' => true,
                 'empresa' => new EmpresaResource($empresa)
             ]);
-
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -137,7 +231,6 @@ class EmpresaController extends Controller
 
             // Prepara os dados para atualização
             $dadosEmpresa = $request->all();
-
             // Se foi enviado um novo nome fantasia ou razão social, gera novo slug
             if (isset($dadosEmpresa['nome_fantasia']) || isset($dadosEmpresa['razao_social'])) {
                 $textoParaSlug = $dadosEmpresa['nome_fantasia'] ?? $empresa->nome_fantasia ?? $dadosEmpresa['razao_social'] ?? $empresa->razao_social;
@@ -149,16 +242,98 @@ class EmpresaController extends Controller
                 $dadosEmpresa['telefone'] = FormatHelper::formatOnlyNumbers($dadosEmpresa['telefone']);
             }
 
-            $empresa->update($dadosEmpresa);
+            // Upload de banner se foi enviada
+            if ($request->hasFile('path_banner')) {
+                // Remove banner anterior se existir
+                if ($empresa->path_banner) {
+                    Storage::disk('public')->delete($empresa->path_banner);
+                }
+                $bannerPath = $request->file('path_banner')->store('empresas/banners', 'public');
+                $dadosEmpresa['path_banner'] = $bannerPath;
+            }
+
+            // Atualiza dados básicos da empresa
+            $dadosBasicos = collect($dadosEmpresa)->only([
+                'razao_social',
+                'nome_fantasia',
+                'slug',
+                'email',
+                'telefone',
+                'cnpj',
+                'path_logo',
+                'path_banner',
+                'nicho_id',
+                'ativo'
+            ])->toArray();
+
+            $empresa->update($dadosBasicos);
+
+            // Atualiza configurações se foram enviadas
+            if (isset($dadosEmpresa['configuracoes'])) {
+                $empresa->configuracoes()->updateOrCreate(
+                    ['empresa_id' => $id],
+                    $dadosEmpresa['configuracoes']
+                );
+            }
+
+            // Atualiza horários se foram enviados
+            if (isset($dadosEmpresa['horarios']) && is_array($dadosEmpresa['horarios'])) {
+                // Remove horários existentes
+                $empresa->horarios()->delete();
+
+                // Adiciona novos horários
+                foreach ($dadosEmpresa['horarios'] as $horario) {
+                    // Gera slug automaticamente baseado no dia da semana
+                    $horario['slug'] = FormatHelper::formatSlug($horario['dia_semana']);
+                    $empresa->horarios()->create($horario);
+                }
+            }
+
+            // Atualiza endereço se foi enviado
+            if (isset($dadosEmpresa['endereco'])) {
+                $empresa->endereco()->updateOrCreate(
+                    ['empresa_id' => $id],
+                    $dadosEmpresa['endereco']
+                );
+            }
+
+            // Atualiza formas de pagamento se foram enviadas
+            if (isset($dadosEmpresa['formas_pagamento']) && is_array($dadosEmpresa['formas_pagamento'])) {
+                // Remove formas de pagamento existentes
+                $empresa->formasPagamentos()->delete();
+
+                // Adiciona novas formas de pagamento
+                foreach ($dadosEmpresa['formas_pagamento'] as $forma) {
+                    $empresa->formasPagamentos()->create($forma);
+                }
+            }
+
+            // Atualiza bairros de entrega se foram enviados
+            if (isset($dadosEmpresa['bairros_entrega']) && is_array($dadosEmpresa['bairros_entrega'])) {
+                // Remove bairros de entrega existentes
+                $empresa->bairrosEntregas()->delete();
+
+                // Adiciona novos bairros de entrega
+                foreach ($dadosEmpresa['bairros_entrega'] as $bairro) {
+                    $empresa->bairrosEntregas()->create($bairro);
+                }
+            }
+
+            // Verifica se o cadastro está completo após a atualização
+            if (!$empresa->cadastro_completo) {
+                $this->verificarCadastroCompleto($empresa);
+            }
 
             DB::commit();
+
+            // Recarrega a empresa com relacionamentos atualizados
+            $empresa->load(['configuracoes', 'horarios', 'formasPagamentos.formaPagamento', 'endereco', 'bairrosEntregas.bairro']);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Empresa atualizada com sucesso',
-                'empresa' => $empresa
+                'empresa' => new EmpresaResource($empresa)
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -175,5 +350,43 @@ class EmpresaController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+     * Verifica se o cadastro da empresa está completo e atualiza o campo cadastro_completo
+     */
+    private function verificarCadastroCompleto(Empresa $empresa)
+    {
+        $cadastroCompleto = true;
+
+        // Verifica se existe endereço
+        if (!$empresa->endereco) {
+            $cadastroCompleto = false;
+        }
+
+        // Verifica se existe configurações
+        if (!$empresa->configuracoes) {
+            $cadastroCompleto = false;
+        }
+
+        // Verifica se existe pelo menos uma forma de pagamento
+        if ($empresa->formasPagamentos->isEmpty()) {
+            $cadastroCompleto = false;
+        }
+
+        // Verifica se existe pelo menos um horário
+        if ($empresa->horarios->isEmpty()) {
+            $cadastroCompleto = false;
+        }
+
+        // Verifica se existe pelo menos um bairro de entrega
+        if ($empresa->bairrosEntregas->isEmpty()) {
+            $cadastroCompleto = false;
+        }
+
+        // Se todas as verificações passaram, marca como cadastro completo
+        if ($cadastroCompleto) {
+            $empresa->update(['cadastro_completo' => true]);
+        }
     }
 }
