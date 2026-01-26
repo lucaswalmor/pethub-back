@@ -1,0 +1,362 @@
+{
+	"info": {
+		"_postman_id": "12345678-1234-1234-1234-123456789012",
+		"name": "PetHub API",
+		"description": "Coleção de endpoints da API PetHub para gerenciamento de empresas pet",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Autenticação",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"usuario@email.com\",\n  \"password\": \"32329585\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						},
+						"description": "Realizar login do usuário"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"logout"
+							]
+						},
+						"description": "Realizar logout do usuário autenticado"
+					},
+					"response": []
+				},
+				{
+					"name": "Informações do Usuário",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"user"
+							]
+						},
+						"description": "Obter informações do usuário autenticado"
+					},
+					"response": []
+				},
+				{
+					"name": "Teste - Login com Usuário da Empresa",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"lucaswsb52@gmail.com\",\n  \"password\": \"32329585\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						},
+						"description": "Login de teste com o usuário administrador criado junto com a empresa"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Empresas",
+			"item": [
+				{
+					"name": "Listar Empresas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/empresa",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"empresa"
+							]
+						},
+						"description": "Listar todas as empresas do usuário autenticado"
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Empresa",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"razao_social\": \"PetShop do Lucas Ltda\",\n  \"nome_fantasia\": \"PetShop do Lucas\",\n  \"email\": \"lucaswsb52@gmail.com\",\n  \"telefone\": \"(11) 99999-9999\",\n  \"cnpj\": \"12.345.678/0001-90\",\n  \"nicho_id\": 1,\n  \"ativo\": true,\n  \"endereco\": {\n    \"logradouro\": \"Rua das Flores\",\n    \"numero\": \"123\",\n    \"complemento\": \"Sala 2\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"São Paulo\",\n    \"estado\": \"SP\",\n    \"cep\": \"01234-567\",\n    \"ponto_referencia\": \"Próximo ao Shopping\",\n    \"observacoes\": \"Entrada pelos fundos\"\n  },\n  \"usuario_admin\": {\n    \"name\": \"Lucas Silva\",\n    \"email\": \"lucaswsb52@gmail.com\",\n    \"password\": \"32329585\",\n    \"password_confirmation\": \"32329585\",\n    \"permissao_id\": 1\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/empresa",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"empresa"
+							]
+						},
+						"description": "Criar uma nova empresa com usuário administrador (cadastro inicial)"
+					},
+					"response": []
+				},
+				{
+					"name": "Exibir Empresa",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/empresa/{{empresa_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"empresa",
+								"{{empresa_id}}"
+							]
+						},
+						"description": "Exibir detalhes completos de uma empresa específica com todos os relacionamentos"
+					},
+					"response": []
+				},
+				{
+					"name": "Exibir Empresa (Básica)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/empresa/{{empresa_id}}?basic=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"empresa",
+								"{{empresa_id}}"
+							],
+							"query": [
+								{
+									"key": "basic",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Exibir apenas informações básicas da empresa (sem relacionamentos)"
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar Empresa",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome_fantasia\": \"PetShop do Lucas Atualizado\",\n  \"email\": \"lucaswsb52@gmail.com\",\n  \"telefone\": \"(34) 99202-1394\",\n  \"ativo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/empresa/{{empresa_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"empresa",
+								"{{empresa_id}}"
+							]
+						},
+						"description": "Atualizar dados de uma empresa específica (todos os campos são opcionais)"
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar Apenas Configurações",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"configuracoes\": {\n    \"faz_entrega\": true,\n    \"faz_retirada\": true,\n    \"valor_entrega_padrao\": 10.50,\n    \"telefone_comercial\": \"(34) 99202-1394\",\n    \"instagram\": \"https://instagram.com/petshop\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/empresa/{{empresa_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"empresa",
+								"{{empresa_id}}"
+							]
+						},
+						"description": "Atualizar apenas as configurações da empresa (exemplo de atualização parcial)"
+					},
+					"response": []
+				},
+				{
+					"name": "Excluir Empresa",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/empresa/{{empresa_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"empresa",
+								"{{empresa_id}}"
+							]
+						},
+						"description": "Excluir uma empresa específica"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "empresa_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
