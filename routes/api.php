@@ -28,12 +28,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Rota para listar permissões
     Route::get('/permissoes', [PermissaoController::class, 'index']);
 
-    // Rota para verificar cadastro completo da empresa
-    Route::get('/empresa/{id}/verificar-cadastro', [EmpresaController::class, 'verificarCadastro']);
-
     // Rotas de usuários
     Route::controller(UsuarioController::class)->prefix('usuarios')->group(function () {
         Route::get('/', 'index')->middleware('check.permission:usuarios.listar');
+        Route::post('/criar-funcionario', 'store')->middleware('check.permission:usuarios.criar');
         Route::get('/{id}', 'show')->middleware('check.permission:usuarios.listar');
         Route::put('/{id}', 'update')->middleware('check.permission:usuarios.editar');
         Route::delete('/{id}', 'destroy')->middleware('check.permission:usuarios.deletar');
@@ -42,9 +40,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Rotas de empresas
     Route::controller(EmpresaController::class)->prefix('empresa')->group(function () {
         Route::get('/', 'index')->middleware('check.permission:empresas.listar');
+        Route::get('/{id}/verificar-cadastro', 'verificarCadastro')->middleware('check.permission:empresas.listar');
         Route::put('/{id}', 'update')->middleware('check.permission:empresas.editar');
         Route::get('/{id}', 'show')->middleware('check.permission:empresas.listar');
         Route::post('/{id}/upload-image', 'uploadImage')->middleware('check.permission:empresas.upload_imagens');
         Route::delete('/{id}', 'destroy')->middleware('check.permission:empresas.deletar');
+
     });
 });

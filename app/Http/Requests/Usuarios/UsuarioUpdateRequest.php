@@ -4,7 +4,10 @@ namespace App\Http\Requests\Usuarios;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use App\Models\User;
+use App\Helpers\VerificaEmpresa;
 
 class UsuarioUpdateRequest extends FormRequest
 {
@@ -13,7 +16,15 @@ class UsuarioUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $usuarioId = $this->route('id');
+        
+        // Se não tem ID na rota, não pode autorizar
+        if (!$usuarioId) {
+            return false;
+        }
+        
+        // Verificar se o usuário autenticado e o usuário sendo editado pertencem à mesma empresa
+        return VerificaEmpresa::verificaUsuariosMesmaEmpresa((int)$usuarioId);
     }
 
     /**
@@ -97,6 +108,24 @@ class UsuarioUpdateRequest extends FormRequest
                 }
             }
         });
+    }
+
+    /**
+     * Handle a failed authorization attempt.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     */
+    protected function failedAuthorization()
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'success' => false,
+                'error' => 'Acesso negado',
+                'message' => 'Você não tem permissão para editar este usuário.'
+            ], 403)
+        );
     }
 
     /**

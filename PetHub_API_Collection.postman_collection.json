@@ -107,7 +107,7 @@
 								"verificar-cadastro"
 							]
 						},
-						"description": "Verifica se o cadastro da empresa está completo.\n\n## ✅ Critérios para Cadastro Completo:\n- Endereço cadastrado\n- Configurações definidas\n- Pelo menos 1 forma de pagamento\n- Pelo menos 1 horário de funcionamento\n- Pelo menos 1 bairro de entrega\n\n## 📋 Resposta:\n```json\n{\n  \"success\": true,\n  \"cadastro_completo\": false,\n  \"empresa_id\": 1,\n  \"empresa_nome\": \"PetShop Exemplo\"\n}\n```\n\n## 🔑 Permissões Necessárias:\n- Qualquer usuário autenticado pode verificar (não requer permissões específicas)"
+						"description": "Verifica se o cadastro da empresa está completo.\n\n## 🔒 Validação de Isolamento:\n- Usuário autenticado deve pertencer à empresa solicitada\n- Retorna **403 Forbidden** se não houver acesso autorizado\n- Usuários podem estar em múltiplas empresas, mas só acessam dados das suas empresas\n\n## ✅ Critérios para Cadastro Completo:\n- Endereço cadastrado\n- Configurações definidas\n- Pelo menos 1 forma de pagamento\n- Pelo menos 1 horário de funcionamento\n- Pelo menos 1 bairro de entrega\n\n## 📋 Resposta de Sucesso:\n```json\n{\n  \"success\": true,\n  \"cadastro_completo\": false,\n  \"empresa_id\": 1,\n  \"empresa_nome\": \"PetShop Exemplo\"\n}\n```\n\n## ⚠️ Resposta de Erro (403):\n```json\n{\n  \"success\": false,\n  \"error\": \"Acesso negado\",\n  \"message\": \"Você não tem permissão para acessar esta empresa.\"\n}\n```\n\n## 🔑 Permissões Necessárias:\n- Qualquer usuário autenticado pode verificar (não requer permissões específicas)"
 					}
 				},
 				{
@@ -151,7 +151,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/empresa/{{empresa_id}}",
+							"raw": "{{base_url}}/api/empresa/{{empresa_id}}?basic=false",
 							"host": [
 								"{{base_url}}"
 							],
@@ -159,9 +159,16 @@
 								"api",
 								"empresa",
 								"{{empresa_id}}"
+							],
+							"query": [
+								{
+									"key": "basic",
+									"value": "false"
+								}
 							]
 						}
-					}
+					},
+					"description": "Obtém detalhes completos de uma empresa específica.\n\n## 🔒 Validação de Isolamento:\n- Usuário autenticado deve pertencer à empresa solicitada\n- Retorna **403 Forbidden** se não houver acesso autorizado\n- Usuários podem estar em múltiplas empresas, mas só acessam dados das suas empresas\n\n## 📋 Resposta de Sucesso:\n```json\n{\n  \"success\": true,\n  \"empresa\": { ... }\n}\n```\n\n## ⚠️ Resposta de Erro (403):\n```json\n{\n  \"success\": false,\n  \"error\": \"Acesso negado\",\n  \"message\": \"Você não tem permissão para acessar esta empresa.\"\n}\n```\n\n## 🔑 Permissões Necessárias:\n- `empresas.listar`\n- **OU** usuário Master (acesso total)"
 				},
 				{
 					"name": "Atualizar Empresa",
@@ -192,7 +199,7 @@
 								"{{empresa_id}}"
 							]
 						},
-						"description": "Atualizar dados da empresa apenas com JSON (sem imagens)"
+						"description": "Atualizar dados da empresa apenas com JSON (sem imagens)\n\n## 🔒 Validação de Isolamento:\n- Usuário autenticado deve pertencer à empresa solicitada\n- Retorna **403 Forbidden** se não houver acesso autorizado\n- Usuários podem estar em múltiplas empresas, mas só acessam dados das suas empresas\n\n## ⚠️ Resposta de Erro (403):\n```json\n{\n  \"success\": false,\n  \"error\": \"Acesso negado\",\n  \"message\": \"Você não tem permissão para acessar esta empresa.\"\n}\n```\n\n## 🔑 Permissões Necessárias:\n- `empresas.editar`\n- **OU** usuário Master (acesso total)"
 					}
 				},
 				{
@@ -234,7 +241,7 @@
 								"upload-image"
 							]
 						},
-						"description": "Upload de logo e/ou banner da empresa. Pode enviar apenas um dos arquivos ou ambos."
+						"description": "Upload de logo e/ou banner da empresa. Pode enviar apenas um dos arquivos ou ambos.\n\n## 🔒 Validação de Isolamento:\n- Usuário autenticado deve pertencer à empresa solicitada\n- Retorna **403 Forbidden** se não houver acesso autorizado\n- Usuários podem estar em múltiplas empresas, mas só acessam dados das suas empresas\n\n## ⚠️ Resposta de Erro (403):\n```json\n{\n  \"success\": false,\n  \"error\": \"Acesso negado\",\n  \"message\": \"Você não tem permissão para acessar esta empresa.\"\n}\n```\n\n## 🔑 Permissões Necessárias:\n- `empresas.upload_imagens`\n- **OU** usuário Master (acesso total)"
 					}
 				},
 				{
@@ -317,7 +324,7 @@
 								"usuarios"
 							]
 						},
-						"description": "Cadastra um novo usuário.\n\n## 📝 Para Cliente:\n- Deixe `empresa_id` como `null`\n- Deixe `permissoes` como `null` (será cliente padrão)\n- Inclua o campo `endereco`\n\n## 👷 Para Funcionário:\n- Defina `empresa_id` da empresa\n- Defina `permissoes` como array de IDs: `[2, 7, 9]`\n- **NÃO envie** o campo `endereco` (será usado o da empresa)\n\n## 🔑 Formato das Permissões:\n```json\n\"permissoes\": [2, 7, 9]\n```\n\n## 📋 Permissões Disponíveis:\n- `1`: sistema.acesso_total\n- `2`: usuarios.listar\n- `3`: usuarios.criar\n- `4`: usuarios.editar\n- `5`: usuarios.deletar\n- `6`: usuarios.gerenciar_permissoes\n- `7`: empresas.listar\n- `8`: empresas.criar\n- `9`: empresas.editar\n- `10`: empresas.deletar\n- `11`: empresas.gerenciar_funcionarios\n- `12`: empresas.upload_imagens\n\n## ⚠️ Importante:\n- **Funcionários NÃO devem enviar endereco**\n- Rota pública (qualquer pessoa pode se cadastrar)\n- Usuários Master têm acesso automático a tudo"
+						"description": "Cadastra um novo usuário.\n\n## 🔒 Validação de Isolamento:\n- Se `empresa_id` for fornecido, usuário autenticado deve pertencer a essa empresa\n- Retorna **403 Forbidden** se tentar criar funcionário em empresa não autorizada\n- Clientes (sem `empresa_id`) podem se cadastrar livremente (rota pública)\n\n## 📝 Para Cliente:\n- Deixe `empresa_id` como `null`\n- Deixe `permissoes` como `null` (será cliente padrão)\n- Inclua o campo `endereco`\n\n## 👷 Para Funcionário:\n- Defina `empresa_id` da empresa\n- Defina `permissoes` como array de IDs: `[2, 7, 9]`\n- **NÃO envie** o campo `endereco` (será usado o da empresa)\n- **Requer autenticação** e acesso à empresa especificada\n\n## 🔑 Formato das Permissões:\n```json\n\"permissoes\": [2, 7, 9]\n```\n\n## 📋 Permissões Disponíveis:\n- `1`: sistema.acesso_total\n- `2`: usuarios.listar\n- `3`: usuarios.criar\n- `4`: usuarios.editar\n- `5`: usuarios.deletar\n- `6`: usuarios.gerenciar_permissoes\n- `7`: empresas.listar\n- `8`: empresas.criar\n- `9`: empresas.editar\n- `10`: empresas.deletar\n- `11`: empresas.gerenciar_funcionarios\n- `12`: empresas.upload_imagens\n\n## ⚠️ Importante:\n- **Funcionários NÃO devem enviar endereco**\n- Clientes podem se cadastrar sem autenticação (rota pública)\n- Funcionários requerem autenticação e acesso à empresa\n- Usuários Master têm acesso automático a tudo\n\n## ⚠️ Resposta de Erro (403) - Funcionário:\n```json\n{\n  \"success\": false,\n  \"error\": \"Acesso negado\",\n  \"message\": \"Você não tem permissão para criar funcionários nesta empresa.\"\n}\n```"
 					}
 				},
 				{
@@ -364,7 +371,7 @@
 								"{{usuario_id}}"
 							]
 						},
-						"description": "Obtém detalhes de um usuário específico.\n\n## 🔑 Permissões Necessárias:\n- `usuarios.listar`\n- **OU** usuário Master (acesso total)"
+						"description": "Obtém detalhes de um usuário específico.\n\n## 🔒 Validação de Isolamento:\n- Usuário autenticado e usuário solicitado devem pertencer à mesma empresa\n- Retorna **403 Forbidden** se não houver empresa em comum\n- Clientes não podem ver outros clientes\n\n## ⚠️ Resposta de Erro (403):\n```json\n{\n  \"error\": \"Você não tem permissão para visualizar este usuário.\",\n  \"message\": \"O usuário não pertence à mesma empresa que você.\"\n}\n```\n\n## 🔑 Permissões Necessárias:\n- `usuarios.listar`\n- **OU** usuário Master (acesso total)"
 					}
 				},
 				{
@@ -420,7 +427,7 @@
 								"{{usuario_id}}"
 							]
 						},
-						"description": "Deleta um usuário. ⚠️ IMPORTANTE: Usuários master (criados junto com empresa) não podem ser deletados."
+						"description": "Deleta um usuário.\n\n## 🔒 Validação de Isolamento:\n- Usuário autenticado e usuário sendo deletado devem pertencer à mesma empresa\n- Retorna **403 Forbidden** se não houver empresa em comum\n\n## ⚠️ IMPORTANTE:\n- Usuários master (criados junto com empresa) não podem ser deletados\n- Retorna **403** se tentar deletar master\n\n## ⚠️ Resposta de Erro (403) - Sem acesso:\n```json\n{\n  \"error\": \"Acesso negado\",\n  \"message\": \"Você não tem permissão para deletar este usuário.\"\n}\n```\n\n## ⚠️ Resposta de Erro (403) - Master:\n```json\n{\n  \"error\": \"Não é possível deletar um usuário master.\"\n}\n```\n\n## 🔑 Permissões Necessárias:\n- `usuarios.deletar`\n- **OU** usuário Master (acesso total)"
 					}
 				}
 			]

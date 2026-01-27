@@ -3,6 +3,9 @@
 namespace App\Http\Requests\Empresa;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Helpers\VerificaEmpresa;
 
 class EmpresaUpdateRequest extends FormRequest
 {
@@ -22,7 +25,7 @@ class EmpresaUpdateRequest extends FormRequest
     protected function prepareForValidation()
     {
         // Se for FormData, precisamos converter arrays aninhados
-        if ($this->isMethod('put') && !$this->hasHeader('Content-Type', 'application/json')) {
+        if ($this->isMethod('put') && $this->header('Content-Type') !== 'application/json') {
             $data = $this->all();
 
             // Converter arrays de formulário para arrays PHP
@@ -312,6 +315,24 @@ class EmpresaUpdateRequest extends FormRequest
 
             'bairros_entrega.*.ativo.boolean' => 'O campo ativo do bairro deve ser verdadeiro ou falso.',
         ];
+    }
+
+    /**
+     * Handle a failed authorization attempt.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     */
+    protected function failedAuthorization()
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'success' => false,
+                'error' => 'Acesso negado',
+                'message' => 'Você não tem permissão para acessar esta empresa.'
+            ], 403)
+        );
     }
 
     /**

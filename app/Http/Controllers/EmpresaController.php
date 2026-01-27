@@ -17,6 +17,7 @@ use App\Http\Resources\Usuario\UsuarioResource;
 use App\Models\UsuarioEnderecos;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Helpers\VerificaEmpresa;
 
 class EmpresaController extends Controller
 {
@@ -126,6 +127,15 @@ class EmpresaController extends Controller
     public function uploadImage(EmpresaUploadImageRequest $request, string $id)
     {
         try {
+            // Verificar se o usuário autenticado tem acesso a esta empresa
+            if (!VerificaEmpresa::verificaEmpresaPertenceAoUsuario((int)$id)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Acesso negado',
+                    'message' => 'Você não tem permissão para acessar esta empresa.'
+                ], 403);
+            }
+
             $empresa = Empresa::findOrFail($id);
             $tipo = $request->query('tipo'); // 'banner' ou 'logo'
             $dadosAtualizacao = [];
@@ -197,6 +207,15 @@ class EmpresaController extends Controller
     public function show(Request $request, string $id)
     {
         try {
+            // Verificar se o usuário autenticado tem acesso a esta empresa
+            if (!VerificaEmpresa::verificaEmpresaPertenceAoUsuario((int)$id)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Acesso negado',
+                    'message' => 'Você não tem permissão para acessar esta empresa.'
+                ], 403);
+            }
+
             // Verifica se deve retornar apenas dados básicos, enviar via query param na url
             $basic = filter_var($request->query('basic', false), FILTER_VALIDATE_BOOLEAN);
 
@@ -230,7 +249,7 @@ class EmpresaController extends Controller
                 'assinatura.plano',
                 'formasPagamentos.formaPagamento',
                 'bairrosEntregas.bairro',
-                'usuarios.usuario.permissao'
+                'usuarios.usuario.permissoes'
             ])->findOrFail($id);
 
             return response()->json([
@@ -257,6 +276,15 @@ class EmpresaController extends Controller
     public function update(EmpresaUpdateRequest $request, string $id)
     {
         try {
+            // Verificar se o usuário autenticado tem acesso a esta empresa
+            if (!VerificaEmpresa::verificaEmpresaPertenceAoUsuario((int)$id)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Acesso negado',
+                    'message' => 'Você não tem permissão para acessar esta empresa.'
+                ], 403);
+            }
+
             DB::beginTransaction();
 
             $empresa = Empresa::findOrFail($id);
@@ -390,6 +418,15 @@ class EmpresaController extends Controller
     public function verificarCadastro(Request $request, string $id)
     {
         try {
+            // Verificar se o usuário autenticado tem acesso a esta empresa
+            if (!VerificaEmpresa::verificaEmpresaPertenceAoUsuario((int)$id)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Acesso negado',
+                    'message' => 'Você não tem permissão para acessar esta empresa.'
+                ], 403);
+            }
+
             $empresa = Empresa::findOrFail($id);
 
             $cadastroCompleto = true;

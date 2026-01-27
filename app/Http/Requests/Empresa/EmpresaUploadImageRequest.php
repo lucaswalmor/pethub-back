@@ -3,6 +3,9 @@
 namespace App\Http\Requests\Empresa;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Helpers\VerificaEmpresa;
 
 class EmpresaUploadImageRequest extends FormRequest
 {
@@ -11,7 +14,15 @@ class EmpresaUploadImageRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $empresaId = $this->route('id');
+        
+        // Se não tem ID na rota, não pode autorizar
+        if (!$empresaId) {
+            return false;
+        }
+        
+        // Verificar se a empresa pertence ao usuário autenticado
+        return VerificaEmpresa::verificaEmpresaPertenceAoUsuario((int)$empresaId);
     }
 
     /**
@@ -57,6 +68,24 @@ class EmpresaUploadImageRequest extends FormRequest
             'logo.mimes' => 'A logo deve ser um arquivo do tipo: jpeg, png, jpg, gif.',
             'logo.max' => 'A logo não pode ter mais que 2MB.',
         ];
+    }
+
+    /**
+     * Handle a failed authorization attempt.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     */
+    protected function failedAuthorization()
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'success' => false,
+                'error' => 'Acesso negado',
+                'message' => 'Você não tem permissão para acessar esta empresa.'
+            ], 403)
+        );
     }
 
     /**

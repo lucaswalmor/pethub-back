@@ -4,6 +4,9 @@ namespace App\Http\Requests\Usuarios;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Helpers\VerificaEmpresa;
 
 class UsuarioStoreRequest extends FormRequest
 {
@@ -12,6 +15,15 @@ class UsuarioStoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        // Verificar se há token de autenticação (bearer token)
+        $hasToken = $this->bearerToken() !== null;
+
+        if ($hasToken) {
+            // Verificar se a empresa pertence ao usuário autenticado
+            return VerificaEmpresa::verificaEmpresaPertenceAoUsuario((int)$this->empresa_id);
+        }
+
+        // Se não há token, é cliente e pode se cadastrar (rota pública)
         return true;
     }
 
@@ -23,7 +35,8 @@ class UsuarioStoreRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $hasToken = $this->bearerToken() !== null;
+        $rules = [
             // Campos principais do usuário
             'nome' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:usuarios,email',
@@ -45,6 +58,14 @@ class UsuarioStoreRequest extends FormRequest
             'endereco.ponto_referencia' => 'nullable|string|max:255',
             'endereco.observacoes' => 'nullable|string|max:500',
         ];
+
+        if ($hasToken) {
+            // Se há token, é funcionário: empresa_id e permissoes são obrigatórios
+            $rules['empresa_id'] = 'required|exists:empresas,id';
+            $rules['permissoes'] = 'required|array|min:1';
+        }
+
+        return $rules;
     }
 
     /**
@@ -121,7 +142,7 @@ class UsuarioStoreRequest extends FormRequest
     protected function prepareForValidation()
     {
         // Se for FormData, precisamos converter arrays aninhados
-        if ($this->isMethod('post') && !$this->hasHeader('Content-Type', 'application/json')) {
+        if ($this->isMethod('post') && $this->header('Content-Type') !== 'application/json') {
             $data = $this->all();
 
             // Converter arrays de formulário para arrays PHP
@@ -146,12 +167,34 @@ class UsuarioStoreRequest extends FormRequest
      */
     public function withValidator($validator)
     {
-        $validator->after(function ($validator) {
-            // Se for cliente (sem empresa_id), deve enviar endereço
-            if (!$this->input('empresa_id') && !$this->has('endereco')) {
-                $validator->errors()->add('endereco', 'Clientes devem enviar os dados de endereço.');
+        $hasToken = $this->bearerToken() !== null;
+
+        $validator->after(function ($validator) use ($hasToken) {
+            if (!$hasToken) {
+                // Se não há token (cliente), deve enviar endereço
+                if (!$this->has('endereco')) {
+                    $validator->errors()->add('endereco', 'Clientes devem enviar os dados de endereço.');
+                }
             }
         });
+    }
+
+    /**
+     * Handle a failed authorization attempt.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     */
+    protected function failedAuthorization()
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'success' => false,
+                'error' => 'Acesso negado',
+                'message' => 'Você não tem permissão para criar funcionários nesta empresa.'
+            ], 403)
+        );
     }
 
     /**

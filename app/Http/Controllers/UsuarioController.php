@@ -14,6 +14,8 @@ use App\Models\EmpresaEndereco;
 use App\Models\UsuarioEmpresas;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\VerificaEmpresa;
+use Illuminate\Support\Facades\Auth;
 
 class UsuarioController extends Controller
 {
@@ -22,11 +24,11 @@ class UsuarioController extends Controller
      */
     public function index()
     {
-        $usuarioAutenticado = auth()->user();
+        $usuarioAutenticado = Auth::user();
 
         // Todos os usuários (incluindo masters) veem apenas usuários das suas empresas
         $empresasIds = $usuarioAutenticado->empresas->pluck('id');
-        $usuarios = User::whereHas('empresas', function($query) use ($empresasIds) {
+        $usuarios = User::whereHas('empresas', function ($query) use ($empresasIds) {
             $query->whereIn('empresas.id', $empresasIds);
         })->with(['permissoes', 'enderecos', 'empresas'])->get();
 
@@ -114,7 +116,6 @@ class UsuarioController extends Controller
                 'message' => 'Usuário criado com sucesso',
                 'usuario' => new UsuarioResource($usuario)
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -175,6 +176,14 @@ class UsuarioController extends Controller
     {
         $usuario = User::findOrFail($id);
 
+        // Verificar se o usuário autenticado e o usuário sendo editado pertencem à mesma empresa
+        if (!VerificaEmpresa::verificaUsuariosMesmaEmpresa((int)$id)) {
+            return response()->json([
+                'error' => 'Acesso negado',
+                'message' => 'Você não tem permissão para editar este usuário.'
+            ], 403);
+        }
+
         // Preparar dados para atualização
         $updateData = $request->only(['nome', 'email', 'telefone', 'ativo']);
 
@@ -211,6 +220,14 @@ class UsuarioController extends Controller
         if ($usuario->isMaster()) {
             return response()->json([
                 'error' => 'Não é possível deletar um usuário master.'
+            ], 403);
+        }
+
+        // Verificar se o usuário autenticado e o usuário sendo deletado pertencem à mesma empresa
+        if (!VerificaEmpresa::verificaUsuariosMesmaEmpresa((int)$id)) {
+            return response()->json([
+                'error' => 'Acesso negado',
+                'message' => 'Você não tem permissão para deletar este usuário.'
             ], 403);
         }
 
