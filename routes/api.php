@@ -8,6 +8,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\PermissaoController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\EmpresaAvaliacaoController;
+use App\Http\Controllers\PedidoController;
 
 // Rotas de autenticação (não precisam de middleware)
 Route::post('/login', [AuthController::class, 'login']);
@@ -41,6 +42,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', 'store'); // Usuários criam avaliações (sem permissão específica)
         Route::get('/{id}', 'show')->middleware('check.permission:avaliacoes.show'); // Empresa vê avaliação específica
         Route::get('/empresa/{empresaId}', 'avaliacoesPorEmpresa'); // Público - ver avaliações da empresa
+    });
+
+    // Rotas de pedidos
+    Route::controller(PedidoController::class)->prefix('pedidos')->group(function () {
+        Route::get('/', 'index')->middleware('check.permission:pedidos.index'); // Dashboard empresa
+        Route::post('/', 'store'); // Usuários criam pedidos
+        Route::get('/{id}', 'show'); // Usuários/empresas veem pedidos específicos
+        Route::put('/{id}', 'update')->middleware('check.permission:pedidos.update'); // Empresa altera status
+        Route::delete('/{id}', 'destroy')->middleware('check.permission:pedidos.destroy'); // Empresa exclui (apenas pendentes)
+        Route::post('/validar-cupom', 'validarCupom'); // Validar cupom antes do pedido
+        Route::get('/meus-pedidos', 'meusPedidos'); // Pedidos do usuário autenticado
     });
 
     // Rotas de usuários

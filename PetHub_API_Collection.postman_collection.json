@@ -61,6 +61,260 @@
 			]
 		},
 		{
+			"name": "Pedidos",
+			"item": [
+				{
+					"name": "Listar Pedidos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/pedidos?per_page=15&order_by=created_at&order_direction=desc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pedidos"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Número de pedidos por página (padrão: 15)"
+								},
+								{
+									"key": "order_by",
+									"value": "created_at",
+									"description": "Campo para ordenação (created_at, total, etc.)"
+								},
+								{
+									"key": "order_direction",
+									"value": "desc",
+									"description": "Direção da ordenação (asc, desc)"
+								},
+								{
+									"key": "empresa_id",
+									"value": "",
+									"description": "Filtrar por empresa específica"
+								},
+								{
+									"key": "status_id",
+									"value": "",
+									"description": "Filtrar por status do pedido"
+								},
+								{
+									"key": "usuario_id",
+									"value": "",
+									"description": "Filtrar por usuário específico"
+								},
+								{
+									"key": "data_inicio",
+									"value": "",
+									"description": "Data inicial (YYYY-MM-DD)"
+								},
+								{
+									"key": "data_fim",
+									"value": "",
+									"description": "Data final (YYYY-MM-DD)"
+								}
+							]
+						},
+						"description": "Lista pedidos das empresas do usuário autenticado com paginação e filtros.\n\n## 🔒 Isolamento por Empresa:\n- Masters veem pedidos de todas as suas empresas\n- Funcionários veem apenas pedidos de sua empresa\n- Usuários comuns não têm acesso a esta rota\n\n## 📋 Parâmetros de Consulta:\n- `per_page`: Pedidos por página (padrão: 15)\n- `order_by`: Campo para ordenação\n- `order_direction`: asc/desc\n- `empresa_id`: Filtrar por empresa\n- `status_id`: Filtrar por status\n- `usuario_id`: Filtrar por usuário\n- `data_inicio/data_fim`: Filtro por período\n\n## 📄 Resposta:\n```json\n{\n  \"pedidos\": [...],\n  \"paginacao\": {\n    \"total\": 100,\n    \"per_page\": 15,\n    \"current_page\": 1,\n    \"has_more_pages\": true\n  }\n}\n```\n\n## 🔑 Permissões Necessárias:\n- `pedidos.index`"
+					}
+				},
+				{
+					"name": "Criar Pedido",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"empresa_id\": 1,\n  \"pagamento_id\": 1,\n  \"subtotal\": 89.90,\n  \"desconto\": 0.00,\n  \"frete\": 5.00,\n  \"total\": 94.90,\n  \"observacoes\": \"Entregar na portaria\",\n  \"itens\": [\n    {\n      \"produto_id\": 1,\n      \"quantidade\": 1,\n      \"preco_unitario\": 89.90,\n      \"subtotal\": 89.90,\n      \"observacoes\": \"Produto frágil\"\n    }\n  ],\n  \"endereco\": {\n    \"endereco_id\": 1,\n    \"cep\": \"38400-000\",\n    \"rua\": \"Rua das Flores\",\n    \"numero\": \"123\",\n    \"complemento\": \"Apto 45\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"Uberlândia\",\n    \"estado\": \"MG\",\n    \"ponto_referencia\": \"Próximo ao shopping\",\n    \"observacoes\": \"Casa azul\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/pedidos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pedidos"
+							]
+						},
+						"description": "Cria um novo pedido com itens, endereço e forma de pagamento.\n\n## 🔒 Validações Obrigatórias:\n- **Usuário deve estar autenticado**\n- **Empresa deve existir e estar ativa**\n- **Produtos devem pertencer à empresa**\n- **Produtos devem estar ativos e com estoque**\n- **Endereço deve pertencer ao usuário**\n- **Preços devem corresponder aos valores atuais**\n\n## 📝 Estrutura do Pedido:\n```json\n{\n  \"empresa_id\": 1,\n  \"pagamento_id\": 1,\n  \"subtotal\": 89.90,\n  \"desconto\": 0.00,\n  \"frete\": 5.00,\n  \"total\": 94.90,\n  \"observacoes\": \"Texto opcional\",\n  \"itens\": [\n    {\n      \"produto_id\": 1,\n      \"quantidade\": 1,\n      \"preco_unitario\": 89.90,\n      \"subtotal\": 89.90,\n      \"observacoes\": \"Opcional\"\n    }\n  ],\n  \"endereco\": {\n    \"endereco_id\": 1,\n    \"cep\": \"38400-000\",\n    \"rua\": \"Rua A\",\n    \"numero\": \"123\",\n    \"complemento\": \"Apto 1\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"Cidade\",\n    \"estado\": \"MG\",\n    \"ponto_referencia\": \"Próximo ao mercado\",\n    \"observacoes\": \"Casa azul\"\n  }\n}\n```\n\n## ⚠️ Regras de Negócio:\n- **Status inicial**: `pendente`\n- **Histórico criado automaticamente**\n- **Endereço duplicado** na tabela pedido_endereco\n- **Itens criados** na tabela pedido_items\n\n## 📄 Resposta de Sucesso:\n```json\n{\n  \"success\": true,\n  \"message\": \"Pedido criado com sucesso\",\n  \"pedido\": {\n    \"id\": 1,\n    \"codigo\": \"PED-000001\",\n    \"total\": 94.90,\n    \"status_pedido\": {\n      \"nome\": \"Pendente\",\n      \"slug\": \"pendente\"\n    },\n    \"itens\": [...],\n    \"endereco\": {...}\n  }\n}\n```\n\n## 🔑 Permissões Necessárias:\n- Qualquer usuário autenticado pode criar pedidos"
+					}
+				},
+				{
+					"name": "Ver Pedido",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/pedidos/{{pedido_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pedidos",
+								"{{pedido_id}}"
+							]
+						},
+						"description": "Obtém detalhes completos de um pedido específico.\n\n## 🔒 Validações de Acesso:\n- **Criador do pedido** pode visualizar\n- **Funcionários da empresa** podem visualizar\n- **Masters** podem visualizar todos os pedidos\n\n## 📋 Dados Incluídos:\n- Informações básicas do pedido\n- Itens com produtos relacionados\n- Endereço de entrega\n- Histórico de status\n- Avaliação (se existir)\n- Dados do usuário e empresa\n\n## 📄 Resposta Estruturada:\n```json\n{\n  \"success\": true,\n  \"pedido\": {\n    \"id\": 1,\n    \"codigo\": \"PED-000001\",\n    \"total\": 94.90,\n    \"usuario\": {...},\n    \"empresa\": {...},\n    \"status_pedido\": {...},\n    \"itens\": [...],\n    \"endereco\": {...},\n    \"historico_status\": [...],\n    \"avaliacao\": {...}\n  }\n}\n```\n\n## 🔑 Permissões Necessárias:\n- Usuário criador OU empresa do pedido"
+					}
+				},
+				{
+					"name": "Atualizar Pedido",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status_pedido_id\": 2,\n  \"observacoes\": \"Pedido em preparação\",\n  \"status_observacoes\": \"Cliente confirmou o pedido\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/pedidos/{{pedido_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pedidos",
+								"{{pedido_id}}"
+							]
+						},
+						"description": "Atualiza status e observações do pedido (apenas empresas).\n\n## 🔒 Validações:\n- **Apenas funcionários da empresa** podem alterar\n- **Apenas campos permitidos**: status, observações\n- **Histórico criado automaticamente** ao alterar status\n\n## 📝 Campos Atualizáveis:\n- `status_pedido_id`: Novo status do pedido\n- `observacoes`: Observações gerais\n- `status_observacoes`: Observações específicas do status\n\n## ⚠️ Restrições:\n- **Usuários comuns não podem alterar pedidos**\n- **Apenas empresa do pedido pode alterar**\n- **Itens não podem ser alterados**\n- **Endereço não pode ser alterado**\n\n## 📋 Status Disponíveis:\n- `1`: Pendente\n- `2`: Confirmado\n- `3`: Em Preparação\n- `4`: Em Entrega\n- `5`: Entregue\n- `6`: Cancelado\n\n## 🔑 Permissões Necessárias:\n- `pedidos.update`\n- Empresa do pedido"
+					}
+				},
+				{
+					"name": "Excluir Pedido",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/pedidos/{{pedido_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pedidos",
+								"{{pedido_id}}"
+							]
+						},
+						"description": "Exclui um pedido (apenas empresas, apenas pedidos pendentes).\n\n## 🔒 Validações:\n- **Apenas funcionários da empresa** podem excluir\n- **Apenas pedidos com status PENDENTE**\n- **Soft delete** preservando dados\n\n## ⚠️ Restrições:\n- **Pedidos confirmados não podem ser excluídos**\n- **Dados preservados** para auditoria\n- **Usuários comuns não podem excluir**\n\n## 🔑 Permissões Necessárias:\n- `pedidos.destroy`\n- Empresa do pedido"
+					}
+				},
+				{
+					"name": "Validar Cupom",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cupom_codigo\": \"DESCONTO10\",\n  \"empresa_id\": 1,\n  \"valor_compra\": 89.90\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/pedidos/validar-cupom",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pedidos",
+								"validar-cupom"
+							]
+						},
+						"description": "Valida cupom antes de criar pedido, retornando desconto aplicável.\n\n## 🎯 Finalidade:\n- **Verificar validade do cupom** antes do checkout\n- **Calcular desconto** aplicável\n- **Validar regras de negócio**\n\n## 📝 Parâmetros:\n- `cupom_codigo`: Código do cupom\n- `empresa_id`: Empresa do pedido\n- `valor_compra`: Valor total da compra\n\n## 🔍 Validações Realizadas:\n1. **Cupom existe** (empresa ou sistema)\n2. **Cupom ativo** e dentro da validade\n3. **Usuário tem direito** ao cupom\n4. **Valor mínimo** atendido (se aplicável)\n5. **Limite de uso** não excedido\n\n## 📄 Resposta de Sucesso:\n```json\n{\n  \"success\": true,\n  \"cupom\": {\n    \"id\": 1,\n    \"codigo\": \"DESCONTO10\",\n    \"tipo\": \"percentual\",\n    \"valor\": 10.00,\n    \"tipo_cupom\": \"empresa\"\n  },\n  \"desconto\": {\n    \"valor\": 8.99,\n    \"valor_formatado\": \"R$ 8,99\"\n  },\n  \"total_com_desconto\": 80.91,\n  \"total_formatado\": \"R$ 80,91\"\n}\n```\n\n## ⚠️ Respostas de Erro:\n- **Cupom inválido/expirado**\n- **Cupom não disponível** para o usuário\n- **Valor insuficiente** para o cupom\n- **Cupom já utilizado**\n\n## 🔑 Permissões Necessárias:\n- Qualquer usuário autenticado pode validar cupons"
+					}
+				},
+				{
+					"name": "Meus Pedidos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/pedidos/meus-pedidos?per_page=10&empresa_id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"pedidos",
+								"meus-pedidos"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "10",
+									"description": "Número de pedidos por página"
+								},
+								{
+									"key": "empresa_id",
+									"value": "1",
+									"description": "Filtrar por empresa específica"
+								},
+								{
+									"key": "status_id",
+									"value": "",
+									"description": "Filtrar por status do pedido"
+								}
+							]
+						},
+						"description": "Lista pedidos do usuário autenticado com paginação.\n\n## 👤 Funcionalidade:\n- **Pedidos pessoais** do usuário logado\n- **Histórico completo** de compras\n- **Status atual** de cada pedido\n- **Filtros por empresa/status**\n\n## 📋 Filtros Disponíveis:\n- `empresa_id`: Filtrar por empresa\n- `status_id`: Filtrar por status\n- `per_page`: Pedidos por página\n\n## 📄 Resposta:\n```json\n{\n  \"success\": true,\n  \"pedidos\": [...],\n  \"paginacao\": {\n    \"total\": 25,\n    \"per_page\": 10,\n    \"current_page\": 1,\n    \"has_more_pages\": true\n  }\n}\n```\n\n## 🔑 Permissões Necessárias:\n- Qualquer usuário autenticado"
+					}
+				}
+			]
+		},
+		{
 			"name": "Avaliações",
 			"item": [
 				{
@@ -1036,6 +1290,11 @@
 		},
 		{
 			"key": "avaliacao_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "pedido_id",
 			"value": "",
 			"type": "string"
 		}
