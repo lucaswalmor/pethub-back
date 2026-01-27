@@ -22,18 +22,59 @@ class UsuarioController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $usuarioAutenticado = Auth::user();
 
         // Todos os usuários (incluindo masters) veem apenas usuários das suas empresas
         $empresasIds = $usuarioAutenticado->empresas->pluck('id');
-        $usuarios = User::whereHas('empresas', function ($query) use ($empresasIds) {
+
+        $query = User::whereHas('empresas', function ($query) use ($empresasIds) {
             $query->whereIn('empresas.id', $empresasIds);
-        })->with(['permissoes', 'enderecos', 'empresas'])->get();
+        })->with(['permissoes', 'enderecos', 'empresas']);
+
+        // Filtros opcionais
+        if ($request->has('empresa_id') && $request->empresa_id) {
+            $query->whereHas('empresas', function ($q) use ($request) {
+                $q->where('empresas.id', $request->empresa_id);
+            });
+        }
+
+        if ($request->has('ativo') && $request->ativo !== null) {
+            $query->where('ativo', $request->boolean('ativo'));
+        }
+
+        if ($request->has('is_master') && $request->is_master !== null) {
+            $query->where('is_master', $request->boolean('is_master'));
+        }
+
+        if ($request->has('nome') && $request->nome) {
+            $query->where('nome', 'like', '%' . $request->nome . '%');
+        }
+
+        if ($request->has('email') && $request->email) {
+            $query->where('email', 'like', '%' . $request->email . '%');
+        }
+
+        // Ordenação
+        $orderBy = $request->get('order_by', 'created_at');
+        $orderDirection = $request->get('order_direction', 'desc');
+        $query->orderBy($orderBy, $orderDirection);
+
+        // Paginação
+        $perPage = $request->get('per_page', 15);
+        $usuarios = $query->paginate($perPage);
 
         return response()->json([
-            'usuarios' => UsuarioResource::collection($usuarios)
+            'usuarios' => UsuarioResource::collection($usuarios),
+            'meta' => [
+                'total' => $usuarios->total(),
+                'per_page' => $usuarios->perPage(),
+                'current_page' => $usuarios->currentPage(),
+                'last_page' => $usuarios->lastPage(),
+                'from' => $usuarios->firstItem(),
+                'to' => $usuarios->lastItem(),
+            ]
         ]);
     }
 

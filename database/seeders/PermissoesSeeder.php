@@ -20,19 +20,28 @@ class PermissoesSeeder extends Seeder
             ['nome' => 'Acesso Total', 'slug' => 'sistema.acesso_total'],
 
             // Usuários
-            ['nome' => 'Listar Usuários', 'slug' => 'usuarios.listar'],
-            ['nome' => 'Criar Usuários', 'slug' => 'usuarios.criar'],
-            ['nome' => 'Editar Usuários', 'slug' => 'usuarios.editar'],
-            ['nome' => 'Deletar Usuários', 'slug' => 'usuarios.deletar'],
-            ['nome' => 'Gerenciar Permissões', 'slug' => 'usuarios.gerenciar_permissoes'],
+            ['nome' => 'Listar Usuários', 'slug' => 'usuarios.index'],
+            ['nome' => 'Criar Usuários', 'slug' => 'usuarios.store'],
+            ['nome' => 'Visualizar Usuário', 'slug' => 'usuarios.show'],
+            ['nome' => 'Editar Usuários', 'slug' => 'usuarios.update'],
+            ['nome' => 'Deletar Usuários', 'slug' => 'usuarios.destroy'],
 
             // Empresas
-            ['nome' => 'Listar Empresas', 'slug' => 'empresas.listar'],
-            ['nome' => 'Criar Empresas', 'slug' => 'empresas.criar'],
-            ['nome' => 'Editar Empresas', 'slug' => 'empresas.editar'],
-            ['nome' => 'Deletar Empresas', 'slug' => 'empresas.deletar'],
-            ['nome' => 'Gerenciar Funcionários', 'slug' => 'empresas.gerenciar_funcionarios'],
-            ['nome' => 'Upload de Imagens', 'slug' => 'empresas.upload_imagens'],
+            ['nome' => 'Listar Empresas', 'slug' => 'empresas.index'],
+            ['nome' => 'Criar Empresas', 'slug' => 'empresas.store'],
+            ['nome' => 'Visualizar Empresa', 'slug' => 'empresas.show'],
+            ['nome' => 'Editar Empresas', 'slug' => 'empresas.update'],
+            ['nome' => 'Deletar Empresas', 'slug' => 'empresas.destroy'],
+            ['nome' => 'Verificar Cadastro', 'slug' => 'empresas.verificar_cadastro'],
+            ['nome' => 'Upload de Imagem', 'slug' => 'empresas.upload_image'],
+
+            // Produtos
+            ['nome' => 'Listar Produtos', 'slug' => 'produtos.index'],
+            ['nome' => 'Criar Produtos', 'slug' => 'produtos.store'],
+            ['nome' => 'Visualizar Produto', 'slug' => 'produtos.show'],
+            ['nome' => 'Editar Produtos', 'slug' => 'produtos.update'],
+            ['nome' => 'Deletar Produtos', 'slug' => 'produtos.destroy'],
+            ['nome' => 'Upload Imagem Produto', 'slug' => 'produtos.upload_image'],
         ];
 
         foreach ($permissoes as $permissao) {

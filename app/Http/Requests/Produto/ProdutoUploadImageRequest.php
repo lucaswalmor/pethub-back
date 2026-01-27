@@ -1,28 +1,36 @@
 <?php
 
-namespace App\Http\Requests\Empresa;
+namespace App\Http\Requests\Produto;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use App\Helpers\VerificaEmpresa;
+use App\Models\Produto;
 
-class EmpresaUploadImageRequest extends FormRequest
+class ProdutoUploadImageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        $empresaId = $this->route('id');
-        
+        $produtoId = $this->route('id');
+
         // Se não tem ID na rota, não pode autorizar
-        if (!$empresaId) {
+        if (!$produtoId) {
             return false;
         }
-        
-        // Verificar se a empresa pertence ao usuário autenticado
-        return VerificaEmpresa::verificaEmpresaPertenceAoUsuario((int)$empresaId);
+
+        // Buscar o produto para verificar a empresa
+        $produto = Produto::find($produtoId);
+
+        if (!$produto) {
+            return false;
+        }
+
+        // Verificar se o usuário tem acesso à empresa do produto
+        return VerificaEmpresa::verificaEmpresaPertenceAoUsuario($produto->empresa_id);
     }
 
     /**
@@ -32,21 +40,8 @@ class EmpresaUploadImageRequest extends FormRequest
      */
     public function rules(): array
     {
-        $tipo = $this->query('tipo');
-
-        if ($tipo === 'banner') {
-            return [
-                'banner' => 'required|image|mimes:jpeg,png,jpg,gif|max:15360',
-            ];
-        } elseif ($tipo === 'logo') {
-            return [
-                'logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:15360',
-            ];
-        }
-
         return [
-            'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:15360',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:15360',
+            'imagem' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:15360',
         ];
     }
 
@@ -58,15 +53,10 @@ class EmpresaUploadImageRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'banner.required' => 'O banner é obrigatório.',
-            'banner.image' => 'O banner deve ser uma imagem válida.',
-            'banner.mimes' => 'O banner deve ser um arquivo do tipo: jpeg, png, jpg, gif.',
-            'banner.max' => 'O banner não pode ter mais que 15MB.',
-
-            'logo.required' => 'A logo é obrigatória.',
-            'logo.image' => 'A logo deve ser uma imagem válida.',
-            'logo.mimes' => 'A logo deve ser um arquivo do tipo: jpeg, png, jpg, gif.',
-            'logo.max' => 'A logo não pode ter mais que 15MB.',
+            'imagem.required' => 'A imagem é obrigatória.',
+            'imagem.image' => 'O arquivo deve ser uma imagem válida.',
+            'imagem.mimes' => 'A imagem deve ser um arquivo do tipo: jpeg, png, jpg, gif, webp.',
+            'imagem.max' => 'A imagem não pode ter mais que 15MB.',
         ];
     }
 
@@ -83,7 +73,7 @@ class EmpresaUploadImageRequest extends FormRequest
             response()->json([
                 'success' => false,
                 'error' => 'Acesso negado',
-                'message' => 'Você não tem permissão para acessar esta empresa.'
+                'message' => 'Você não tem permissão para acessar este produto.'
             ], 403)
         );
     }

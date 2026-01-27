@@ -24,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // #endregion
             // Sempre retornar JSON para rotas API (mesmo que expectsJson seja false)
             if (str_starts_with($request->path(), 'api')) {
-                return response()->json(['error' => 'Não autenticado', 'message' => 'Token de autenticação inválido ou ausente'], 401);
+                return response()->json(['error' => 'Não autenticado', 'message' => 'Usuário não autenticado!'], 401);
             }
         });
         
@@ -35,7 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if (str_starts_with($request->path(), 'api')) {
                 // Se a mensagem contém "Route [login]", é uma tentativa de redirecionamento de autenticação
                 if (str_contains($e->getMessage(), 'Route [login]')) {
-                    return response()->json(['error' => 'Não autenticado', 'message' => 'Token de autenticação inválido ou ausente'], 401);
+                    return response()->json(['error' => 'Não autenticado', 'message' => 'Usuário não autenticado!'], 401);
                 }
                 return response()->json(['error' => 'Rota não encontrada', 'message' => $e->getMessage()], 404);
             }

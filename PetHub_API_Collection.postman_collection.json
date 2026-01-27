@@ -61,6 +61,73 @@
 			]
 		},
 		{
+			"name": "Público",
+			"item": [
+				{
+					"name": "Listar Produtos por Empresa",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/produtos/empresa/{{empresa_slug}}?per_page=20&order_by=nome&order_direction=asc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"produtos",
+								"empresa",
+								"{{empresa_slug}}"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "20",
+									"description": "Número de produtos por página (padrão: 20, otimizado para infinite scroll)"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Página atual (para paginação)"
+								},
+								{
+									"key": "order_by",
+									"value": "nome",
+									"description": "Campo para ordenação (nome, preco, created_at)"
+								},
+								{
+									"key": "order_direction",
+									"value": "asc",
+									"description": "Direção da ordenação (asc, desc)"
+								},
+								{
+									"key": "categoria_id",
+									"value": "",
+									"description": "Filtrar por categoria específica"
+								},
+								{
+									"key": "tipo",
+									"value": "",
+									"description": "Filtrar por tipo (produto, servico)"
+								},
+								{
+									"key": "destaque",
+									"value": "",
+									"description": "Mostrar apenas produtos em destaque (true)"
+								},
+								{
+									"key": "q",
+									"value": "",
+									"description": "Buscar por nome ou descrição do produto"
+								}
+							]
+						},
+						"description": "Lista produtos públicos de uma empresa específica para clientes finais.\n\n## 🌐 Endpoint Público:\n- **Não requer autenticação**\n- Acessível para qualquer usuário (clientes, visitantes)\n- Otimizado para infinite scroll no frontend\n\n## 📋 Funcionalidades:\n- Lista apenas produtos ativos da empresa\n- Empresa deve estar ativa e com cadastro completo\n- Filtros avançados para busca e navegação\n- Paginação otimizada (20 produtos por página)\n- Ordenação flexível (nome, preço, data)\n\n## 🔍 Filtros Disponíveis:\n- `categoria_id`: Filtrar por categoria específica\n- `tipo`: produto/servico\n- `destaque`: Apenas produtos em destaque\n- `q`: Busca textual (nome/descrição)\n- `order_by`: nome/preco/created_at\n- `order_direction`: asc/desc\n\n## 📄 Resposta Estruturada:\n```json\n{\n  \"success\": true,\n  \"empresa\": {\n    \"id\": 1,\n    \"nome_fantasia\": \"PetShop Exemplo\",\n    \"slug\": \"petshop-exemplo\"\n  },\n  \"produtos\": [...],\n  \"meta\": {\n    \"total\": 100,\n    \"per_page\": 20,\n    \"current_page\": 1,\n    \"has_more_pages\": true\n  },\n  \"filtros_aplicados\": {...}\n}\n```\n\n## ⚠️ Validações:\n- Empresa deve existir e estar ativa\n- Cadastro da empresa deve estar completo\n- Apenas produtos ativos são retornados\n- Retorna **404** se empresa não encontrada\n\n## 🔗 Uso no Frontend:\n- Perfeito para páginas de catálogo de produtos\n- Infinite scroll com carregamento progressivo\n- Filtros em tempo real\n- URLs amigáveis com slug da empresa\n\n## 📊 Performance:\n- Consultas otimizadas com eager loading\n- Índices recomendados em `empresa_id`, `ativo`, `categoria_id`\n- Cache opcional para empresas populares"
+					}
+				}
+			]
+		},
+		{
 			"name": "Empresas",
 			"item": [
 				{
@@ -219,13 +286,13 @@
 									"key": "banner",
 									"type": "file",
 									"src": [],
-									"description": "Arquivo do banner (máx. 5MB)"
+									"description": "Arquivo do banner (máx. 15MB)"
 								},
 								{
 									"key": "logo",
 									"type": "file",
 									"src": [],
-									"description": "Arquivo da logo (máx. 2MB)"
+									"description": "Arquivo da logo (máx. 15MB)"
 								}
 							]
 						},
@@ -338,16 +405,58 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/usuarios",
+							"raw": "{{base_url}}/api/usuarios?per_page=15&order_by=created_at&order_direction=desc",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"usuarios"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Número de usuários por página (padrão: 15)"
+								},
+								{
+									"key": "order_by",
+									"value": "created_at",
+									"description": "Campo para ordenação (created_at, nome, email, etc.)"
+								},
+								{
+									"key": "order_direction",
+									"value": "desc",
+									"description": "Direção da ordenação (asc, desc)"
+								},
+								{
+									"key": "empresa_id",
+									"value": "",
+									"description": "Filtrar por empresa específica"
+								},
+								{
+									"key": "ativo",
+									"value": "",
+									"description": "Filtrar por status ativo (true, false)"
+								},
+								{
+									"key": "is_master",
+									"value": "",
+									"description": "Filtrar por tipo master (true, false)"
+								},
+								{
+									"key": "nome",
+									"value": "",
+									"description": "Buscar por nome (parcial)"
+								},
+								{
+									"key": "email",
+									"value": "",
+									"description": "Buscar por email (parcial)"
+								}
 							]
 						},
-						"description": "Lista todos os usuários do sistema.\n\n## 🔑 Permissões Necessárias:\n- `usuarios.listar`\n- **OU** usuário Master (acesso total)"
+						"description": "Lista usuários das empresas do usuário autenticado com paginação e filtros.\n\n## 🔒 Isolamento por Empresa:\n- Mostra apenas usuários das empresas que o usuário tem acesso\n- Masters veem usuários de todas as suas empresas\n- Funcionários veem apenas colegas da mesma empresa\n\n## 📋 Parâmetros de Consulta:\n- `per_page`: Usuários por página (padrão: 15)\n- `order_by`: Campo para ordenação\n- `order_direction`: asc/desc\n- `empresa_id`: Filtrar por empresa\n- `ativo`: true/false\n- `is_master`: true/false (apenas masters)\n- `nome`: Busca parcial por nome\n- `email`: Busca parcial por email\n\n## 🔑 Permissões Necessárias:\n- `usuarios.listar`\n- **OU** usuário Master (acesso total)"
 					}
 				},
 				{
@@ -431,6 +540,315 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "Produtos",
+			"item": [
+				{
+					"name": "Listar Produtos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/produtos?per_page=15&order_by=created_at&order_direction=desc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"produtos"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Número de produtos por página (padrão: 15)"
+								},
+								{
+									"key": "order_by",
+									"value": "created_at",
+									"description": "Campo para ordenação (created_at, nome, preco, etc.)"
+								},
+								{
+									"key": "order_direction",
+									"value": "desc",
+									"description": "Direção da ordenação (asc, desc)"
+								},
+								{
+									"key": "empresa_id",
+									"value": "",
+									"description": "Filtrar por empresa específica"
+								},
+								{
+									"key": "categoria_id",
+									"value": "",
+									"description": "Filtrar por categoria"
+								},
+								{
+									"key": "tipo",
+									"value": "",
+									"description": "Filtrar por tipo (produto, servico)"
+								},
+								{
+									"key": "ativo",
+									"value": "",
+									"description": "Filtrar por status ativo (true, false)"
+								},
+								{
+									"key": "destaque",
+									"value": "",
+									"description": "Filtrar por produtos em destaque (true, false)"
+								}
+							]
+						},
+						"description": "Lista produtos das empresas do usuário autenticado com paginação e filtros.\n\n## 🔒 Isolamento por Empresa:\n- Mostra apenas produtos das empresas que o usuário tem acesso\n- Masters veem produtos de todas as suas empresas\n- Funcionários veem apenas produtos da sua empresa\n\n## 📋 Parâmetros de Consulta:\n- `per_page`: Produtos por página (padrão: 15)\n- `order_by`: Campo para ordenação\n- `order_direction`: asc/desc\n- `empresa_id`: Filtrar por empresa\n- `categoria_id`: Filtrar por categoria\n- `tipo`: produto/servico\n- `ativo`: true/false\n- `destaque`: true/false\n\n## 🔑 Permissões Necessárias:\n- `produtos.index`"
+					}
+				},
+				{
+					"name": "Criar Produto",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"empresa_id\": 1,\n  \"categoria_id\": 1,\n  \"unidade_medida_id\": 1,\n  \"tipo\": \"produto\",\n  \"nome\": \"Ração Premium para Cães\",\n  \"imagem\": \"produtos/racao-premium.jpg\",\n  \"slug\": \"racao-premium-para-caes\",\n  \"descricao\": \"Ração premium de alta qualidade para cães adultos\",\n  \"preco\": 89.90,\n  \"estoque\": 50.0,\n  \"destaque\": false,\n  \"ativo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/produtos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"produtos"
+							]
+						},
+						"description": "Cria um novo produto.\n\n## 🔒 Validação de Isolamento:\n- Usuário deve ter acesso à empresa especificada\n- Retorna **403 Forbidden** se não houver permissão\n\n## 📝 Campos Obrigatórios:\n- `empresa_id`: ID da empresa\n- `categoria_id`: ID da categoria\n- `unidade_medida_id`: ID da unidade de medida\n- `tipo`: \"produto\" ou \"servico\"\n- `nome`: Nome do produto\n- `preco`: Preço em reais\n\n## 📝 Campos Opcionais:\n- `imagem`: Caminho da imagem\n- `slug`: Slug único (gerado automaticamente se não informado)\n- `descricao`: Descrição do produto\n- `estoque`: Quantidade em estoque (padrão: 0)\n- `destaque`: Produto em destaque (padrão: false)\n- `ativo`: Produto ativo (padrão: true)\n\n## ⚠️ Regras de Negócio:\n- Nome deve ser único por empresa\n- Slug gerado automaticamente se não fornecido\n- Preço deve ser positivo\n- Estoque não pode ser negativo\n\n## 🔑 Permissões Necessárias:\n- `produtos.store`"
+					}
+				},
+				{
+					"name": "Exibir Produto",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/produtos/{{produto_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"produtos",
+								"{{produto_id}}"
+							]
+						},
+						"description": "Obtém detalhes de um produto específico.\n\n## 🔒 Validação de Isolamento:\n- Produto deve pertencer a uma empresa que o usuário tem acesso\n- Retorna **403 Forbidden** se não houver permissão\n\n## 📋 Dados Incluídos:\n- Informações completas do produto\n- Dados da empresa, categoria e unidade de medida\n- Campos calculados (preço formatado, etc.)\n\n## 🔑 Permissões Necessárias:\n- `produtos.show`"
+					}
+				},
+				{
+					"name": "Atualizar Produto",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"Ração Premium para Cães - Atualizado\",\n  \"preco\": 95.90,\n  \"estoque\": 45.0,\n  \"destaque\": true,\n  \"ativo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/produtos/{{produto_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"produtos",
+								"{{produto_id}}"
+							]
+						},
+						"description": "Atualiza dados de um produto. Todos os campos são opcionais.\n\n## 🔒 Validação de Isolamento:\n- Produto deve pertencer a uma empresa que o usuário tem acesso\n- Retorna **403 Forbidden** se não houver permissão\n\n## 📝 Campos Atualizáveis:\n- `categoria_id`: ID da categoria\n- `unidade_medida_id`: ID da unidade de medida\n- `tipo`: \"produto\" ou \"servico\"\n- `nome`: Nome do produto\n- `imagem`: Caminho da imagem\n- `slug`: Slug único\n- `descricao`: Descrição do produto\n- `preco`: Preço em reais\n- `estoque`: Quantidade em estoque\n- `destaque`: Produto em destaque\n- `ativo`: Produto ativo\n\n## ⚠️ Regras de Validação:\n- Nome deve ser único por empresa (exceto o próprio produto)\n- Slug deve ser único globalmente\n- Preço deve ser positivo\n- Estoque não pode ser negativo\n\n## 🔑 Permissões Necessárias:\n- `produtos.update`"
+					}
+				},
+				{
+					"name": "Deletar Produto",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/produtos/{{produto_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"produtos",
+								"{{produto_id}}"
+							]
+						},
+						"description": "Remove um produto do sistema (soft delete).\n\n## 🔒 Validação de Isolamento:\n- Produto deve pertencer a uma empresa que o usuário tem acesso\n- Retorna **403 Forbidden** se não houver permissão\n\n## ⚠️ Restrições:\n- Produto não pode ser deletado se estiver sendo usado em pedidos\n- Retorna **400 Bad Request** se houver pedidos associados\n\n## 🔑 Permissões Necessárias:\n- `produtos.destroy`"
+					}
+				},
+				{
+					"name": "Toggle Destaque",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/produtos/{{produto_id}}/toggle-destaque",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"produtos",
+								"{{produto_id}}",
+								"toggle-destaque"
+							]
+						},
+						"description": "Alterna o status de destaque do produto.\n\n## 🔒 Validação de Isolamento:\n- Produto deve pertencer a uma empresa que o usuário tem acesso\n\n## 📋 Funcionamento:\n- Se produto estiver em destaque: remove destaque\n- Se produto não estiver em destaque: adiciona destaque\n\n## 🔑 Permissões Necessárias:\n- `produtos.update`"
+					}
+				},
+				{
+					"name": "Toggle Ativo",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/produtos/{{produto_id}}/toggle-ativo",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"produtos",
+								"{{produto_id}}",
+								"toggle-ativo"
+							]
+						},
+						"description": "Alterna o status ativo do produto.\n\n## 🔒 Validação de Isolamento:\n- Produto deve pertencer a uma empresa que o usuário tem acesso\n\n## 📋 Funcionamento:\n- Se produto estiver ativo: desativa\n- Se produto estiver inativo: ativa\n\n## 🔑 Permissões Necessárias:\n- `produtos.update`"
+					}
+				},
+				{
+					"name": "Buscar Produtos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/produtos/search/buscar?q=racao&categoria_id=1&tipo=produto",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"produtos",
+								"search",
+								"buscar"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "racao",
+									"description": "Termo de busca (nome ou descrição)"
+								},
+								{
+									"key": "categoria_id",
+									"value": "1",
+									"description": "Filtrar por categoria específica"
+								},
+								{
+									"key": "tipo",
+									"value": "produto",
+									"description": "Filtrar por tipo (produto, servico)"
+								}
+							]
+						},
+						"description": "Busca produtos por nome, descrição ou categoria.\n\n## 🔒 Isolamento por Empresa:\n- Mostra apenas produtos das empresas que o usuário tem acesso\n- Busca limitada ao escopo das empresas do usuário\n\n## 📋 Parâmetros de Busca:\n- `q`: Termo de busca (nome ou descrição)\n- `categoria_id`: Filtrar por categoria\n- `tipo`: produto/servico\n\n## 📋 Resultados:\n- Retorna apenas produtos ativos\n- Ordenados por nome\n- Inclui dados completos dos produtos\n\n## 🔑 Permissões Necessárias:\n- `produtos.index`"
+					}
+				},
+				{
+					"name": "Upload Imagem Produto",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "imagem",
+									"type": "file",
+									"src": [],
+									"description": "Arquivo da imagem (máx. 15MB)"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/produtos/{{produto_id}}/upload-image",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"produtos",
+								"{{produto_id}}",
+								"upload-image"
+							]
+						},
+						"description": "Upload ou atualização de imagem do produto.\n\n## 🔒 Validação de Isolamento:\n- Produto deve pertencer a uma empresa que o usuário tem acesso\n- Retorna **403 Forbidden** se não houver permissão\n\n## 📋 Funcionamento:\n- Remove imagem anterior automaticamente se existir\n- Salva nova imagem no diretório `produtos/imagens/{empresa_id}`\n- Suporta formatos: JPEG, PNG, JPG, GIF, WebP\n- Tamanho máximo: 15MB\n\n## 📋 Formato da Imagem:\n- **Tipos aceitos**: jpeg, png, jpg, gif, webp\n- **Tamanho máximo**: 15MB\n- **Armazenamento**: Disco público do Laravel\n\n## ⚠️ Comportamento:\n- Se não enviar imagem: retorna erro 400\n- Se produto não existir: retorna erro 404\n- Imagem anterior é automaticamente removida\n\n## 🔑 Permissões Necessárias:\n- `produtos.upload_image`"
+					}
+				}
+			]
 		}
 	],
 	"variable": [
@@ -451,6 +869,16 @@
 		},
 		{
 			"key": "usuario_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "produto_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "empresa_slug",
 			"value": "",
 			"type": "string"
 		}
