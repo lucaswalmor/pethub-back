@@ -29,20 +29,21 @@ class UsuarioStoreRequest extends FormRequest
             'email' => 'required|string|email|max:255|unique:usuarios,email',
             'password' => 'required|string|min:8',
             'telefone' => 'required|string|max:20',
-            'permissao_id' => 'sometimes|nullable|exists:permissoes,id',
+            'permissoes' => 'sometimes|nullable|array',
+            'permissoes.*' => 'exists:permissoes,id',
             'empresa_id' => 'sometimes|nullable|exists:empresas,id',
 
             // Endereço (obrigatório apenas para clientes, opcional para funcionários)
-            'endereco' => 'sometimes|nullable|array',
-            'endereco.cep' => 'sometimes|nullable|string|max:10',
-            'endereco.rua' => 'sometimes|required|string|max:255',
-            'endereco.numero' => 'sometimes|required|string|max:20',
-            'endereco.complemento' => 'sometimes|nullable|string|max:255',
-            'endereco.bairro' => 'sometimes|nullable|string|max:255',
-            'endereco.cidade' => 'sometimes|nullable|string|max:255',
-            'endereco.estado' => 'sometimes|nullable|string|size:2',
-            'endereco.ponto_referencia' => 'sometimes|nullable|string|max:255',
-            'endereco.observacoes' => 'sometimes|nullable|string|max:500',
+            'endereco' => 'nullable|array',
+            'endereco.cep' => 'nullable|string|max:10',
+            'endereco.rua' => 'required_with:endereco|string|max:255',
+            'endereco.numero' => 'required_with:endereco|string|max:20',
+            'endereco.complemento' => 'nullable|string|max:255',
+            'endereco.bairro' => 'nullable|string|max:255',
+            'endereco.cidade' => 'nullable|string|max:255',
+            'endereco.estado' => 'nullable|string|size:2',
+            'endereco.ponto_referencia' => 'nullable|string|max:255',
+            'endereco.observacoes' => 'nullable|string|max:500',
         ];
     }
 
@@ -73,7 +74,8 @@ class UsuarioStoreRequest extends FormRequest
             'telefone.string' => 'O telefone deve ser um texto válido.',
             'telefone.max' => 'O telefone não pode ter mais que 20 caracteres.',
 
-            'permissao_id.exists' => 'A permissão selecionada não existe.',
+            'permissoes.array' => 'As permissões devem ser enviadas como um array.',
+            'permissoes.*.exists' => 'Uma ou mais permissões selecionadas não existem.',
 
             'empresa_id.exists' => 'A empresa selecionada não existe.',
 
@@ -83,11 +85,11 @@ class UsuarioStoreRequest extends FormRequest
             'endereco.cep.string' => 'O CEP deve ser um texto válido.',
             'endereco.cep.max' => 'O CEP não pode ter mais que 10 caracteres.',
 
-            'endereco.rua.required' => 'A rua é obrigatória.',
+            'endereco.rua.required_with' => 'A rua é obrigatória quando endereço é fornecido.',
             'endereco.rua.string' => 'A rua deve ser um texto válido.',
             'endereco.rua.max' => 'A rua não pode ter mais que 255 caracteres.',
 
-            'endereco.numero.required' => 'O número é obrigatório.',
+            'endereco.numero.required_with' => 'O número é obrigatório quando endereço é fornecido.',
             'endereco.numero.string' => 'O número deve ser um texto válido.',
             'endereco.numero.max' => 'O número não pode ter mais que 20 caracteres.',
 

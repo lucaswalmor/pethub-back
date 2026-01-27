@@ -17,6 +17,17 @@ class UsuarioUpdateRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        // Para edição, sempre permitir permissoes
+        // A validação de quem pode alterar permissões fica no controller
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -29,7 +40,8 @@ class UsuarioUpdateRequest extends FormRequest
             'email' => 'sometimes|required|string|email|max:255|unique:usuarios,email,' . $this->route('usuario'),
             'password' => 'sometimes|nullable|string|min:8',
             'telefone' => 'sometimes|required|string|max:20',
-            'permissao_id' => 'sometimes|nullable|exists:permissoes,id',
+            'permissoes' => 'sometimes|nullable|array',
+            'permissoes.*' => 'exists:permissoes,id',
             'ativo' => 'sometimes|boolean',
         ];
     }
@@ -60,7 +72,8 @@ class UsuarioUpdateRequest extends FormRequest
             'telefone.string' => 'O telefone deve ser um texto válido.',
             'telefone.max' => 'O telefone não pode ter mais que 20 caracteres.',
 
-            'permissao_id.exists' => 'A permissão selecionada não existe.',
+            'permissoes.array' => 'As permissões devem ser enviadas como um array.',
+            'permissoes.*.exists' => 'Uma ou mais permissões selecionadas não existem.',
 
             'ativo.boolean' => 'O campo ativo deve ser verdadeiro ou falso.',
         ];
@@ -76,11 +89,11 @@ class UsuarioUpdateRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Verificar se está tentando alterar permissões de usuário master
-            if ($this->has('permissao_id')) {
+            if ($this->has('permissoes')) {
                 $usuario = User::find($this->route('usuario'));
 
                 if ($usuario && $usuario->isMaster()) {
-                    $validator->errors()->add('permissao_id', 'Não é possível alterar as permissões de um usuário master.');
+                    $validator->errors()->add('permissoes', 'Não é possível alterar as permissões de um usuário master.');
                 }
             }
         });

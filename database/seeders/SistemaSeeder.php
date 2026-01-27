@@ -124,24 +124,9 @@ class SistemaSeeder extends Seeder
         }
 
         // -----------------------------
-        // Permissões
+        // Permissões (executa seeder dedicada)
         // -----------------------------
-        $permissoes = [
-            'admin',
-            'vendedor',
-            'financeiro',
-            'cliente',
-        ];
-
-        foreach ($permissoes as $p) {
-            DB::table('permissoes')->insert([
-                'nome' => ucfirst($p),
-                'slug' => strtolower($p),
-                'ativo' => true,
-                'created_at' => $timestamp,
-                'updated_at' => $timestamp,
-            ]);
-        }
+        $this->call(PermissoesSeeder::class);
 
         // -----------------------------
         // Bairros de Uberlândia-MG

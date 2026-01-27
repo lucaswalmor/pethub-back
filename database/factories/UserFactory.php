@@ -24,12 +24,12 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'permissao_id' => 4, // cliente por padrão
             'nome' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'password' => static::$password ??= Hash::make('password'),
             'telefone' => fake()->phoneNumber(),
             'ativo' => true,
+            'is_master' => false, // Cliente por padrão
             'email_verified_at' => now(),
             'remember_token' => Str::random(10),
         ];

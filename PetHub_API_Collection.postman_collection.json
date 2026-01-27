@@ -86,6 +86,31 @@
 					}
 				},
 				{
+					"name": "Verificar Cadastro Empresa",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/empresa/{{empresa_id}}/verificar-cadastro",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"empresa",
+								"{{empresa_id}}",
+								"verificar-cadastro"
+							]
+						},
+						"description": "Verifica se o cadastro da empresa está completo.\n\n## ✅ Critérios para Cadastro Completo:\n- Endereço cadastrado\n- Configurações definidas\n- Pelo menos 1 forma de pagamento\n- Pelo menos 1 horário de funcionamento\n- Pelo menos 1 bairro de entrega\n\n## 📋 Resposta:\n```json\n{\n  \"success\": true,\n  \"cadastro_completo\": false,\n  \"empresa_id\": 1,\n  \"empresa_nome\": \"PetShop Exemplo\"\n}\n```\n\n## 🔑 Permissões Necessárias:\n- Qualquer usuário autenticado pode verificar (não requer permissões específicas)"
+					}
+				},
+				{
 					"name": "Criar Empresa",
 					"request": {
 						"method": "POST",
@@ -101,7 +126,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"razao_social\": \"PetShop do Lucas Ltda\",\n  \"nome_fantasia\": \"PetShop do Lucas\",\n  \"email\": \"lucaswsb52@gmail.com\",\n  \"telefone\": \"(11) 99999-9999\",\n  \"cnpj\": \"12.345.678/0001-90\",\n  \"nicho_id\": 1,\n  \"ativo\": true,\n  \"endereco\": {\n    \"logradouro\": \"Rua das Flores\",\n    \"numero\": \"123\",\n    \"complemento\": \"Sala 2\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"São Paulo\",\n    \"estado\": \"SP\",\n    \"cep\": \"01234-567\",\n    \"ponto_referencia\": \"Próximo ao Shopping\",\n    \"observacoes\": \"Entrada pelos fundos\"\n  },\n  \"usuario_admin\": {\n    \"nome\": \"Lucas Silva\",\n    \"email\": \"lucaswsb52@gmail.com\",\n    \"password\": \"32329585\",\n    \"password_confirmation\": \"32329585\",\n    \"permissao_id\": 1,\n    \"telefone\": \"(34) 99202-1394\"\n  }\n}"
+							"raw": "{\n  \"razao_social\": \"PetShop do Lucas Ltda\",\n  \"nome_fantasia\": \"PetShop do Lucas\",\n  \"email\": \"lucaswsb52@gmail.com\",\n  \"telefone\": \"(11) 99999-9999\",\n  \"cnpj\": \"12.345.678/0001-90\",\n  \"nicho_id\": 1,\n  \"ativo\": true,\n  \"endereco\": {\n    \"logradouro\": \"Rua das Flores\",\n    \"numero\": \"123\",\n    \"complemento\": \"Sala 2\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"São Paulo\",\n    \"estado\": \"SP\",\n    \"cep\": \"01234-567\",\n    \"ponto_referencia\": \"Próximo ao Shopping\",\n    \"observacoes\": \"Entrada pelos fundos\"\n  },\n  \"usuario_admin\": {\n    \"nome\": \"Lucas Silva\",\n    \"email\": \"lucaswsb52@gmail.com\",\n    \"password\": \"32329585\",\n    \"password_confirmation\": \"32329585\",\n    \"permissoes\": [1],\n    \"telefone\": \"(34) 99202-1394\"\n  }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/empresa",
@@ -238,6 +263,34 @@
 			]
 		},
 		{
+			"name": "Permissões",
+			"item": [
+				{
+					"name": "Listar Permissões",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/permissoes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"permissoes"
+							]
+						},
+						"description": "Lista todas as permissões disponíveis no sistema.\n\n## 📋 Resposta:\n```json\n{\n  \"permissoes\": [\n    {\n      \"id\": 1,\n      \"nome\": \"Acesso Total\",\n      \"slug\": \"sistema.acesso_total\"\n    },\n    {\n      \"id\": 2,\n      \"nome\": \"Listar Usuários\",\n      \"slug\": \"usuarios.listar\"\n    }\n    // ...\n  ]\n}\n```\n\n## 🔑 Permissões Necessárias:\n- Qualquer usuário autenticado pode acessar"
+					}
+				}
+			]
+		},
+		{
 			"name": "Usuários",
 			"item": [
 				{
@@ -252,7 +305,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"nome\": \"João Silva\",\n  \"email\": \"joao.silva@email.com\",\n  \"password\": \"senha123\",\n  \"telefone\": \"34999999999\",\n  \"permissao_id\": null,\n  \"empresa_id\": null,\n  \"endereco\": {\n    \"cep\": \"38400-000\",\n    \"rua\": \"Rua das Flores\",\n    \"numero\": \"123\",\n    \"complemento\": \"Apto 45\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"Uberlândia\",\n    \"estado\": \"MG\",\n    \"ponto_referencia\": \"Próximo ao shopping\",\n    \"observacoes\": \"Cliente preferencial\"\n  }\n}"
+							"raw": "{\n  \"nome\": \"João Silva\",\n  \"email\": \"joao.silva@email.com\",\n  \"password\": \"senha123\",\n  \"telefone\": \"34999999999\",\n  \"permissoes\": null,\n  \"empresa_id\": null,\n  \"endereco\": {\n    \"cep\": \"38400-000\",\n    \"rua\": \"Rua das Flores\",\n    \"numero\": \"123\",\n    \"complemento\": \"Apto 45\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"Uberlândia\",\n    \"estado\": \"MG\",\n    \"ponto_referencia\": \"Próximo ao shopping\",\n    \"observacoes\": \"Cliente preferencial\"\n  }\n}\n\n/* Para funcionário, use:\n{\n  \"nome\": \"Maria Santos\",\n  \"email\": \"maria.santos@empresa.com\",\n  \"password\": \"senha123\",\n  \"telefone\": \"34988888888\",\n  \"permissoes\": [2, 7, 9],\n  \"empresa_id\": 1\n}\n*/"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/usuarios",
@@ -264,7 +317,7 @@
 								"usuarios"
 							]
 						},
-						"description": "Cadastra um novo usuário. Para cliente: deixe empresa_id e permissao_id como null e inclua endereco. Para funcionário: defina empresa_id e permissao_id (se necessário) e remova o campo endereco."
+						"description": "Cadastra um novo usuário.\n\n## 📝 Para Cliente:\n- Deixe `empresa_id` como `null`\n- Deixe `permissoes` como `null` (será cliente padrão)\n- Inclua o campo `endereco`\n\n## 👷 Para Funcionário:\n- Defina `empresa_id` da empresa\n- Defina `permissoes` como array de IDs: `[2, 7, 9]`\n- **NÃO envie** o campo `endereco` (será usado o da empresa)\n\n## 🔑 Formato das Permissões:\n```json\n\"permissoes\": [2, 7, 9]\n```\n\n## 📋 Permissões Disponíveis:\n- `1`: sistema.acesso_total\n- `2`: usuarios.listar\n- `3`: usuarios.criar\n- `4`: usuarios.editar\n- `5`: usuarios.deletar\n- `6`: usuarios.gerenciar_permissoes\n- `7`: empresas.listar\n- `8`: empresas.criar\n- `9`: empresas.editar\n- `10`: empresas.deletar\n- `11`: empresas.gerenciar_funcionarios\n- `12`: empresas.upload_imagens\n\n## ⚠️ Importante:\n- **Funcionários NÃO devem enviar endereco**\n- Rota pública (qualquer pessoa pode se cadastrar)\n- Usuários Master têm acesso automático a tudo"
 					}
 				},
 				{
@@ -286,7 +339,8 @@
 								"api",
 								"usuarios"
 							]
-						}
+						},
+						"description": "Lista todos os usuários do sistema.\n\n## 🔑 Permissões Necessárias:\n- `usuarios.listar`\n- **OU** usuário Master (acesso total)"
 					}
 				},
 				{
@@ -309,7 +363,8 @@
 								"usuarios",
 								"{{usuario_id}}"
 							]
-						}
+						},
+						"description": "Obtém detalhes de um usuário específico.\n\n## 🔑 Permissões Necessárias:\n- `usuarios.listar`\n- **OU** usuário Master (acesso total)"
 					}
 				},
 				{
@@ -328,7 +383,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"nome\": \"João Silva Atualizado\",\n  \"telefone\": \"34999999999\",\n  \"ativo\": true\n}"
+							"raw": "{\n  \"nome\": \"João Silva Atualizado\",\n  \"telefone\": \"34999999999\",\n  \"ativo\": true\n}\n\n/* Para funcionário, adicione:\n\"permissoes\": [2, 7, 9],\n\"empresa_id\": 1\n*/"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/usuarios/{{usuario_id}}",
@@ -341,7 +396,7 @@
 								"{{usuario_id}}"
 							]
 						},
-						"description": "Atualiza dados do usuário. Campos opcionais. Usuários master não podem ter permissões alteradas."
+						"description": "Atualiza dados do usuário. Campos opcionais.\n\n## 📝 Campos Atualizáveis:\n- `nome`, `email`, `telefone`, `ativo`\n- `permissoes`: Array de IDs das permissões `[1, 2, 3]` (apenas para funcionários)\n\n## 👥 Regras por Tipo de Usuário:\n\n### Cliente:\n- Não envie `permissoes` (será ignorado automaticamente)\n- Clientes não precisam de permissões específicas\n\n### Funcionário:\n- Envie `permissoes` como array de IDs\n- Campo sobrescreve todas as permissões anteriores\n- Para remover todas as permissões, envie `permissoes`: `[]`\n\n## ⚠️ IMPORTANTE:\n- Usuários master não podem ter permissões alteradas\n- Usuários master não podem ser deletados"
 					}
 				},
 				{
@@ -364,7 +419,8 @@
 								"usuarios",
 								"{{usuario_id}}"
 							]
-						}
+						},
+						"description": "Deleta um usuário. ⚠️ IMPORTANTE: Usuários master (criados junto com empresa) não podem ser deletados."
 					}
 				}
 			]

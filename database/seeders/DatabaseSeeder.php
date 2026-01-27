@@ -24,13 +24,16 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         // Criar usuário de teste (remover em produção)
-        User::create([
-            'permissao_id' => 1, // admin
+        $user = User::create([
             'nome' => 'Test User',
             'email' => 'test@example.com',
             'password' => Hash::make('password'),
             'telefone' => '(11) 99999-9999',
             'ativo' => true,
+            'is_master' => true, // Usuário master para testes
         ]);
+
+        // Atribuir todas as permissões ao usuário de teste
+        $user->permissoes()->sync(ids: [1]);
     }
 }

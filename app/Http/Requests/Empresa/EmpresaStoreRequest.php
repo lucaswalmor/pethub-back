@@ -121,7 +121,8 @@ class EmpresaStoreRequest extends FormRequest
             'usuario_admin.email' => 'required|email|max:255|unique:usuarios,email',
             'usuario_admin.password' => 'required|string|min:8|max:255',
             'usuario_admin.password_confirmation' => 'required|string|same:usuario_admin.password',
-            'usuario_admin.permissao_id' => 'required|integer|exists:permissoes,id',
+            'usuario_admin.permissoes' => 'required|array',
+            'usuario_admin.permissoes.*' => 'exists:permissoes,id',
         ];
     }
 
@@ -329,9 +330,9 @@ class EmpresaStoreRequest extends FormRequest
             'usuario_admin.password_confirmation.string' => 'A confirmação da senha deve ser um texto válido.',
             'usuario_admin.password_confirmation.same' => 'A confirmação da senha deve ser igual à senha.',
 
-            'usuario_admin.permissao_id.required' => 'A permissão do usuário administrador é obrigatória.',
-            'usuario_admin.permissao_id.integer' => 'A permissão deve ser um número inteiro.',
-            'usuario_admin.permissao_id.exists' => 'A permissão selecionada não existe.',
+            'usuario_admin.permissoes.required' => 'As permissões do usuário administrador são obrigatórias.',
+            'usuario_admin.permissoes.array' => 'As permissões devem ser enviadas como um array.',
+            'usuario_admin.permissoes.*.exists' => 'Uma ou mais permissões selecionadas não existem.',
         ];
     }
 

@@ -11,9 +11,9 @@ class Permissao extends Model
 
     protected $table = 'permissoes';
 
-    // Relação com usuários
+    // Relação many-to-many com usuários
     public function usuarios()
     {
-        return $this->hasMany(User::class, 'permissao_id');
+        return $this->belongsToMany(User::class, 'usuarios_permissoes', 'permissao_id', 'usuario_id');
     }
 }

@@ -21,7 +21,6 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'permissao_id',
         'nome',
         'email',
         'password',
@@ -59,12 +58,6 @@ class User extends Authenticatable
         return $this->hasMany(UsuarioEnderecos::class, 'usuario_id');
     }
 
-    // Relação com permissão
-    public function permissao()
-    {
-        return $this->belongsTo(Permissao::class, 'permissao_id');
-    }
-
     // Relação com empresas (através da tabela usuarios_empresas)
     public function empresas()
     {
@@ -83,28 +76,32 @@ class User extends Authenticatable
         return $this->hasMany(UsuarioEmpresas::class, 'usuario_id');
     }
 
-    // Verifica se o usuário é administrador
-    public function isAdmin()
+    // Relação many-to-many com permissões
+    public function permissoes()
     {
-        return $this->permissao->slug === 'admin';
+        return $this->belongsToMany(Permissao::class, 'usuarios_permissoes', 'usuario_id', 'permissao_id');
     }
 
-    // Verifica se o usuário é vendedor
-    public function isVendedor()
+    // Verifica se o usuário tem uma permissão específica
+    public function hasPermission(string $slug): bool
     {
-        return $this->permissao->slug === 'vendedor';
+        // Se é master, pode tudo
+        if ($this->isMaster()) {
+            return true;
+        }
+
+        return $this->permissoes()->where('slug', $slug)->exists();
     }
 
-    // Verifica se o usuário é financeiro
-    public function isFinanceiro()
+    // Verifica se o usuário tem qualquer uma das permissões
+    public function hasAnyPermission(array $slugs): bool
     {
-        return $this->permissao->slug === 'financeiro';
-    }
+        // Se é master, pode tudo
+        if ($this->isMaster()) {
+            return true;
+        }
 
-    // Verifica se o usuário é cliente
-    public function isCliente()
-    {
-        return $this->permissao->slug === 'cliente';
+        return $this->permissoes()->whereIn('slug', $slugs)->exists();
     }
 
     // Verifica se o usuário é master da empresa

@@ -20,13 +20,15 @@ class UsuarioLoginResource extends JsonResource
             'email' => $this->email,
             'telefone' => $this->telefone,
             'ativo' => $this->ativo,
-            'permissao' => $this->whenLoaded('permissao', function () {
-                return [
-                    'id' => $this->permissao->id,
-                    'nome' => $this->permissao->nome,
-                    'slug' => $this->permissao->slug,
-                ];
-            }),
+            'permissoes' => $this->whenLoaded('permissoes', function () {
+                return $this->permissoes->map(function ($permissao) {
+                    return [
+                        'id' => $permissao->id,
+                        'nome' => $permissao->nome,
+                        'slug' => $permissao->slug,
+                    ];
+                });
+            }, []),
             'empresas' => $this->whenLoaded('empresas', function () {
                 return $this->empresas->map(function ($empresa) {
                     return [

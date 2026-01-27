@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\Usuarios\UsuarioStoreRequest;
 use App\Http\Requests\Usuarios\UsuarioUpdateRequest;
+use App\Http\Resources\Usuario\UsuarioResource;
 use App\Models\User;
 use App\Models\UsuarioEnderecos;
 use App\Models\Permissao;
@@ -21,19 +22,17 @@ class UsuarioController extends Controller
      */
     public function index()
     {
-        $usuarios = User::with(['permissao', 'enderecos', 'empresas'])->get();
+        $usuarioAutenticado = auth()->user();
+
+        // Todos os usuários (incluindo masters) veem apenas usuários das suas empresas
+        $empresasIds = $usuarioAutenticado->empresas->pluck('id');
+        $usuarios = User::whereHas('empresas', function($query) use ($empresasIds) {
+            $query->whereIn('empresas.id', $empresasIds);
+        })->with(['permissoes', 'enderecos', 'empresas'])->get();
 
         return response()->json([
-            'usuarios' => $usuarios
+            'usuarios' => UsuarioResource::collection($usuarios)
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -43,70 +42,53 @@ class UsuarioController extends Controller
     {
         DB::beginTransaction();
         try {
-            // Determinar a permissão do usuário
-            $permissaoId = $request->input('permissao_id');
-            if (!$permissaoId) {
-                // Se não foi enviada permissão, usar cliente como padrão
-                $permissao = Permissao::where('slug', 'cliente')->first();
-            } else {
-                $permissao = Permissao::find($permissaoId);
-            }
-
-            if (!$permissao) {
-                return response()->json(['error' => 'Permissão não encontrada'], 400);
-            }
-
-            // Verificar se é um funcionário (empresa cadastrando usuário)
-            $isFuncionario = $request->has('empresa_id') && $request->empresa_id;
-
-            // Criar o usuário
+            // Criar o usuário (sempre como não-master)
+            // Usuários master são criados APENAS no EmpresaController
             $usuario = User::create([
-                'permissao_id' => $permissao->id,
                 'nome' => $request->nome,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'telefone' => $request->telefone,
                 'ativo' => true,
-                'is_master' => $isFuncionario, // Define como master se for funcionário
+                'is_master' => false, // Sempre false - master só no EmpresaController
             ]);
 
-            // Lidar com o endereço
-            if ($isFuncionario) {
-                // Se for funcionário, usar o endereço da empresa
-                $empresa = Empresa::with('endereco')->findOrFail($request->empresa_id);
-                $enderecoEmpresa = $empresa->endereco;
-
-                if (!$enderecoEmpresa) {
-                    DB::rollBack();
-                    return response()->json(['error' => 'Empresa não possui endereço cadastrado'], 400);
-                }
-
-                UsuarioEnderecos::create([
-                    'usuario_id' => $usuario->id,
-                    'cep' => $enderecoEmpresa->cep,
-                    'rua' => $enderecoEmpresa->logradouro,
-                    'numero' => $enderecoEmpresa->numero,
-                    'complemento' => $enderecoEmpresa->complemento,
-                    'bairro' => $enderecoEmpresa->bairro,
-                    'cidade' => $enderecoEmpresa->cidade,
-                    'estado' => $enderecoEmpresa->estado,
-                    'ponto_referencia' => $enderecoEmpresa->ponto_referencia,
-                    'observacoes' => $enderecoEmpresa->observacoes,
-                    'ativo' => true,
-                ]);
-
-                // Criar relação na tabela usuarios_empresas
+            // Vincular à empresa se foi especificada (para funcionários)
+            if ($request->has('empresa_id') && $request->empresa_id) {
                 UsuarioEmpresas::create([
                     'usuario_id' => $usuario->id,
                     'empresa_id' => $request->empresa_id,
                 ]);
-            } else {
-                // Se for cliente, usar o endereço enviado na requisição
-                if (!$request->has('endereco')) {
-                    DB::rollBack();
-                    return response()->json(['error' => 'Endereço é obrigatório para clientes'], 400);
-                }
+            }
 
+            // Sincronizar permissões se foram enviadas (para funcionários)
+            if ($request->has('permissoes') && is_array($request->permissoes)) {
+                $usuario->permissoes()->sync($request->permissoes);
+            }
+
+            // Lógica de criação de endereço baseada no tipo de usuário
+            $isFuncionario = $request->has('permissoes') && $request->has('empresa_id') && $request->empresa_id;
+
+            if ($isFuncionario) {
+                // Para funcionários: usar endereço da empresa, ignorar endereço enviado no body
+                $empresa = \App\Models\Empresa::with('endereco')->find($request->empresa_id);
+                if ($empresa && $empresa->endereco) {
+                    UsuarioEnderecos::create([
+                        'usuario_id' => $usuario->id,
+                        'cep' => $empresa->endereco->cep,
+                        'rua' => $empresa->endereco->logradouro,
+                        'numero' => $empresa->endereco->numero,
+                        'complemento' => $empresa->endereco->complemento,
+                        'bairro' => $empresa->endereco->bairro,
+                        'cidade' => $empresa->endereco->cidade,
+                        'estado' => $empresa->endereco->estado,
+                        'ponto_referencia' => $empresa->endereco->ponto_referencia,
+                        'observacoes' => $empresa->endereco->observacoes,
+                        'ativo' => true,
+                    ]);
+                }
+            } elseif ($request->has('endereco')) {
+                // Para clientes: usar endereço enviado no body
                 $enderecoData = $request->endereco;
                 UsuarioEnderecos::create([
                     'usuario_id' => $usuario->id,
@@ -126,11 +108,11 @@ class UsuarioController extends Controller
             DB::commit();
 
             // Retornar usuário criado com relações
-            $usuario->load(['permissao', 'enderecos', 'empresas']);
+            $usuario->load(['permissoes', 'enderecos', 'empresas']);
 
             return response()->json([
                 'message' => 'Usuário criado com sucesso',
-                'usuario' => $usuario
+                'usuario' => new UsuarioResource($usuario)
             ], 201);
 
         } catch (\Exception $e) {
@@ -147,10 +129,34 @@ class UsuarioController extends Controller
      */
     public function show(string $id)
     {
-        $usuario = User::with(['permissao', 'enderecos', 'empresas'])->findOrFail($id);
+        $usuarioAutenticado = auth()->user()->load('empresas');
+        $usuario = User::with(['permissoes', 'enderecos', 'empresas'])->findOrFail($id);
+
+        // Verificar se o usuário autenticado e o usuário sendo buscado pertencem à mesma empresa
+        $empresasUsuarioAutenticado = $usuarioAutenticado->empresas->pluck('id');
+        $empresasUsuarioBuscado = $usuario->empresas->pluck('id');
+
+        // Verificar se há interseção entre as empresas (pertencem à mesma empresa)
+        $temEmpresaComum = $empresasUsuarioAutenticado->intersect($empresasUsuarioBuscado)->isNotEmpty();
+
+        // Se não há empresa em comum, não pode visualizar
+        if (!$temEmpresaComum) {
+            return response()->json([
+                'error' => 'Você não tem permissão para visualizar este usuário.',
+                'message' => 'O usuário não pertence à mesma empresa que você.'
+            ], 403);
+        }
+
+        // Se ambos não têm empresas associadas (clientes), não podem se ver
+        if ($empresasUsuarioAutenticado->isEmpty() && $empresasUsuarioBuscado->isEmpty()) {
+            return response()->json([
+                'error' => 'Você não tem permissão para visualizar este usuário.',
+                'message' => 'Clientes não podem visualizar outros clientes.'
+            ], 403);
+        }
 
         return response()->json([
-            'usuario' => $usuario
+            'usuario' => new UsuarioResource($usuario)
         ]);
     }
 
@@ -170,7 +176,7 @@ class UsuarioController extends Controller
         $usuario = User::findOrFail($id);
 
         // Preparar dados para atualização
-        $updateData = $request->only(['nome', 'email', 'telefone', 'permissao_id', 'ativo']);
+        $updateData = $request->only(['nome', 'email', 'telefone', 'ativo']);
 
         // Se senha foi fornecida, fazer hash
         if ($request->has('password') && $request->password) {
@@ -180,12 +186,17 @@ class UsuarioController extends Controller
         // Atualizar usuário
         $usuario->update($updateData);
 
+        // Sincronizar permissões se foram enviadas
+        if ($request->has('permissoes') && is_array($request->permissoes)) {
+            $usuario->permissoes()->sync($request->permissoes);
+        }
+
         // Recarregar com relacionamentos
-        $usuario->load(['permissao', 'enderecos', 'empresas']);
+        $usuario->load(['permissoes', 'enderecos', 'empresas']);
 
         return response()->json([
             'message' => 'Usuário atualizado com sucesso',
-            'usuario' => $usuario
+            'usuario' => new UsuarioResource($usuario)
         ]);
     }
 

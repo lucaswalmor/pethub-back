@@ -11,7 +11,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Empresa;
 use App\Models\User;
+use App\Models\EmpresaEndereco;
 use App\Helpers\FormatHelper;
+use App\Http\Resources\Usuario\UsuarioResource;
+use App\Models\UsuarioEnderecos;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -61,6 +64,15 @@ class EmpresaController extends Controller
             // Cria a empresa
             $empresa = Empresa::create($dadosEmpresa);
 
+            // Cria o endereço da empresa se foi enviado
+            if ($request->has('endereco')) {
+                $dadosEndereco = $request->input('endereco');
+                $dadosEndereco['empresa_id'] = $empresa->id;
+
+                // Import necessário para EmpresaEndereco
+                $endereco = EmpresaEndereco::create($dadosEndereco);
+            }
+
             // Prepara os dados do usuário administrador
             $dadosUsuario = $request->input('usuario_admin');
 
@@ -72,15 +84,35 @@ class EmpresaController extends Controller
             // Cria o usuário administrador
             $usuario = User::create($dadosUsuario);
 
+            // Sincronizar permissões do usuário administrador
+            $usuario->permissoes()->sync($request->input('usuario_admin.permissoes'));
+
             // Associa o usuário à empresa
             $usuario->empresas()->attach($empresa->id);
+
+            // Criar endereço do usuário administrador usando o mesmo endereço da empresa
+            if ($endereco) {
+                UsuarioEnderecos::create([
+                    'usuario_id' => $usuario->id,
+                    'cep' => $endereco->cep,
+                    'rua' => $endereco->logradouro,
+                    'numero' => $endereco->numero,
+                    'complemento' => $endereco->complemento,
+                    'bairro' => $endereco->bairro,
+                    'cidade' => $endereco->cidade,
+                    'estado' => $endereco->estado,
+                    'ponto_referencia' => $endereco->ponto_referencia,
+                    'observacoes' => $endereco->observacoes,
+                    'ativo' => true,
+                ]);
+            }
 
             DB::commit();
 
             return response()->json([
                 'message' => 'Empresa criada com sucesso',
-                'empresa' => $empresa,
-                'usuario' => $usuario,
+                'empresa' => new EmpresaResource($empresa),
+                'usuario' => new UsuarioResource($usuario),
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -350,6 +382,62 @@ class EmpresaController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+     * Check if company registration is complete.
+     */
+    public function verificarCadastro(Request $request, string $id)
+    {
+        try {
+            $empresa = Empresa::findOrFail($id);
+
+            $cadastroCompleto = true;
+
+            // Verifica se existe endereço
+            if (!$empresa->endereco) {
+                $cadastroCompleto = false;
+            }
+
+            // Verifica se existe configurações
+            if (!$empresa->configuracoes) {
+                $cadastroCompleto = false;
+            }
+
+            // Verifica se existe pelo menos uma forma de pagamento
+            if ($empresa->formasPagamentos->isEmpty()) {
+                $cadastroCompleto = false;
+            }
+
+            // Verifica se existe pelo menos um horário
+            if ($empresa->horarios->isEmpty()) {
+                $cadastroCompleto = false;
+            }
+
+            // Verifica se existe pelo menos um bairro de entrega
+            if ($empresa->bairrosEntregas->isEmpty()) {
+                $cadastroCompleto = false;
+            }
+
+            return response()->json([
+                'success' => true,
+                'cadastro_completo' => $cadastroCompleto,
+                'empresa_id' => $empresa->id,
+                'empresa_nome' => $empresa->nome_fantasia ?? $empresa->razao_social
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Empresa não encontrada'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno do servidor',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

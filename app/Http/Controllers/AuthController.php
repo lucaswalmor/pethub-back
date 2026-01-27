@@ -18,7 +18,7 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         try {
-            $user = User::with(['permissao', 'empresas'])->where('email', $request->email)->first();
+            $user = User::with(['permissoes', 'empresas'])->where('email', $request->email)->first();
 
             if (!$user || !Hash::check($request->password, $user->password)) {
                 return response()->json([
@@ -87,7 +87,7 @@ class AuthController extends Controller
         try {
             return response()->json([
                 'success' => true,
-                'user' => new UsuarioLoginResource($request->user()->load(['permissao', 'empresas'])),
+                'user' => new UsuarioLoginResource($request->user()->load(['permissoes', 'empresas'])),
             ]);
 
         } catch (\Exception $e) {
