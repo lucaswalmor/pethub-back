@@ -28,9 +28,6 @@ class ProdutoResource extends JsonResource
             'estoque' => $this->estoque,
             'destaque' => $this->destaque,
             'ativo' => $this->ativo,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
 
             // Relacionamentos
             'empresa' => $this->whenLoaded('empresa', function () {
@@ -74,13 +71,6 @@ class ProdutoResource extends JsonResource
             // URLs úteis
             'url_imagem' => $this->when($this->imagem, function () {
                 return asset('storage/' . $this->imagem);
-            }),
-
-            'url_produto' => $this->when($this->empresa && $this->slug, function () {
-                return route('produto.show', [
-                    'empresa' => $this->empresa->slug,
-                    'produto' => $this->slug
-                ]);
             }),
         ];
     }

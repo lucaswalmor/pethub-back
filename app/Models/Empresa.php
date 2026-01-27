@@ -84,4 +84,32 @@ class Empresa extends Model
     {
         return $this->hasMany(Pedido::class, 'empresa_id');
     }
+
+    // Relação com avaliações
+    public function avaliacoes()
+    {
+        return $this->hasMany(EmpresaAvaliacao::class, 'empresa_id');
+    }
+
+    // Relação com cupons da empresa
+    public function cupons()
+    {
+        return $this->hasMany(EmpresaCupom::class, 'empresa_id');
+    }
+
+    /**
+     * Calcular média das avaliações da empresa
+     */
+    public function calcularMediaAvaliacoes()
+    {
+        return $this->avaliacoes()->selectRaw('AVG(nota) as media, COUNT(*) as total')->first();
+    }
+
+    /**
+     * Obter cupons ativos da empresa
+     */
+    public function cuponsAtivos()
+    {
+        return $this->cupons()->ativos()->get();
+    }
 }

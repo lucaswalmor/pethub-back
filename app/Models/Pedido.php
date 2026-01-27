@@ -49,4 +49,36 @@ class Pedido extends Model
     {
         return $this->hasMany(PedidoHistoricoStatus::class, 'pedido_id');
     }
+
+    // Relação com avaliação do pedido (1 por pedido)
+    public function avaliacao()
+    {
+        return $this->hasOne(EmpresaAvaliacao::class, 'pedido_id');
+    }
+
+    // Relação com cupons de empresa usados no pedido
+    public function empresaCuponsUsados()
+    {
+        return $this->hasMany(EmpresaCupomUsado::class, 'pedido_id');
+    }
+
+    // Relação com cupons do sistema usados no pedido
+    public function sistemaCuponsUsados()
+    {
+        return $this->hasMany(SistemaCupomUsado::class, 'pedido_id');
+    }
+
+    // Relação com cupons de usuário usados no pedido
+    public function usuarioCuponsUsados()
+    {
+        return $this->hasMany(UsuarioCupom::class, 'pedido_id');
+    }
+
+    /**
+     * Verificar se pedido pode ser avaliado
+     */
+    public function podeSerAvaliado()
+    {
+        return $this->statusPedido && $this->statusPedido->slug === 'entregue' && !$this->avaliacao;
+    }
 }

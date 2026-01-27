@@ -12,6 +12,7 @@ use App\Models\UnidadeMedida;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\VerificaEmpresa;
 use App\Http\Requests\Produto\ProdutoUploadImageRequest;
+use App\Models\Empresa;
 use Illuminate\Support\Facades\DB;
 
 class ProdutoController extends Controller
@@ -61,13 +62,14 @@ class ProdutoController extends Controller
 
         return response()->json([
             'produtos' => ProdutoResource::collection($produtos),
-            'meta' => [
+            'paginacao' => [
                 'total' => $produtos->total(),
                 'per_page' => $produtos->perPage(),
                 'current_page' => $produtos->currentPage(),
                 'last_page' => $produtos->lastPage(),
                 'from' => $produtos->firstItem(),
                 'to' => $produtos->lastItem(),
+                'has_more_pages' => $produtos->hasMorePages(),
             ]
         ]);
     }
@@ -310,7 +312,7 @@ class ProdutoController extends Controller
     public function listarPorEmpresa(Request $request, string $empresaSlug)
     {
         // Buscar empresa por slug
-        $empresa = \App\Models\Empresa::where('slug', $empresaSlug)
+        $empresa = Empresa::where('slug', $empresaSlug)
             ->where('ativo', true)
             ->where('cadastro_completo', true)
             ->first();
@@ -373,7 +375,7 @@ class ProdutoController extends Controller
                 'telefone' => $empresa->telefone,
             ],
             'produtos' => ProdutoResource::collection($produtos),
-            'meta' => [
+            'paginacao' => [
                 'total' => $produtos->total(),
                 'per_page' => $produtos->perPage(),
                 'current_page' => $produtos->currentPage(),
@@ -418,7 +420,7 @@ class ProdutoController extends Controller
                     \Illuminate\Support\Facades\Storage::disk('public')->delete($produto->imagem);
                 }
 
-                $imagemPath = $request->file('imagem')->store("produtos/imagens/{$produto->empresa_id}", 'public');
+                $imagemPath = $request->file('imagem')->store("empresas/produtos/empresa/{$produto->empresa_id}/produto/{$produto->id}/imagem", 'public');
                 $dadosAtualizacao['imagem'] = $imagemPath;
             }
 

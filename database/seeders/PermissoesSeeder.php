@@ -42,6 +42,12 @@ class PermissoesSeeder extends Seeder
             ['nome' => 'Editar Produtos', 'slug' => 'produtos.update'],
             ['nome' => 'Deletar Produtos', 'slug' => 'produtos.destroy'],
             ['nome' => 'Upload Imagem Produto', 'slug' => 'produtos.upload_image'],
+
+            // Avaliações
+            ['nome' => 'Listar Avaliações', 'slug' => 'avaliacoes.index'],
+            ['nome' => 'Criar Avaliações', 'slug' => 'avaliacoes.store'],
+            ['nome' => 'Visualizar Avaliação', 'slug' => 'avaliacoes.show'],
+            ['nome' => 'Avaliações por Empresa', 'slug' => 'avaliacoes.empresa'],
         ];
 
         foreach ($permissoes as $permissao) {

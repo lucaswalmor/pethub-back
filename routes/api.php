@@ -7,6 +7,7 @@ use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\PermissaoController;
 use App\Http\Controllers\ProdutoController;
+use App\Http\Controllers\EmpresaAvaliacaoController;
 
 // Rotas de autenticação (não precisam de middleware)
 Route::post('/login', [AuthController::class, 'login']);
@@ -33,6 +34,14 @@ Route::controller(ProdutoController::class)->prefix('produtos')->group(function 
 Route::middleware('auth:sanctum')->group(function () {
     // Rota para listar permissões
     Route::get('/permissoes', [PermissaoController::class, 'index']);
+
+    // Rotas de avaliações
+    Route::controller(EmpresaAvaliacaoController::class)->prefix('avaliacoes')->group(function () {
+        Route::get('/', 'index')->middleware('check.permission:avaliacoes.index'); // Dashboard empresa
+        Route::post('/', 'store'); // Usuários criam avaliações (sem permissão específica)
+        Route::get('/{id}', 'show')->middleware('check.permission:avaliacoes.show'); // Empresa vê avaliação específica
+        Route::get('/empresa/{empresaId}', 'avaliacoesPorEmpresa'); // Público - ver avaliações da empresa
+    });
 
     // Rotas de usuários
     Route::controller(UsuarioController::class)->prefix('usuarios')->group(function () {

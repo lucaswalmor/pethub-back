@@ -61,6 +61,158 @@
 			]
 		},
 		{
+			"name": "Avaliações",
+			"item": [
+				{
+					"name": "Listar Avaliações",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/avaliacoes?per_page=15&order_by=created_at&order_direction=desc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"avaliacoes"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Número de avaliações por página (padrão: 15)"
+								},
+								{
+									"key": "order_by",
+									"value": "created_at",
+									"description": "Campo para ordenação (created_at, nota, etc.)"
+								},
+								{
+									"key": "order_direction",
+									"value": "desc",
+									"description": "Direção da ordenação (asc, desc)"
+								},
+								{
+									"key": "empresa_id",
+									"value": "",
+									"description": "Filtrar por empresa específica"
+								},
+								{
+									"key": "usuario_id",
+									"value": "",
+									"description": "Filtrar por usuário específico"
+								}
+							]
+						},
+						"description": "Lista todas as avaliações do sistema com paginação e filtros.\n\n## 🔒 Validação de Isolamento:\n- Apenas usuários com permissão `empresas.listar` podem acessar\n- Masters veem todas as avaliações\n- Funcionários veem apenas avaliações de suas empresas\n\n## 📋 Parâmetros de Consulta:\n- `per_page`: Avaliações por página (padrão: 15)\n- `order_by`: Campo para ordenação\n- `order_direction`: asc/desc\n- `empresa_id`: Filtrar por empresa\n- `usuario_id`: Filtrar por usuário\n\n## 📄 Resposta:\n```json\n{\n  \"avaliacoes\": [...],\n  \"paginacao\": {\n    \"total\": 50,\n    \"per_page\": 15,\n    \"current_page\": 1,\n    \"has_more_pages\": true\n  }\n}\n```\n\n## 🔑 Permissões Necessárias:\n- `avaliacoes.index`"
+					}
+				},
+				{
+					"name": "Criar Avaliação",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pedido_id\": 1,\n  \"empresa_id\": 1,\n  \"nota\": 5.0,\n  \"descricao\": \"Excelente atendimento! Produto chegou em perfeito estado e dentro do prazo.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/avaliacoes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"avaliacoes"
+							]
+						},
+						"description": "Cria uma nova avaliação para um pedido entregue.\n\n## 🔒 Validações Obrigatórias:\n- **Pedido deve pertencer ao usuário autenticado**\n- **Pedido deve estar com status ENTREGUE**\n- **Pedido ainda não foi avaliado**\n- **Nota deve ser de 1.0 a 5.0** (incrementos de 0.5)\n\n## 📝 Campos Obrigatórios:\n- `pedido_id`: ID do pedido entregue\n- `nota`: Nota de 1.0 a 5.0 (ex: 4.0, 4.5, 5.0)\n\n## 📝 Campos Opcionais:\n- `empresa_id`: ID da empresa (validação extra)\n- `descricao`: Comentário da avaliação (máx. 1000 caracteres)\n\n## ⚠️ Regras de Negócio:\n- **1 avaliação por pedido**\n- **Apenas pedidos ENTREGUES podem ser avaliados**\n- **Usuário pode avaliar mesma empresa em pedidos diferentes**\n- **Avaliação sempre vinculada a pedido real**\n\n## 📋 Processo de Validação:\n1. Verifica se pedido existe e pertence ao usuário\n2. Verifica se pedido está ENTREGUE\n3. Verifica se pedido já foi avaliado\n4. Cria avaliação automaticamente vinculada à empresa do pedido\n\n## 📄 Resposta de Sucesso:\n```json\n{\n  \"success\": true,\n  \"message\": \"Avaliação criada com sucesso\",\n  \"avaliacao\": {\n    \"id\": 1,\n    \"nota\": 5.0,\n    \"descricao\": \"Excelente atendimento!\",\n    \"empresa\": {...},\n    \"pedido\": {...}\n  }\n}\n```\n\n## ⚠️ Respostas de Erro:\n- **400**: Pedido não pode ser avaliado (não entregue, já avaliado, etc.)\n- **422**: Dados inválidos\n\n## 🔑 Permissões Necessárias:\n- **Nenhuma permissão específica necessária**\n- Qualquer usuário autenticado pode avaliar seus próprios pedidos"
+					}
+				},
+				{
+					"name": "Ver Avaliação",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/avaliacoes/{{avaliacao_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"avaliacoes",
+								"{{avaliacao_id}}"
+							]
+						},
+						"description": "Obtém detalhes de uma avaliação específica.\n\n## 🔑 Permissões Necessárias:\n- `avaliacoes.index`"
+					}
+				},
+				{
+					"name": "Avaliações por Empresa",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/avaliacoes/empresa/{{empresa_id}}?per_page=10&recentes=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"avaliacoes",
+								"empresa",
+								"{{empresa_id}}"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "10",
+									"description": "Número de avaliações por página"
+								},
+								{
+									"key": "nota",
+									"value": "",
+									"description": "Mostrar apenas avaliações com nota mínima (ex: 4.0)"
+								},
+								{
+									"key": "recentes",
+									"value": "true",
+									"description": "Mostrar apenas avaliações dos últimos 30 dias"
+								}
+							]
+						},
+						"description": "Obtém todas as avaliações de uma empresa específica com estatísticas.\n\n## 📊 Estatísticas Incluídas:\n- **Total de avaliações**\n- **Média de notas**\n- **Distribuição por nota** (1.0, 2.0, 3.0, etc.)\n\n## 📋 Filtros Disponíveis:\n- `nota`: Mínima nota para exibir\n- `recentes`: Apenas últimos 30 dias\n- `per_page`: Avaliações por página\n\n## 📄 Resposta Estruturada:\n```json\n{\n  \"empresa_id\": 1,\n  \"estatisticas\": {\n    \"total_avaliacoes\": 25,\n    \"media_nota\": 4.3,\n    \"distribuicao_notas\": {\n      \"4.0\": 5,\n      \"4.5\": 8,\n      \"5.0\": 12\n    }\n  },\n  \"avaliacoes\": [...],\n  \"paginacao\": {...}\n}\n```\n\n## 🌐 Endpoint Público:\n- **Não requer autenticação ou permissões**\n- Acessível para qualquer usuário (clientes, visitantes, etc.)"
+					}
+				}
+			]
+		},
+		{
 			"name": "Público",
 			"item": [
 				{
@@ -122,7 +274,7 @@
 								}
 							]
 						},
-						"description": "Lista produtos públicos de uma empresa específica para clientes finais.\n\n## 🌐 Endpoint Público:\n- **Não requer autenticação**\n- Acessível para qualquer usuário (clientes, visitantes)\n- Otimizado para infinite scroll no frontend\n\n## 📋 Funcionalidades:\n- Lista apenas produtos ativos da empresa\n- Empresa deve estar ativa e com cadastro completo\n- Filtros avançados para busca e navegação\n- Paginação otimizada (20 produtos por página)\n- Ordenação flexível (nome, preço, data)\n\n## 🔍 Filtros Disponíveis:\n- `categoria_id`: Filtrar por categoria específica\n- `tipo`: produto/servico\n- `destaque`: Apenas produtos em destaque\n- `q`: Busca textual (nome/descrição)\n- `order_by`: nome/preco/created_at\n- `order_direction`: asc/desc\n\n## 📄 Resposta Estruturada:\n```json\n{\n  \"success\": true,\n  \"empresa\": {\n    \"id\": 1,\n    \"nome_fantasia\": \"PetShop Exemplo\",\n    \"slug\": \"petshop-exemplo\"\n  },\n  \"produtos\": [...],\n  \"meta\": {\n    \"total\": 100,\n    \"per_page\": 20,\n    \"current_page\": 1,\n    \"has_more_pages\": true\n  },\n  \"filtros_aplicados\": {...}\n}\n```\n\n## ⚠️ Validações:\n- Empresa deve existir e estar ativa\n- Cadastro da empresa deve estar completo\n- Apenas produtos ativos são retornados\n- Retorna **404** se empresa não encontrada\n\n## 🔗 Uso no Frontend:\n- Perfeito para páginas de catálogo de produtos\n- Infinite scroll com carregamento progressivo\n- Filtros em tempo real\n- URLs amigáveis com slug da empresa\n\n## 📊 Performance:\n- Consultas otimizadas com eager loading\n- Índices recomendados em `empresa_id`, `ativo`, `categoria_id`\n- Cache opcional para empresas populares"
+						"description": "Lista produtos públicos de uma empresa específica para clientes finais.\n\n## 🌐 Endpoint Público:\n- **Não requer autenticação**\n- Acessível para qualquer usuário (clientes, visitantes)\n- Otimizado para infinite scroll no frontend\n\n## 📋 Funcionalidades:\n- Lista apenas produtos ativos da empresa\n- Empresa deve estar ativa e com cadastro completo\n- Filtros avançados para busca e navegação\n- Paginação otimizada (20 produtos por página)\n- Ordenação flexível (nome, preço, data)\n\n## 🔍 Filtros Disponíveis:\n- `categoria_id`: Filtrar por categoria específica\n- `tipo`: produto/servico\n- `destaque`: Apenas produtos em destaque\n- `q`: Busca textual (nome/descrição)\n- `order_by`: nome/preco/created_at\n- `order_direction`: asc/desc\n\n## 📄 Resposta Estruturada:\n```json\n{\n  \"success\": true,\n  \"empresa\": {\n    \"id\": 1,\n    \"nome_fantasia\": \"PetShop Exemplo\",\n    \"slug\": \"petshop-exemplo\"\n  },\n  \"produtos\": [...],\n  \"paginacao\": {\n    \"total\": 100,\n    \"per_page\": 20,\n    \"current_page\": 1,\n    \"has_more_pages\": true\n  },\n  \"filtros_aplicados\": {...}\n}\n```\n\n## ⚠️ Validações:\n- Empresa deve existir e estar ativa\n- Cadastro da empresa deve estar completo\n- Apenas produtos ativos são retornados\n- Retorna **404** se empresa não encontrada\n\n## 🔗 Uso no Frontend:\n- Perfeito para páginas de catálogo de produtos\n- Infinite scroll com carregamento progressivo\n- Filtros em tempo real\n- URLs amigáveis com slug da empresa\n\n## 📊 Performance:\n- Consultas otimizadas com eager loading\n- Índices recomendados em `empresa_id`, `ativo`, `categoria_id`\n- Cache opcional para empresas populares"
 					}
 				}
 			]
@@ -235,7 +387,7 @@
 							]
 						}
 					},
-					"description": "Obtém detalhes completos de uma empresa específica.\n\n## 🔒 Validação de Isolamento:\n- Usuário autenticado deve pertencer à empresa solicitada\n- Retorna **403 Forbidden** se não houver acesso autorizado\n- Usuários podem estar em múltiplas empresas, mas só acessam dados das suas empresas\n\n## 📋 Resposta de Sucesso:\n```json\n{\n  \"success\": true,\n  \"empresa\": { ... }\n}\n```\n\n## ⚠️ Resposta de Erro (403):\n```json\n{\n  \"success\": false,\n  \"error\": \"Acesso negado\",\n  \"message\": \"Você não tem permissão para acessar esta empresa.\"\n}\n```\n\n## 🔑 Permissões Necessárias:\n- `empresas.listar`\n- **OU** usuário Master (acesso total)"
+					"description": "Obtém detalhes completos de uma empresa específica.\n\n## 🔒 Validação de Isolamento:\n- Usuário autenticado deve pertencer à empresa solicitada\n- Retorna **403 Forbidden** se não houver acesso autorizado\n- Usuários podem estar em múltiplas empresas, mas só acessam dados das suas empresas\n\n## 📋 Resposta de Sucesso:\n```json\n{\n  \"success\": true,\n  \"empresa\": { ... }\n}\n```\n\n## ⚠️ Resposta de Erro (403):\n```json\n{\n  \"success\": false,\n  \"error\": \"Acesso negado\",\n  \"message\": \"Você não tem permissão para acessar esta empresa.\"\n}\n```\n\n## 🔑 Permissões Necessárias:\n- `avaliacoes.show`"
 				},
 				{
 					"name": "Atualizar Empresa",
@@ -456,7 +608,7 @@
 								}
 							]
 						},
-						"description": "Lista usuários das empresas do usuário autenticado com paginação e filtros.\n\n## 🔒 Isolamento por Empresa:\n- Mostra apenas usuários das empresas que o usuário tem acesso\n- Masters veem usuários de todas as suas empresas\n- Funcionários veem apenas colegas da mesma empresa\n\n## 📋 Parâmetros de Consulta:\n- `per_page`: Usuários por página (padrão: 15)\n- `order_by`: Campo para ordenação\n- `order_direction`: asc/desc\n- `empresa_id`: Filtrar por empresa\n- `ativo`: true/false\n- `is_master`: true/false (apenas masters)\n- `nome`: Busca parcial por nome\n- `email`: Busca parcial por email\n\n## 🔑 Permissões Necessárias:\n- `usuarios.listar`\n- **OU** usuário Master (acesso total)"
+						"description": "Lista usuários das empresas do usuário autenticado com paginação e filtros.\n\n## 🔒 Isolamento por Empresa:\n- Mostra apenas usuários das empresas que o usuário tem acesso\n- Masters veem usuários de todas as suas empresas\n- Funcionários veem apenas colegas da mesma empresa\n\n## 📋 Parâmetros de Consulta:\n- `per_page`: Usuários por página (padrão: 15)\n- `order_by`: Campo para ordenação\n- `order_direction`: asc/desc\n- `empresa_id`: Filtrar por empresa\n- `ativo`: true/false\n- `is_master`: true/false (apenas masters)\n- `nome`: Busca parcial por nome\n- `email`: Busca parcial por email\n\n## 📄 Resposta:\n```json\n{\n  \"usuarios\": [...],\n  \"paginacao\": {\n    \"total\": 25,\n    \"per_page\": 15,\n    \"current_page\": 1,\n    \"last_page\": 2,\n    \"from\": 1,\n    \"to\": 15\n  }\n}\n```\n\n## 🔑 Permissões Necessárias:\n- `usuarios.listar`\n- **OU** usuário Master (acesso total)"
 					}
 				},
 				{
@@ -606,7 +758,7 @@
 								}
 							]
 						},
-						"description": "Lista produtos das empresas do usuário autenticado com paginação e filtros.\n\n## 🔒 Isolamento por Empresa:\n- Mostra apenas produtos das empresas que o usuário tem acesso\n- Masters veem produtos de todas as suas empresas\n- Funcionários veem apenas produtos da sua empresa\n\n## 📋 Parâmetros de Consulta:\n- `per_page`: Produtos por página (padrão: 15)\n- `order_by`: Campo para ordenação\n- `order_direction`: asc/desc\n- `empresa_id`: Filtrar por empresa\n- `categoria_id`: Filtrar por categoria\n- `tipo`: produto/servico\n- `ativo`: true/false\n- `destaque`: true/false\n\n## 🔑 Permissões Necessárias:\n- `produtos.index`"
+						"description": "Lista produtos das empresas do usuário autenticado com paginação e filtros.\n\n## 🔒 Isolamento por Empresa:\n- Mostra apenas produtos das empresas que o usuário tem acesso\n- Masters veem produtos de todas as suas empresas\n- Funcionários veem apenas produtos da sua empresa\n\n## 📋 Parâmetros de Consulta:\n- `per_page`: Produtos por página (padrão: 15)\n- `order_by`: Campo para ordenação\n- `order_direction`: asc/desc\n- `empresa_id`: Filtrar por empresa\n- `categoria_id`: Filtrar por categoria\n- `tipo`: produto/servico\n- `ativo`: true/false\n- `destaque`: true/false\n\n## 📄 Resposta:\n```json\n{\n  \"produtos\": [...],\n  \"paginacao\": {\n    \"total\": 50,\n    \"per_page\": 15,\n    \"current_page\": 1,\n    \"last_page\": 4,\n    \"from\": 1,\n    \"to\": 15,\n    \"has_more_pages\": true\n  }\n}\n```\n\n## 🔑 Permissões Necessárias:\n- `produtos.index`"
 					}
 				},
 				{
@@ -845,7 +997,7 @@
 								"upload-image"
 							]
 						},
-						"description": "Upload ou atualização de imagem do produto.\n\n## 🔒 Validação de Isolamento:\n- Produto deve pertencer a uma empresa que o usuário tem acesso\n- Retorna **403 Forbidden** se não houver permissão\n\n## 📋 Funcionamento:\n- Remove imagem anterior automaticamente se existir\n- Salva nova imagem no diretório `produtos/imagens/{empresa_id}`\n- Suporta formatos: JPEG, PNG, JPG, GIF, WebP\n- Tamanho máximo: 15MB\n\n## 📋 Formato da Imagem:\n- **Tipos aceitos**: jpeg, png, jpg, gif, webp\n- **Tamanho máximo**: 15MB\n- **Armazenamento**: Disco público do Laravel\n\n## ⚠️ Comportamento:\n- Se não enviar imagem: retorna erro 400\n- Se produto não existir: retorna erro 404\n- Imagem anterior é automaticamente removida\n\n## 🔑 Permissões Necessárias:\n- `produtos.upload_image`"
+						"description": "Upload ou atualização de imagem do produto.\n\n## 🔒 Validação de Isolamento:\n- Produto deve pertencer a uma empresa que o usuário tem acesso\n- Retorna **403 Forbidden** se não houver permissão\n\n## 📋 Funcionamento:\n- Remove imagem anterior automaticamente se existir\n- Salva nova imagem no diretório `empresas/produtos/empresa/{empresa_id}/produto/{produto_id}/imagem`\n- Suporta formatos: JPEG, PNG, JPG, GIF, WebP\n- Tamanho máximo: 15MB\n\n## 📋 Formato da Imagem:\n- **Tipos aceitos**: jpeg, png, jpg, gif, webp\n- **Tamanho máximo**: 15MB\n- **Armazenamento**: Disco público do Laravel\n\n## ⚠️ Comportamento:\n- Se não enviar imagem: retorna erro 400\n- Se produto não existir: retorna erro 404\n- Imagem anterior é automaticamente removida\n\n## 🔑 Permissões Necessárias:\n- `produtos.upload_image`"
 					}
 				}
 			]
@@ -879,6 +1031,11 @@
 		},
 		{
 			"key": "empresa_slug",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "avaliacao_id",
 			"value": "",
 			"type": "string"
 		}

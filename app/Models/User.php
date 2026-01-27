@@ -109,4 +109,36 @@ class User extends Authenticatable
     {
         return $this->is_master;
     }
+
+    // Relação com avaliações feitas pelo usuário
+    public function avaliacoes()
+    {
+        return $this->hasMany(EmpresaAvaliacao::class, 'usuario_id');
+    }
+
+    // Relação com cupons usados pelo usuário (empresa)
+    public function empresaCuponsUsados()
+    {
+        return $this->hasMany(EmpresaCupomUsado::class, 'usuario_id');
+    }
+
+    // Relação com cupons do sistema usados pelo usuário
+    public function sistemaCuponsUsados()
+    {
+        return $this->hasMany(SistemaCupomUsado::class, 'usuario_id');
+    }
+
+    // Relação com cupons atribuídos ao usuário
+    public function cupons()
+    {
+        return $this->hasMany(UsuarioCupom::class, 'usuario_id');
+    }
+
+    /**
+     * Obter cupons válidos do usuário
+     */
+    public function cuponsValidos()
+    {
+        return $this->cupons()->validos()->with('cupom')->get();
+    }
 }

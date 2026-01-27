@@ -67,7 +67,7 @@ class UsuarioController extends Controller
 
         return response()->json([
             'usuarios' => UsuarioResource::collection($usuarios),
-            'meta' => [
+            'paginacao' => [
                 'total' => $usuarios->total(),
                 'per_page' => $usuarios->perPage(),
                 'current_page' => $usuarios->currentPage(),
