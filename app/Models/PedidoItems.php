@@ -10,6 +10,17 @@ class PedidoItems extends Model
     use HasFactory;
     protected $table = 'pedido_items';
 
+    protected $fillable = [
+        'pedido_id',
+        'produto_id',
+        'quantidade',
+        'preco_unitario',
+        'preco_total',
+        'desconto',
+        'observacoes',
+        'ativo',
+    ];
+
     // Relação com pedido
     public function pedido()
     {

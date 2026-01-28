@@ -8,6 +8,277 @@
 	},
 	"item": [
 		{
+			"name": "Site Cliente",
+			"item": [
+				{
+					"name": "Público",
+					"item": [
+						{
+							"name": "Listar Empresas",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/site/empresas?nicho_id=&q=",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"site",
+										"empresas"
+									],
+									"query": [
+										{
+											"key": "nicho_id",
+											"value": "",
+											"description": "Filtrar por nicho"
+										},
+										{
+											"key": "q",
+											"value": "",
+											"description": "Buscar por nome"
+										}
+									]
+								},
+								"description": "Lista empresas ativas com cadastro completo para o site do cliente."
+							}
+						},
+						{
+							"name": "Exibir Empresa (Slug)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/site/empresa/{{empresa_slug}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"site",
+										"empresa",
+										"{{empresa_slug}}"
+									]
+								},
+								"description": "Retorna detalhes completos de uma empresa para o site do cliente."
+							}
+						}
+					]
+				},
+				{
+					"name": "Privado",
+					"item": [
+						{
+							"name": "Meu Perfil",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/site/meu-perfil",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"site",
+										"meu-perfil"
+									]
+								}
+							}
+						},
+						{
+							"name": "Meus Pedidos",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/site/meus-pedidos",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"site",
+										"meus-pedidos"
+									]
+								}
+							}
+						},
+						{
+							"name": "Ver Pedido",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/site/meu-pedido/{{pedido_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"site",
+										"meu-pedido",
+										"{{pedido_id}}"
+									]
+								}
+							}
+						},
+						{
+							"name": "Meus Endereços",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/site/meus-enderecos",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"site",
+										"meus-enderecos"
+									]
+								}
+							}
+						},
+						{
+							"name": "Meus Cupons",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/site/meus-cupons",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"site",
+										"meus-cupons"
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Endereços",
+					"item": [
+						{
+							"name": "Cadastrar Endereço",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"cep\": \"38400-000\",\n  \"rua\": \"Rua das Flores\",\n  \"numero\": \"123\",\n  \"complemento\": \"Apto 1\",\n  \"bairro\": \"Centro\",\n  \"cidade\": \"Uberlândia\",\n  \"estado\": \"MG\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/enderecos",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"enderecos"
+									]
+								}
+							}
+						},
+						{
+							"name": "Editar Endereço",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"rua\": \"Rua das Flores Alterada\",\n  \"numero\": \"456\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/enderecos/{{endereco_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"enderecos",
+										"{{endereco_id}}"
+									]
+								}
+							}
+						},
+						{
+							"name": "Deletar Endereço",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/enderecos/{{endereco_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"enderecos",
+										"{{endereco_id}}"
+									]
+								}
+							}
+						}
+					]
+				}
+			]
+		},
+		{
 			"name": "Autenticação",
 			"item": [
 				{

@@ -11,6 +11,12 @@ class PedidoHistoricoStatus extends Model
 
     protected $table = 'pedido_historico_status';
 
+    protected $fillable = [
+        'pedido_id',
+        'status_pedido_id',
+        'observacoes',
+    ];
+
     // Relação com pedido
     public function pedido()
     {

@@ -11,6 +11,12 @@ class PedidoEndereco extends Model
 
     protected $table = 'pedido_endereco';
 
+    protected $fillable = [
+        'pedido_id',
+        'endereco_id',
+        'observacoes',
+    ];
+
     // Relação com pedido
     public function pedido()
     {

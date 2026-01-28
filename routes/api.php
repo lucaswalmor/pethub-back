@@ -9,6 +9,8 @@ use App\Http\Controllers\PermissaoController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\EmpresaAvaliacaoController;
 use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\SiteClienteController;
+use App\Http\Controllers\UsuarioEnderecosController;
 
 // Rotas de autenticação (não precisam de middleware)
 Route::post('/login', [AuthController::class, 'login']);
@@ -26,9 +28,11 @@ Route::controller(EmpresaController::class)->prefix('empresa')->group(function (
     Route::post('/', 'store');
 });
 
-// Rotas públicas para clientes (não precisam de autenticação)
-Route::controller(ProdutoController::class)->prefix('produtos')->group(function () {
-    Route::get('/empresa/{empresaSlug}', 'listarPorEmpresa');
+
+// Rotas do Site Cliente (Públicas)
+Route::controller(SiteClienteController::class)->prefix('site')->group(function () {
+    Route::get('/empresas', 'getEmpresas');
+    Route::get('/empresa/{slug}', 'getEmpresa')->name('site.empresa.show');
 });
 
 // Rotas protegidas (precisam de autenticação)
@@ -52,7 +56,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', 'update')->middleware('check.permission:pedidos.update'); // Empresa altera status
         Route::delete('/{id}', 'destroy')->middleware('check.permission:pedidos.destroy'); // Empresa exclui (apenas pendentes)
         Route::post('/validar-cupom', 'validarCupom'); // Validar cupom antes do pedido
-        Route::get('/meus-pedidos', 'meusPedidos'); // Pedidos do usuário autenticado
     });
 
     // Rotas de usuários
@@ -62,6 +65,22 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', 'show')->middleware('check.permission:usuarios.show');
         Route::put('/{id}', 'update')->middleware('check.permission:usuarios.update');
         Route::delete('/{id}', 'destroy')->middleware('check.permission:usuarios.destroy');
+    });
+
+    // Rotas do Site Cliente (Privadas)
+    Route::controller(SiteClienteController::class)->prefix('site')->group(function () {
+        Route::get('/meu-perfil', 'getPerfil');
+        Route::get('/meus-pedidos', 'getPedidos');
+        Route::get('/meu-pedido/{id}', 'getPedido');
+        Route::get('/meus-enderecos', 'getEnderecos');
+        Route::get('/meus-cupons', 'meusCupons');
+    });
+
+    // Gestão de Endereços do Cliente
+    Route::controller(UsuarioEnderecosController::class)->prefix('enderecos')->group(function () {
+        Route::post('/', 'store');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
     });
 
     // Rotas de empresas

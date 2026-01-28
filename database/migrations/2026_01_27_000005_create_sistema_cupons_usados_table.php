@@ -22,7 +22,7 @@ return new class extends Migration
             $table->index(['sistema_cupom_id', 'usuario_id']);
             $table->index(['usuario_id', 'created_at']);
             $table->index('pedido_id');
-            $table->unique(['sistema_cupom_id', 'usuario_id', 'pedido_id']); // Evita uso duplicado
+            $table->unique(['sistema_cupom_id', 'usuario_id', 'pedido_id'], 'sis_cupons_usados_unique'); // Evita uso duplicado
         });
     }
 

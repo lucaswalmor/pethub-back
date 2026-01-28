@@ -39,20 +39,12 @@ class PedidoStoreRequest extends FormRequest
             'itens.*.produto_id' => 'required|exists:produtos,id',
             'itens.*.quantidade' => 'required|integer|min:1',
             'itens.*.preco_unitario' => 'required|numeric|min:0',
-            'itens.*.subtotal' => 'required|numeric|min:0',
+            'itens.*.subtotal' => 'required|numeric|min:0', // Campo do JSON, será mapeado para preco_total
             'itens.*.observacoes' => 'nullable|string|max:255',
 
             // Endereço do pedido
             'endereco' => 'required|array',
-            'endereco.endereco_id' => 'required|exists:usuario_enderecos,id',
-            'endereco.cep' => 'required|string|size:9',
-            'endereco.rua' => 'required|string|max:255',
-            'endereco.numero' => 'required|string|max:20',
-            'endereco.complemento' => 'nullable|string|max:255',
-            'endereco.bairro' => 'nullable|string|max:255',
-            'endereco.cidade' => 'nullable|string|max:255',
-            'endereco.estado' => 'nullable|string|size:2',
-            'endereco.ponto_referencia' => 'nullable|string|max:255',
+            'endereco.endereco_id' => 'required|exists:usuarios_enderecos,id',
             'endereco.observacoes' => 'nullable|string|max:500',
         ];
     }
@@ -119,21 +111,6 @@ class PedidoStoreRequest extends FormRequest
             'endereco.endereco_id.required' => 'O endereço é obrigatório.',
             'endereco.endereco_id.exists' => 'O endereço selecionado não existe.',
 
-            'endereco.cep.required' => 'O CEP é obrigatório.',
-            'endereco.cep.size' => 'O CEP deve ter 9 caracteres.',
-
-            'endereco.rua.required' => 'A rua é obrigatória.',
-            'endereco.rua.max' => 'A rua não pode ter mais que 255 caracteres.',
-
-            'endereco.numero.required' => 'O número é obrigatório.',
-            'endereco.numero.max' => 'O número não pode ter mais que 20 caracteres.',
-
-            'endereco.complemento.max' => 'O complemento não pode ter mais que 255 caracteres.',
-            'endereco.bairro.max' => 'O bairro não pode ter mais que 255 caracteres.',
-            'endereco.cidade.max' => 'A cidade não pode ter mais que 255 caracteres.',
-            'endereco.estado.size' => 'O estado deve ter exatamente 2 caracteres.',
-
-            'endereco.ponto_referencia.max' => 'O ponto de referência não pode ter mais que 255 caracteres.',
             'endereco.observacoes.max' => 'As observações do endereço não podem ter mais que 500 caracteres.',
         ];
     }
@@ -181,7 +158,7 @@ class PedidoStoreRequest extends FormRequest
                     }
 
                     // Verificar preço
-                    if ($produto->preco !== (float)$item['preco_unitario']) {
+                    if ((float)$produto->preco !== (float)$item['preco_unitario']) {
                         $validator->errors()->add("itens.{$index}.preco_unitario", 'Preço do produto não corresponde ao valor atual.');
                     }
                 }

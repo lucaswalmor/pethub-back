@@ -24,7 +24,7 @@ return new class extends Migration
             $table->index(['sistema_cupom_id', 'usado_em']);
             $table->index('usado_em');
             $table->index('pedido_id');
-            $table->unique(['usuario_id', 'sistema_cupom_id']); // Um usuário pode ter um cupom apenas uma vez
+            $table->unique(['usuario_id', 'sistema_cupom_id'], 'usr_cupons_unique'); // Um usuário pode ter um cupom apenas uma vez
         });
     }
 

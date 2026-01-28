@@ -29,7 +29,7 @@ class EmpresaAvaliacaoStoreRequest extends FormRequest
         return [
             'pedido_id' => 'required|exists:pedidos,id',
             'empresa_id' => 'nullable|exists:empresas,id', // Opcional para validação extra
-            'nota' => 'required|numeric|min:1|max:5|regex:/^\d+(\.0|\.5)?$/', // Apenas .0 ou .5
+            'nota' => 'required|numeric|min:1|max:5|in:1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0',
             'descricao' => 'nullable|string|max:1000',
         ];
     }
@@ -51,7 +51,7 @@ class EmpresaAvaliacaoStoreRequest extends FormRequest
             'nota.numeric' => 'A nota deve ser um valor numérico.',
             'nota.min' => 'A nota deve ser no mínimo 1.',
             'nota.max' => 'A nota deve ser no máximo 5.',
-            'nota.regex' => 'A nota deve ter apenas uma casa decimal (.0 ou .5).',
+            'nota.in' => 'A nota deve ser um dos valores permitidos: 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5 ou 5.0.',
 
             'descricao.string' => 'A descrição deve ser um texto válido.',
             'descricao.max' => 'A descrição não pode ter mais que 1000 caracteres.',

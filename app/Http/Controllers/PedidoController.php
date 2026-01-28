@@ -108,7 +108,7 @@ class PedidoController extends Controller
                         'produto_id' => $item['produto_id'],
                         'quantidade' => $item['quantidade'],
                         'preco_unitario' => $item['preco_unitario'],
-                        'subtotal' => $item['subtotal'],
+                        'preco_total' => $item['subtotal'],
                         'observacoes' => $item['observacoes'] ?? null,
                     ]);
                 }
@@ -119,14 +119,6 @@ class PedidoController extends Controller
                 PedidoEndereco::create([
                     'pedido_id' => $pedido->id,
                     'endereco_id' => $request->endereco['endereco_id'],
-                    'cep' => $request->endereco['cep'],
-                    'rua' => $request->endereco['rua'],
-                    'numero' => $request->endereco['numero'],
-                    'complemento' => $request->endereco['complemento'] ?? null,
-                    'bairro' => $request->endereco['bairro'] ?? null,
-                    'cidade' => $request->endereco['cidade'] ?? null,
-                    'estado' => $request->endereco['estado'] ?? null,
-                    'ponto_referencia' => $request->endereco['ponto_referencia'] ?? null,
                     'observacoes' => $request->endereco['observacoes'] ?? null,
                 ]);
             }
@@ -426,52 +418,4 @@ class PedidoController extends Controller
         ], 404);
     }
 
-    /**
-     * Obter pedidos do usuário autenticado
-     */
-    public function meusPedidos(Request $request)
-    {
-        $usuario = Auth::user();
-
-        $query = Pedido::where('usuario_id', $usuario->id)
-            ->with([
-                'empresa',
-                'statusPedido',
-                'formaPagamento',
-                'endereco.endereco',
-                'itens.produto'
-            ]);
-
-        // Filtros opcionais
-        if ($request->has('empresa_id') && $request->empresa_id) {
-            $query->where('empresa_id', $request->empresa_id);
-        }
-
-        if ($request->has('status_id') && $request->status_id) {
-            $query->where('status_pedido_id', $request->status_id);
-        }
-
-        // Ordenação
-        $orderBy = $request->get('order_by', 'created_at');
-        $orderDirection = $request->get('order_direction', 'desc');
-        $query->orderBy($orderBy, $orderDirection);
-
-        // Paginação
-        $perPage = $request->get('per_page', 10);
-        $pedidos = $query->paginate($perPage);
-
-        return response()->json([
-            'success' => true,
-            'pedidos' => PedidoResource::collection($pedidos),
-            'paginacao' => [
-                'total' => $pedidos->total(),
-                'per_page' => $pedidos->perPage(),
-                'current_page' => $pedidos->currentPage(),
-                'last_page' => $pedidos->lastPage(),
-                'from' => $pedidos->firstItem(),
-                'to' => $pedidos->lastItem(),
-                'has_more_pages' => $pedidos->hasMorePages(),
-            ]
-        ]);
-    }
 }

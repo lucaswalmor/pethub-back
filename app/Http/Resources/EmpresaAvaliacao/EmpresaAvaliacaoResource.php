@@ -21,8 +21,6 @@ class EmpresaAvaliacaoResource extends JsonResource
             'pedido_id' => $this->pedido_id,
             'nota' => $this->nota,
             'descricao' => $this->descricao,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
 
             // Relacionamentos
             'empresa' => $this->whenLoaded('empresa', function () {

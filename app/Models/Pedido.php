@@ -8,6 +8,19 @@ class Pedido extends Model
 {
     protected $table = 'pedidos';
 
+    protected $fillable = [
+        'usuario_id',
+        'empresa_id',
+        'status_pedido_id',
+        'pagamento_id',
+        'subtotal',
+        'desconto',
+        'frete',
+        'total',
+        'observacoes',
+        'ativo',
+    ];
+
     // Relação com usuário
     public function usuario()
     {
