@@ -37,6 +37,7 @@ class UsuarioEnderecosController extends Controller
             'ponto_referencia' => $request->ponto_referencia,
             'observacoes' => $request->observacoes,
             'ativo' => true,
+            'endereco_padrao' => $request->endereco_padrao ?? false,
         ]);
 
         return response()->json([

@@ -128,6 +128,7 @@ class UsuarioController extends Controller
                         'ponto_referencia' => $empresa->endereco->ponto_referencia,
                         'observacoes' => $empresa->endereco->observacoes,
                         'ativo' => true,
+                        'endereco_padrao' => true,
                     ]);
                 }
             } elseif ($request->has('endereco')) {
@@ -145,6 +146,7 @@ class UsuarioController extends Controller
                     'ponto_referencia' => $enderecoData['ponto_referencia'] ?? null,
                     'observacoes' => $enderecoData['observacoes'] ?? null,
                     'ativo' => true,
+                    'endereco_padrao' => true,
                 ]);
             }
 

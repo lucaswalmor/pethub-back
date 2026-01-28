@@ -23,6 +23,7 @@ class UsuarioEnderecos extends Model
         'ponto_referencia',
         'observacoes',
         'ativo',
+        'endereco_padrao',
     ];
 
     // Relação com usuário

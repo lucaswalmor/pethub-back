@@ -12,9 +12,12 @@ use App\Models\PedidoItems;
 use App\Models\PedidoEndereco;
 use App\Models\PedidoHistoricoStatus;
 use App\Models\EmpresaCupom;
+use App\Models\EmpresaCupomUsado;
 use App\Models\SistemaCupom;
+use App\Models\SistemaCupomUsado;
 use App\Models\UsuarioCupom;
 use App\Models\StatusPedidos;
+use App\Models\EmpresaResgateCupom;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\VerificaEmpresa;
@@ -97,8 +100,28 @@ class PedidoController extends Controller
                 'frete' => $request->frete ?? 0,
                 'total' => $request->total,
                 'observacoes' => $request->observacoes,
+                'cupom_tipo' => $request->cupom_tipo,
+                'cupom_id' => $request->cupom_id,
+                'cupom_valor' => $request->cupom_valor ?? 0,
                 'ativo' => true,
             ]);
+
+            // Registrar uso do cupom se existir
+            if ($request->has('cupom_id') && $request->cupom_id) {
+                if ($request->cupom_tipo === 'sistema') {
+                    SistemaCupomUsado::create([
+                        'sistema_cupom_id' => $request->cupom_id,
+                        'usuario_id' => $usuario->id,
+                        'pedido_id' => $pedido->id,
+                    ]);
+                } elseif ($request->cupom_tipo === 'empresa') {
+                    EmpresaCupomUsado::create([
+                        'empresa_cupom_id' => $request->cupom_id,
+                        'usuario_id' => $usuario->id,
+                        'pedido_id' => $pedido->id,
+                    ]);
+                }
+            }
 
             // Criar itens do pedido
             if ($request->has('itens') && is_array($request->itens)) {
@@ -227,6 +250,40 @@ class PedidoController extends Controller
             }
 
             $pedido->update($updateData);
+
+            // Lógica de resgate de cupom do sistema quando o pedido for entregue
+            if ($request->has('status_pedido_id')) {
+                $statusSlug = StatusPedidos::find($request->status_pedido_id)->slug;
+
+                if ($statusSlug === 'entregue' && $pedido->cupom_tipo === 'sistema') {
+                    // Verificar se já existe um resgate para este pedido
+                    $resgateExistente = EmpresaResgateCupom::where('pedido_id', $pedido->id)->exists();
+
+                    if (!$resgateExistente) {
+                        // Buscar o registro de uso do cupom do sistema
+                        $cupomUsado = SistemaCupomUsado::where('pedido_id', $pedido->id)->first();
+
+                        EmpresaResgateCupom::create([
+                            'empresa_id' => $pedido->empresa_id,
+                            'sistema_cupom_usado_id' => $cupomUsado ? $cupomUsado->id : null,
+                            'pedido_id' => $pedido->id,
+                            'empresa_usuario_id' => Auth::id(),
+                            'valor' => $pedido->cupom_valor,
+                            'status' => 'pendente',
+                            'data_solicitacao' => now(),
+                        ]);
+                    }
+                } elseif ($statusSlug === 'cancelado') {
+                    // Se o pedido for cancelado, cancelamos o resgate se ele estiver pendente ou aprovado
+                    $resgate = EmpresaResgateCupom::where('pedido_id', $pedido->id)
+                        ->whereIn('status', ['pendente', 'aprovado'])
+                        ->first();
+
+                    if ($resgate) {
+                        $resgate->update(['status' => 'cancelado']);
+                    }
+                }
+            }
 
             DB::commit();
 

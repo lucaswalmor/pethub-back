@@ -18,6 +18,9 @@ class Pedido extends Model
         'frete',
         'total',
         'observacoes',
+        'cupom_tipo',
+        'cupom_id',
+        'cupom_valor',
         'ativo',
     ];
 
@@ -85,6 +88,14 @@ class Pedido extends Model
     public function usuarioCuponsUsados()
     {
         return $this->hasMany(UsuarioCupom::class, 'pedido_id');
+    }
+
+    /**
+     * Relação com resgate de cupom do sistema (para a empresa)
+     */
+    public function resgateCupom()
+    {
+        return $this->hasOne(EmpresaResgateCupom::class, 'pedido_id');
     }
 
     /**

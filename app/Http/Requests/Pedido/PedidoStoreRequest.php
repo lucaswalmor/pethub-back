@@ -34,6 +34,11 @@ class PedidoStoreRequest extends FormRequest
             'total' => 'required|numeric|min:0',
             'observacoes' => 'nullable|string|max:1000',
 
+            // Cupons
+            'cupom_tipo' => 'nullable|in:sistema,empresa',
+            'cupom_id' => 'nullable|integer',
+            'cupom_valor' => 'nullable|numeric|min:0',
+
             // Itens do pedido
             'itens' => 'required|array|min:1',
             'itens.*.produto_id' => 'required|exists:produtos,id',
@@ -80,6 +85,11 @@ class PedidoStoreRequest extends FormRequest
 
             'observacoes.string' => 'As observações devem ser um texto válido.',
             'observacoes.max' => 'As observações não podem ter mais que 1000 caracteres.',
+
+            'cupom_tipo.in' => 'O tipo de cupom deve ser sistema ou empresa.',
+            'cupom_id.integer' => 'O ID do cupom deve ser um número inteiro.',
+            'cupom_valor.numeric' => 'O valor do cupom deve ser um número.',
+            'cupom_valor.min' => 'O valor do cupom não pode ser negativo.',
 
             // Itens do pedido
             'itens.required' => 'Os itens do pedido são obrigatórios.',
