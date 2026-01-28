@@ -91,7 +91,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', 'show')->middleware('check.permission:empresas.show');
         Route::post('/{id}/upload-image', 'uploadImage')->middleware('check.permission:empresas.upload_image');
         Route::delete('/{id}', 'destroy')->middleware('check.permission:empresas.destroy');
-
     });
 
     // Rotas de produtos
@@ -107,5 +106,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/{id}/toggle-ativo', 'toggleAtivo')->middleware('check.permission:produtos.update');
         Route::post('/{id}/upload-image', 'uploadImage')->middleware('check.permission:produtos.upload_image');
         Route::get('/search/buscar', 'search')->middleware('check.permission:produtos.index');
+    });
+
+    // Rotas de cupons da empresa
+    Route::controller(EmpresaCuponsController::class)->prefix('cupons')->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
+
+        // Rotas especiais
+        Route::patch('/{id}/toggle-ativo', 'toggleAtivo');
+        Route::get('/{id}/usos', 'usos');
+        Route::get('/estatisticas/cupons', 'estatisticas');
     });
 });
