@@ -41,6 +41,7 @@ class SiteEmpresaResource extends JsonResource
             $dados['nicho'] = [
                 'id' => $this->nicho->id,
                 'nome' => $this->nicho->nome,
+                'imagem' => $this->nicho->imagem ? $this->nicho->imagem : null,
                 'slug' => $this->nicho->slug,
             ];
         }

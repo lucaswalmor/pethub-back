@@ -11,6 +11,13 @@ class NichosEmpresa extends Model
 
     protected $table = 'nichos_empresa';
 
+    protected $fillable = [
+        'nome',
+        'slug',
+        'imagem',
+        'ativo'
+    ];
+
     // Relação com empresas
     public function empresas()
     {

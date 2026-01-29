@@ -39,7 +39,7 @@ class SiteClienteController extends Controller
         }
 
         $empresas = $query->paginate(20);
-        $nichos = NichosEmpresa::where('ativo', true)->get(['id', 'nome', 'slug']);
+        $nichos = NichosEmpresa::where('ativo', true)->get(['id', 'nome', 'imagem', 'slug']);
 
         return response()->json([
             'success' => true,

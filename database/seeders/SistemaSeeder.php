@@ -64,17 +64,33 @@ class SistemaSeeder extends Seeder
         // Nicho da empresa
         // -----------------------------
         $nichos = [
-            'Petshop',
-            'Agropecuária',
-            'Banho e Tosa',
-            'Veterinária',
-            'Rações e Alimentos',
+            [
+                'nome' => 'Petshop',
+                'imagem' => 'https://i.ibb.co/fzbzY9WQ/petshop.png'
+            ],
+            [
+                'nome' => 'Agropecuária',
+                'imagem' => 'https://i.ibb.co/GG6QS07/agropecu-ria.png'
+            ],
+            [
+                'nome' => 'Banho e Tosa',
+                'imagem' => 'https://i.ibb.co/R4jrzbRf/banho-e-tosa.png'
+            ],
+            [
+                'nome' => 'Veterinária',
+                'imagem' => 'https://i.ibb.co/nsbkjDHt/veterin-ria.png'
+            ],
+            [
+                'nome' => 'Caça e Pesca',
+                'imagem' => 'https://i.ibb.co/p605fLGn/cacaepesca.png'
+            ],
         ];
 
         foreach ($nichos as $nicho) {
             DB::table('nichos_empresa')->insert([
-                'nome' => $nicho,
-                'slug' => strtolower(str_replace(' ', '-', $nicho)),
+                'nome' => $nicho['nome'],
+                'slug' => strtolower(str_replace(' ', '-', $nicho['nome'])),
+                'imagem' => $nicho['imagem'],
                 'ativo' => true,
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
