@@ -365,13 +365,14 @@ class EmpresaProdutosSeeder extends Seeder
                 'preco_promocional' => $index % 3 === 0 ? round($precoAjustado * 0.8, 2) : null, // 20% desconto a cada 3 produtos
                 'promocao_ate' => $index % 3 === 0 ? now()->addDays(rand(7, 30))->format('Y-m-d') : null,
                 'tem_promocao' => $index % 3 === 0,
+                'vende_granel' => $produto['categoria_id'] === 1 ? rand(0, 1) : false, // Apenas rações podem ser vendidas a granel (50% de chance)
 
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
             ]);
         }
 
-        $this->command->info('✓ Dados criados para a empresa ' . $empresaIndex . ' (endereço, configurações, horários, formas de pagamento, bairros de entrega e 5 produtos)!');
+        $this->command->info('✓ Dados criados para a empresa ' . $empresaIndex . ' (endereço, configurações, horários, formas de pagamento, bairros de entrega e 5 produtos com informações completas)!');
     }
 
     /**

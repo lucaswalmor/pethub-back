@@ -37,6 +37,7 @@ return new class extends Migration
             $table->decimal('preco_promocional', 10, 2)->nullable();
             $table->date('promocao_ate')->nullable();
             $table->boolean('tem_promocao')->default(false);
+            $table->boolean('vende_granel')->default(false);
 
             $table->timestamps();
             $table->softDeletes();

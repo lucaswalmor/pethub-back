@@ -38,6 +38,7 @@ class Produto extends Model
         'preco_promocional',
         'promocao_ate',
         'tem_promocao',
+        'vende_granel',
     ];
 
     protected $casts = [
@@ -55,6 +56,7 @@ class Produto extends Model
         'preco_promocional' => 'decimal:2',
         'promocao_ate' => 'date',
         'tem_promocao' => 'boolean',
+        'vende_granel' => 'boolean',
     ];
 
     // Boot method para gerar slug automaticamente
@@ -129,6 +131,12 @@ class Produto extends Model
         return $query->where('tipo', $tipo);
     }
 
+    // Scope para filtrar produtos que vendem a granel
+    public function scopeVendeGranel($query, $vendeGranel = true)
+    {
+        return $query->where('vende_granel', $vendeGranel);
+    }
+
     // Método para verificar se tem estoque disponível
     public function temEstoque($quantidade = 1)
     {
@@ -172,6 +180,12 @@ class Produto extends Model
     public function estoqueBaixo()
     {
         return $this->estoque <= $this->estoque_minimo;
+    }
+
+    // Método para verificar se vende a granel
+    public function vendeAGranel()
+    {
+        return $this->vende_granel;
     }
 
     // Método para calcular margem de lucro

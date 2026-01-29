@@ -42,6 +42,7 @@ class ProdutoResource extends JsonResource
             'preco_promocional' => $this->preco_promocional,
             'promocao_ate' => $this->promocao_ate?->format('Y-m-d'),
             'tem_promocao' => $this->tem_promocao,
+            'vende_granel' => $this->vende_granel,
 
             // Relacionamentos
             'empresa' => $this->whenLoaded('empresa', function () {
@@ -88,6 +89,7 @@ class ProdutoResource extends JsonResource
             'esta_em_promocao' => $this->estaEmPromocao(),
             'estoque_baixo' => $this->estoqueBaixo(),
             'margem_lucro' => $this->getMargemLucro(),
+            'vende_a_granel' => $this->vendeAGranel(),
 
             'preco_atual_formatado' => $this->when($this->getPrecoAtual(), function () {
                 return 'R$ ' . number_format($this->getPrecoAtual(), 2, ',', '.');

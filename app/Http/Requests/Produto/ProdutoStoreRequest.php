@@ -57,6 +57,7 @@ class ProdutoStoreRequest extends FormRequest
             'preco_promocional' => 'nullable|numeric|min:0|max:999999.99',
             'promocao_ate' => 'nullable|date|after:today',
             'tem_promocao' => 'nullable|boolean',
+            'vende_granel' => 'nullable|boolean',
         ];
     }
 
@@ -151,6 +152,7 @@ class ProdutoStoreRequest extends FormRequest
             'promocao_ate.after' => 'A data de promoção deve ser futura.',
 
             'tem_promocao.boolean' => 'O campo promoção deve ser verdadeiro ou falso.',
+            'vende_granel.boolean' => 'O campo vende a granel deve ser verdadeiro ou falso.',
         ];
     }
 
