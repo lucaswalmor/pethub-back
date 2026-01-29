@@ -26,6 +26,18 @@ class Produto extends Model
         'estoque',
         'destaque',
         'ativo',
+        'marca',
+        'sku',
+        'preco_custo',
+        'estoque_minimo',
+        'peso',
+        'altura',
+        'largura',
+        'comprimento',
+        'ordem',
+        'preco_promocional',
+        'promocao_ate',
+        'tem_promocao',
     ];
 
     protected $casts = [
@@ -33,6 +45,16 @@ class Produto extends Model
         'estoque' => 'decimal:3',
         'destaque' => 'boolean',
         'ativo' => 'boolean',
+        'preco_custo' => 'decimal:2',
+        'estoque_minimo' => 'decimal:3',
+        'peso' => 'decimal:3',
+        'altura' => 'decimal:2',
+        'largura' => 'decimal:2',
+        'comprimento' => 'decimal:2',
+        'ordem' => 'integer',
+        'preco_promocional' => 'decimal:2',
+        'promocao_ate' => 'date',
+        'tem_promocao' => 'boolean',
     ];
 
     // Boot method para gerar slug automaticamente
@@ -130,5 +152,36 @@ class Produto extends Model
         $this->estoque += $quantidade;
         $this->save();
         return true;
+    }
+
+    // Método para verificar se está em promoção válida
+    public function estaEmPromocao()
+    {
+        return $this->tem_promocao &&
+               $this->preco_promocional &&
+               (!$this->promocao_ate || $this->promocao_ate >= now());
+    }
+
+    // Método para obter preço atual (considerando promoção)
+    public function getPrecoAtual()
+    {
+        return $this->estaEmPromocao() ? $this->preco_promocional : $this->preco;
+    }
+
+    // Método para verificar se está com estoque baixo
+    public function estoqueBaixo()
+    {
+        return $this->estoque <= $this->estoque_minimo;
+    }
+
+    // Método para calcular margem de lucro
+    public function getMargemLucro()
+    {
+        if (!$this->preco_custo || $this->preco <= 0) {
+            return null;
+        }
+
+        $precoAtual = $this->getPrecoAtual();
+        return (($precoAtual - $this->preco_custo) / $this->preco_custo) * 100;
     }
 }

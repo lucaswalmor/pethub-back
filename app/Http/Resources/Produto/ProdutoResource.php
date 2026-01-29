@@ -29,6 +29,20 @@ class ProdutoResource extends JsonResource
             'destaque' => $this->destaque,
             'ativo' => $this->ativo,
 
+            // Novas colunas
+            'marca' => $this->marca,
+            'sku' => $this->sku,
+            'preco_custo' => $this->preco_custo,
+            'estoque_minimo' => $this->estoque_minimo,
+            'peso' => $this->peso,
+            'altura' => $this->altura,
+            'largura' => $this->largura,
+            'comprimento' => $this->comprimento,
+            'ordem' => $this->ordem,
+            'preco_promocional' => $this->preco_promocional,
+            'promocao_ate' => $this->promocao_ate?->format('Y-m-d'),
+            'tem_promocao' => $this->tem_promocao,
+
             // Relacionamentos
             'empresa' => $this->whenLoaded('empresa', function () {
                 return [
@@ -67,6 +81,32 @@ class ProdutoResource extends JsonResource
 
             'tem_estoque' => $this->when($this->estoque !== null, function () {
                 return $this->estoque > 0;
+            }),
+
+            // Campos calculados adicionais
+            'preco_atual' => $this->getPrecoAtual(),
+            'esta_em_promocao' => $this->estaEmPromocao(),
+            'estoque_baixo' => $this->estoqueBaixo(),
+            'margem_lucro' => $this->getMargemLucro(),
+
+            'preco_atual_formatado' => $this->when($this->getPrecoAtual(), function () {
+                return 'R$ ' . number_format($this->getPrecoAtual(), 2, ',', '.');
+            }),
+
+            'preco_custo_formatado' => $this->when($this->preco_custo, function () {
+                return 'R$ ' . number_format($this->preco_custo, 2, ',', '.');
+            }),
+
+            'preco_promocional_formatado' => $this->when($this->preco_promocional, function () {
+                return 'R$ ' . number_format($this->preco_promocional, 2, ',', '.');
+            }),
+
+            'peso_formatado' => $this->when($this->peso, function () {
+                return number_format($this->peso, 3, ',', '.') . ' kg';
+            }),
+
+            'dimensoes_formatado' => $this->when($this->altura && $this->largura && $this->comprimento, function () {
+                return $this->altura . ' x ' . $this->largura . ' x ' . $this->comprimento . ' cm';
             }),
 
             // URLs úteis

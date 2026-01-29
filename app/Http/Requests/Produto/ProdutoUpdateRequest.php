@@ -52,12 +52,26 @@ class ProdutoUpdateRequest extends FormRequest
             'tipo' => 'sometimes|nullable|in:produto,servico',
             'nome' => 'sometimes|nullable|string|max:255',
             'imagem' => 'sometimes|nullable|string|max:500',
-            'slug' => 'sometimes|nullable|string|max:255|unique:produtos,slug,' . $produtoId,
+            'slug' => 'sometimes|nullable|string|max:255',
             'descricao' => 'sometimes|nullable|string|max:1000',
             'preco' => 'sometimes|nullable|numeric|min:0|max:999999.99',
             'estoque' => 'sometimes|nullable|numeric|min:0|max:999999.999',
             'destaque' => 'sometimes|nullable|boolean',
             'ativo' => 'sometimes|nullable|boolean',
+
+            // Novas colunas
+            'marca' => 'sometimes|nullable|string|max:255',
+            'sku' => 'sometimes|nullable|string|max:255|unique:produtos,sku,' . $produtoId,
+            'preco_custo' => 'sometimes|nullable|numeric|min:0|max:999999.99',
+            'estoque_minimo' => 'sometimes|nullable|numeric|min:0|max:999999.999',
+            'peso' => 'sometimes|nullable|numeric|min:0|max:999.999',
+            'altura' => 'sometimes|nullable|numeric|min:0|max:9999.99',
+            'largura' => 'sometimes|nullable|numeric|min:0|max:9999.99',
+            'comprimento' => 'sometimes|nullable|numeric|min:0|max:9999.99',
+            'ordem' => 'sometimes|nullable|integer|min:0|max:999999',
+            'preco_promocional' => 'sometimes|nullable|numeric|min:0|max:999999.99',
+            'promocao_ate' => 'sometimes|nullable|date|after:today',
+            'tem_promocao' => 'sometimes|nullable|boolean',
         ];
     }
 
@@ -84,7 +98,6 @@ class ProdutoUpdateRequest extends FormRequest
 
             'slug.string' => 'O slug deve ser um texto válido.',
             'slug.max' => 'O slug não pode ter mais que 255 caracteres.',
-            'slug.unique' => 'Este slug já está sendo usado por outro produto.',
 
             'descricao.string' => 'A descrição deve ser um texto válido.',
             'descricao.max' => 'A descrição não pode ter mais que 1000 caracteres.',
@@ -99,6 +112,51 @@ class ProdutoUpdateRequest extends FormRequest
 
             'destaque.boolean' => 'O campo destaque deve ser verdadeiro ou falso.',
             'ativo.boolean' => 'O campo ativo deve ser verdadeiro ou falso.',
+
+            // Novas colunas
+            'marca.string' => 'A marca deve ser um texto válido.',
+            'marca.max' => 'A marca não pode ter mais que 255 caracteres.',
+
+            'sku.string' => 'O SKU deve ser um texto válido.',
+            'sku.max' => 'O SKU não pode ter mais que 255 caracteres.',
+            'sku.unique' => 'Este SKU já está sendo usado por outro produto.',
+
+            'preco_custo.numeric' => 'O preço de custo deve ser um valor numérico.',
+            'preco_custo.min' => 'O preço de custo não pode ser negativo.',
+            'preco_custo.max' => 'O preço de custo não pode ser maior que 999.999,99.',
+
+            'estoque_minimo.numeric' => 'O estoque mínimo deve ser um valor numérico.',
+            'estoque_minimo.min' => 'O estoque mínimo não pode ser negativo.',
+            'estoque_minimo.max' => 'O estoque mínimo não pode ser maior que 999.999,999.',
+
+            'peso.numeric' => 'O peso deve ser um valor numérico.',
+            'peso.min' => 'O peso não pode ser negativo.',
+            'peso.max' => 'O peso não pode ser maior que 999,999 kg.',
+
+            'altura.numeric' => 'A altura deve ser um valor numérico.',
+            'altura.min' => 'A altura não pode ser negativa.',
+            'altura.max' => 'A altura não pode ser maior que 9.999,99 cm.',
+
+            'largura.numeric' => 'A largura deve ser um valor numérico.',
+            'largura.min' => 'A largura não pode ser negativa.',
+            'largura.max' => 'A largura não pode ser maior que 9.999,99 cm.',
+
+            'comprimento.numeric' => 'O comprimento deve ser um valor numérico.',
+            'comprimento.min' => 'O comprimento não pode ser negativo.',
+            'comprimento.max' => 'O comprimento não pode ser maior que 9.999,99 cm.',
+
+            'ordem.integer' => 'A ordem deve ser um número inteiro.',
+            'ordem.min' => 'A ordem não pode ser negativa.',
+            'ordem.max' => 'A ordem não pode ser maior que 999.999.',
+
+            'preco_promocional.numeric' => 'O preço promocional deve ser um valor numérico.',
+            'preco_promocional.min' => 'O preço promocional não pode ser negativo.',
+            'preco_promocional.max' => 'O preço promocional não pode ser maior que 999.999,99.',
+
+            'promocao_ate.date' => 'A data de promoção deve ser uma data válida.',
+            'promocao_ate.after' => 'A data de promoção deve ser futura.',
+
+            'tem_promocao.boolean' => 'O campo promoção deve ser verdadeiro ou falso.',
         ];
     }
 

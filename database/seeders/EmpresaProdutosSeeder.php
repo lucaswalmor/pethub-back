@@ -351,11 +351,79 @@ class EmpresaProdutosSeeder extends Seeder
                 'estoque' => $estoqueAjustado,
                 'destaque' => $index < 2, // Primeiros 2 produtos são destaques
                 'ativo' => true,
+
+                // Novas colunas
+                'marca' => $this->getMarcaAleatoria(),
+                'sku' => $index % 2 === 0 ? 'PROD-' . $empresaId . '-' . str_pad($index + 1, 3, '0', STR_PAD_LEFT) : null, // SKU apenas para produtos pares
+                'preco_custo' => round($precoAjustado * 0.6, 2), // 60% do preço de venda
+                'estoque_minimo' => round($estoqueAjustado * 0.1, 3), // 10% do estoque
+                'peso' => $this->getPesoAleatorio($produto['categoria_id']),
+                'altura' => $this->getDimensaoAleatoria(),
+                'largura' => $this->getDimensaoAleatoria(),
+                'comprimento' => $this->getDimensaoAleatoria(),
+                'ordem' => $index,
+                'preco_promocional' => $index % 3 === 0 ? round($precoAjustado * 0.8, 2) : null, // 20% desconto a cada 3 produtos
+                'promocao_ate' => $index % 3 === 0 ? now()->addDays(rand(7, 30))->format('Y-m-d') : null,
+                'tem_promocao' => $index % 3 === 0,
+
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
             ]);
         }
 
         $this->command->info('✓ Dados criados para a empresa ' . $empresaIndex . ' (endereço, configurações, horários, formas de pagamento, bairros de entrega e 5 produtos)!');
+    }
+
+    /**
+     * Retorna uma marca aleatória
+     */
+    private function getMarcaAleatoria()
+    {
+        $marcas = [
+            'Royal Canin',
+            'Pedigree',
+            'Whiskas',
+            'Premier',
+            'Golden',
+            'Pro Plan',
+            'Vital Farmina',
+            'Nutrilus',
+            'Biofresh',
+            'GranPlus',
+            'Fórmula Natural',
+            'Pet Luxo',
+            'MegaZoo',
+            'ZooCenter',
+            'Pet Shop Premium',
+        ];
+
+        return $marcas[array_rand($marcas)];
+    }
+
+    /**
+     * Retorna um peso aleatório baseado na categoria
+     */
+    private function getPesoAleatorio($categoriaId)
+    {
+        $pesosPorCategoria = [
+            1 => [1.0, 5.0, 15.0, 25.0], // Rações
+            2 => [0.1, 0.3, 0.5, 1.0],   // Brinquedos
+            3 => [0.2, 0.5, 1.0, 2.0],   // Acessórios
+            4 => [0.3, 0.7, 1.2, 2.5],   // Higiene
+            5 => [0.5, 1.5, 5.0, 25.0],  // Agropecuária
+            6 => [0.1, 0.2, 0.5, 1.0],   // Medicamentos
+            7 => [0.1, 0.3, 0.8, 2.0],   // Petiscos
+        ];
+
+        $pesos = $pesosPorCategoria[$categoriaId] ?? [0.1, 0.5, 1.0, 2.0];
+        return $pesos[array_rand($pesos)];
+    }
+
+    /**
+     * Retorna uma dimensão aleatória
+     */
+    private function getDimensaoAleatoria()
+    {
+        return rand(5, 50); // 5 a 50 cm
     }
 }
