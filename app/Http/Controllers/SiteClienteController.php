@@ -64,15 +64,20 @@ class SiteClienteController extends Controller
     {
         $empresa = Empresa::where('slug', $slug)
             ->where('ativo', true)
+            ->where('cadastro_completo', true)
             ->with([
-                'nicho', 
-                'horarios', 
-                'bairrosEntregas.bairro', 
-                'produtos.categoria', 
-                'produtos.unidadeMedida',
-                'formasPagamentos.formaPagamento', 
+                'nicho',
+                'endereco',
+                'horarios',
+                'bairrosEntregas.bairro',
+                'produtos' => function($query) {
+                    $query->where('ativo', true)->with(['categoria', 'unidadeMedida']);
+                },
+                'formasPagamentos.formaPagamento',
                 'configuracoes',
-                'avaliacoes.usuario'
+                'avaliacoes' => function($query) {
+                    $query->with('usuario:id,nome')->latest()->limit(10);
+                }
             ])
             ->firstOrFail();
 

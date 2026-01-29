@@ -32,7 +32,7 @@ Route::controller(EmpresaController::class)->prefix('empresa')->group(function (
 // Rotas do Site Cliente (Públicas)
 Route::controller(SiteClienteController::class)->prefix('site')->group(function () {
     Route::get('/empresas', 'getEmpresas');
-    Route::get('/empresa/{slug}', 'getEmpresa')->name('site.empresa.show');
+    Route::get('/empresa/{slug}', 'getEmpresa');
 });
 
 // Rotas protegidas (precisam de autenticação)
