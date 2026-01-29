@@ -173,31 +173,31 @@ class EmpresaProdutosSeeder extends Seeder
             1 => [ // Petshop
                 [
                     'categoria_id' => 1, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Ração Premium para Cães Adultos', 'imagem' => 'produtos/racao-premium-caes.jpg',
+                    'nome' => 'Ração Premium para Cães Adultos', 'imagem' => '',
                     'descricao' => 'Ração premium de alta qualidade para cães adultos, rica em proteínas e vitaminas essenciais.',
                     'preco' => 89.90, 'estoque' => 50.0
                 ],
                 [
                     'categoria_id' => 1, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Ração Premium para Gatos', 'imagem' => 'produtos/racao-premium-gatos.jpg',
+                    'nome' => 'Ração Premium para Gatos', 'imagem' => '',
                     'descricao' => 'Ração premium especial para gatos, com fórmula balanceada para manter o pelo saudável.',
                     'preco' => 79.90, 'estoque' => 40.0
                 ],
                 [
                     'categoria_id' => 2, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Bola de Borracha para Cães', 'imagem' => 'produtos/bola-borracha.jpg',
+                    'nome' => 'Bola de Borracha para Cães', 'imagem' => '',
                     'descricao' => 'Bola de borracha resistente, ideal para brincadeiras e exercícios físicos.',
                     'preco' => 15.90, 'estoque' => 100.0
                 ],
                 [
                     'categoria_id' => 3, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Coleira Nylon para Cães', 'imagem' => 'produtos/coleira-nylon.jpg',
+                    'nome' => 'Coleira Nylon para Cães', 'imagem' => '',
                     'descricao' => 'Coleira de nylon resistente e confortável, disponível em várias cores.',
                     'preco' => 29.90, 'estoque' => 75.0
                 ],
                 [
                     'categoria_id' => 4, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Shampoo para Cães e Gatos', 'imagem' => 'produtos/shampoo-pet.jpg',
+                    'nome' => 'Shampoo para Cães e Gatos', 'imagem' => '',
                     'descricao' => 'Shampoo neutro suave para banho de cães e gatos, deixa o pelo macio.',
                     'preco' => 19.90, 'estoque' => 60.0
                 ],
@@ -205,31 +205,31 @@ class EmpresaProdutosSeeder extends Seeder
             2 => [ // Agropecuária
                 [
                     'categoria_id' => 1, 'unidade_medida_id' => 3, 'tipo' => 'produto',
-                    'nome' => 'Ração para Bovinos', 'imagem' => 'produtos/racao-bovinos.jpg',
+                    'nome' => 'Ração para Bovinos', 'imagem' => '',
                     'descricao' => 'Ração balanceada para bovinos de corte e leite, com alto teor proteico.',
                     'preco' => 45.00, 'estoque' => 200.0
                 ],
                 [
                     'categoria_id' => 1, 'unidade_medida_id' => 3, 'tipo' => 'produto',
-                    'nome' => 'Ração para Aves', 'imagem' => 'produtos/racao-aves.jpg',
+                    'nome' => 'Ração para Aves', 'imagem' => '',
                     'descricao' => 'Ração completa para aves poedeiras e de corte.',
                     'preco' => 35.00, 'estoque' => 150.0
                 ],
                 [
                     'categoria_id' => 5, 'unidade_medida_id' => 2, 'tipo' => 'produto',
-                    'nome' => 'Fertilizante Orgânico', 'imagem' => 'produtos/fertilizante-organico.jpg',
+                    'nome' => 'Fertilizante Orgânico', 'imagem' => '',
                     'descricao' => 'Fertilizante orgânico natural para hortaliças e frutas.',
                     'preco' => 25.00, 'estoque' => 80.0
                 ],
                 [
                     'categoria_id' => 5, 'unidade_medida_id' => 2, 'tipo' => 'produto',
-                    'nome' => 'Sementes de Milho', 'imagem' => 'produtos/sementes-milho.jpg',
+                    'nome' => 'Sementes de Milho', 'imagem' => '',
                     'descricao' => 'Sementes de milho híbrido de alta produtividade.',
                     'preco' => 15.00, 'estoque' => 500.0
                 ],
                 [
                     'categoria_id' => 5, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Inseticida Natural', 'imagem' => 'produtos/inseticida-natural.jpg',
+                    'nome' => 'Inseticida Natural', 'imagem' => '',
                     'descricao' => 'Inseticida orgânico para controle de pragas em hortas.',
                     'preco' => 18.00, 'estoque' => 120.0
                 ],
@@ -237,31 +237,31 @@ class EmpresaProdutosSeeder extends Seeder
             3 => [ // Banho e Tosa
                 [
                     'categoria_id' => 4, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Shampoo Profissional para Cães', 'imagem' => 'produtos/shampoo-profissional.jpg',
+                    'nome' => 'Shampoo Profissional para Cães', 'imagem' => '',
                     'descricao' => 'Shampoo profissional para cães, remove sujeiras profundas.',
                     'preco' => 35.00, 'estoque' => 30.0
                 ],
                 [
                     'categoria_id' => 4, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Condicionador para Pelos', 'imagem' => 'produtos/condicionador.jpg',
+                    'nome' => 'Condicionador para Pelos', 'imagem' => '',
                     'descricao' => 'Condicionador especial para deixar o pelo brilhante e macio.',
                     'preco' => 28.00, 'estoque' => 25.0
                 ],
                 [
                     'categoria_id' => 3, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Tesoura Profissional para Tosa', 'imagem' => 'produtos/tesoura-tosa.jpg',
+                    'nome' => 'Tesoura Profissional para Tosa', 'imagem' => '',
                     'descricao' => 'Tesoura profissional para tosa de cães e gatos.',
                     'preco' => 45.00, 'estoque' => 15.0
                 ],
                 [
                     'categoria_id' => 3, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Perfume para Animais', 'imagem' => 'produtos/perfume-pet.jpg',
+                    'nome' => 'Perfume para Animais', 'imagem' => '',
                     'descricao' => 'Perfume especial para animais, deixa cheiro agradável por dias.',
                     'preco' => 22.00, 'estoque' => 40.0
                 ],
                 [
                     'categoria_id' => 4, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Cera para Patas', 'imagem' => 'produtos/cera-patas.jpg',
+                    'nome' => 'Cera para Patas', 'imagem' => '',
                     'descricao' => 'Cera hidratante especial para patas de cães.',
                     'preco' => 15.00, 'estoque' => 35.0
                 ],
@@ -269,31 +269,31 @@ class EmpresaProdutosSeeder extends Seeder
             4 => [ // Veterinária
                 [
                     'categoria_id' => 5, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Antipulgas para Cães', 'imagem' => 'produtos/antipulgas.jpg',
+                    'nome' => 'Antipulgas para Cães', 'imagem' => '',
                     'descricao' => 'Medicamento veterinário para controle de pulgas e carrapatos.',
                     'preco' => 45.00, 'estoque' => 20.0
                 ],
                 [
                     'categoria_id' => 5, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Vermífugo para Gatos', 'imagem' => 'produtos/vermifugo.jpg',
+                    'nome' => 'Vermífugo para Gatos', 'imagem' => '',
                     'descricao' => 'Vermífugo oral para gatos, elimina parasitas internos.',
                     'preco' => 25.00, 'estoque' => 30.0
                 ],
                 [
                     'categoria_id' => 5, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Vacina Antirrábica', 'imagem' => 'produtos/vacina-rabica.jpg',
+                    'nome' => 'Vacina Antirrábica', 'imagem' => '',
                     'descricao' => 'Vacina antirrábica para cães e gatos, proteção anual.',
                     'preco' => 35.00, 'estoque' => 15.0
                 ],
                 [
                     'categoria_id' => 4, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Desinfetante Veterinário', 'imagem' => 'produtos/desinfetante.jpg',
+                    'nome' => 'Desinfetante Veterinário', 'imagem' => '',
                     'descricao' => 'Desinfetante específico para ambientes veterinários.',
                     'preco' => 18.00, 'estoque' => 25.0
                 ],
                 [
                     'categoria_id' => 5, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Anti-inflamatório para Animais', 'imagem' => 'produtos/antiinflamatorio.jpg',
+                    'nome' => 'Anti-inflamatório para Animais', 'imagem' => '',
                     'descricao' => 'Anti-inflamatório veterinário para dores e inflamações.',
                     'preco' => 28.00, 'estoque' => 18.0
                 ],
@@ -301,31 +301,31 @@ class EmpresaProdutosSeeder extends Seeder
             5 => [ // Caça e Pesca
                 [
                     'categoria_id' => 3, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Vara de Pesca Profissional', 'imagem' => 'produtos/vara-pesca.jpg',
+                    'nome' => 'Vara de Pesca Profissional', 'imagem' => '',
                     'descricao' => 'Vara de pesca telescópica de carbono, resistente e leve.',
                     'preco' => 120.00, 'estoque' => 12.0
                 ],
                 [
                     'categoria_id' => 3, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Molinete Shimano', 'imagem' => 'produtos/molinete.jpg',
+                    'nome' => 'Molinete Shimano', 'imagem' => '',
                     'descricao' => 'Molinete profissional Shimano para pesca esportiva.',
                     'preco' => 85.00, 'estoque' => 8.0
                 ],
                 [
                     'categoria_id' => 3, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Escopeta de Caça', 'imagem' => 'produtos/escopeta.jpg',
+                    'nome' => 'Escopeta de Caça', 'imagem' => '',
                     'descricao' => 'Escopeta calibre 12 para caça, com certificação.',
                     'preco' => 250.00, 'estoque' => 5.0
                 ],
                 [
                     'categoria_id' => 3, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Munição para Caça', 'imagem' => 'produtos/municao.jpg',
+                    'nome' => 'Munição para Caça', 'imagem' => '',
                     'descricao' => 'Munição calibre 12 para caça de pequeno porte.',
                     'preco' => 15.00, 'estoque' => 100.0
                 ],
                 [
                     'categoria_id' => 3, 'unidade_medida_id' => 1, 'tipo' => 'produto',
-                    'nome' => 'Isca Artificial para Pesca', 'imagem' => 'produtos/isca-artificial.jpg',
+                    'nome' => 'Isca Artificial para Pesca', 'imagem' => '',
                     'descricao' => 'Conjunto de iscas artificiais variadas para pesca.',
                     'preco' => 22.00, 'estoque' => 40.0
                 ],
