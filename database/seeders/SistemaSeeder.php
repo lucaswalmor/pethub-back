@@ -18,20 +18,45 @@ class SistemaSeeder extends Seeder
         // Categorias
         // -----------------------------
         $categorias = [
-            'Rações',
-            'Brinquedos',
-            'Acessórios',
-            'Higiene e Limpeza',
-            'Medicamentos',
-            'Petiscos',
-            'Serviços',
-            'Outros',
+            [
+                'nome' => 'Rações',
+                'imagem' => 'https://i.ibb.co/pvVM29V6/racao.png'
+            ],
+            [
+                'nome' => 'Brinquedos',
+                'imagem' => 'https://i.ibb.co/MknKJ6sL/brinquedos.png'
+            ],
+            [
+                'nome' => 'Acessórios',
+                'imagem' => 'https://i.ibb.co/fVBWwHr5/acessorios.png'
+            ],
+            [
+                'nome' => 'Higiene e Limpeza',
+                'imagem' => 'https://i.ibb.co/FkSnj4CL/higienelimpeza.png'
+            ],
+            [
+                'nome' => 'Medicamentos',
+                'imagem' => 'https://i.ibb.co/TMThkqz5/Medicamentos.png'
+            ],
+            [
+                'nome' => 'Petiscos',
+                'imagem' => 'https://i.ibb.co/9mv4RBSr/petisco.png'
+            ],
+            [
+                'nome' => 'Serviços',
+                'imagem' => 'https://i.ibb.co/27kVvXzY/servicos.png'
+            ],
+            [
+                'nome' => 'Outros',
+                'imagem' => null
+            ],
         ];
 
         foreach ($categorias as $categoria) {
             DB::table('categorias')->insert([
-                'nome' => $categoria,
-                'slug' => strtolower(str_replace(' ', '-', $categoria)),
+                'nome' => $categoria['nome'],
+                'slug' => strtolower(str_replace(' ', '-', $categoria['nome'])),
+                'imagem' => $categoria['imagem'],
                 'ativo' => true,
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,

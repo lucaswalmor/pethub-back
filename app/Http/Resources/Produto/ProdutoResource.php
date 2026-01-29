@@ -44,6 +44,7 @@ class ProdutoResource extends JsonResource
                     'id' => $this->categoria->id,
                     'nome' => $this->categoria->nome,
                     'slug' => $this->categoria->slug,
+                    'imagem' => $this->categoria->imagem,
                 ];
             }),
 

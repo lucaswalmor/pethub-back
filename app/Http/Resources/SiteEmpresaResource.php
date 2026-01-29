@@ -98,9 +98,19 @@ class SiteEmpresaResource extends JsonResource
         });
 
         $dados['produtos'] = $this->whenLoaded('produtos', function () {
-            return \App\Http\Resources\Produto\ProdutoResource::collection(
-                $this->produtos->where('ativo', true)
-            );
+            $produtosAtivos = $this->produtos->where('ativo', true);
+
+            // Agrupar produtos por categoria
+            $produtosPorCategoria = $produtosAtivos->groupBy(function ($produto) {
+                return $produto->categoria ? $produto->categoria->nome : 'Sem Categoria';
+            })->map(function ($produtos, $categoriaNome) {
+                return [
+                    'categoria' => $categoriaNome,
+                    'produtos' => \App\Http\Resources\Produto\ProdutoResource::collection($produtos)
+                ];
+            })->values();
+
+            return $produtosPorCategoria;
         });
 
         $dados['avaliacoes_recentes'] = $this->whenLoaded('avaliacoes', function () {

@@ -11,6 +11,13 @@ class Categorias extends Model
 
     protected $table = 'categorias';
 
+    protected $fillable = [
+        'nome',
+        'slug',
+        'imagem',
+        'ativo',
+    ];
+
     // Relação com produtos
     public function produtos()
     {

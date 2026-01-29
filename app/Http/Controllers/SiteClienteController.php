@@ -13,6 +13,7 @@ use App\Http\Resources\Pedido\PedidoResource;
 use App\Http\Resources\Usuario\UsuarioResource;
 use App\Http\Resources\Api\ApiResourceCollection;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Categorias;
 
 class SiteClienteController extends Controller
 {
@@ -81,9 +82,12 @@ class SiteClienteController extends Controller
             ])
             ->firstOrFail();
 
+        $categorias = Categorias::where('ativo', true)->get();
+
         return response()->json([
             'success' => true,
-            'empresa' => new SiteEmpresaResource($empresa)
+            'empresa' => new SiteEmpresaResource($empresa),
+            'categorias' => $categorias
         ]);
     }
 
