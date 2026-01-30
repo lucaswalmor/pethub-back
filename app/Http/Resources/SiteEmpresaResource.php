@@ -26,6 +26,7 @@ class SiteEmpresaResource extends JsonResource
             // 'path_banner' => $this->path_banner ? asset('storage/' . $this->path_banner) : null,
             'ativo' => $this->ativo,
             'empresa_aberta' => $this->isAberta(),
+            'horario_hoje' => $this->getHorarioHoje(),
             'empresa_nova' => $this->created_at >= now()->subMonth(),
         ];
 
@@ -131,6 +132,49 @@ class SiteEmpresaResource extends JsonResource
     }
 
     /**
+     * Obtém o horário de funcionamento do dia atual
+     */
+    private function getHorarioHoje(): ?string
+    {
+        // Obter o dia da semana (0=domingo, 1=segunda, ..., 6=sábado)
+        $dias = [
+            0 => 'domingo',
+            1 => 'segunda',
+            2 => 'terca',
+            3 => 'quarta',
+            4 => 'quinta',
+            5 => 'sexta',
+            6 => 'sabado',
+        ];
+
+        $hojeNumero = now()->dayOfWeek;
+        $hojeTexto = isset($dias[$hojeNumero]) ? $dias[$hojeNumero] : null;
+
+        if (!$hojeTexto) {
+            return null;
+        }
+
+        // Busca a relação 'horarios', caso exista
+        $horarios = $this->relationLoaded('horarios') ? $this->horarios : ($this->horarios ?? collect());
+
+        if (!$horarios || $horarios->isEmpty()) {
+            return null;
+        }
+
+        $horarioHoje = $horarios->first(function($horario) use ($hojeTexto) {
+            return strtolower($horario->dia_semana) === $hojeTexto;
+        });
+
+        if ($horarioHoje && $horarioHoje->horario_inicio && $horarioHoje->horario_fim) {
+            $horarioInicio = Carbon::createFromFormat('H:i:s', $horarioHoje->horario_inicio)->format('H:i');
+            $horarioFim = Carbon::createFromFormat('H:i:s', $horarioHoje->horario_fim)->format('H:i');
+            return $horarioInicio . ' - ' . $horarioFim;
+        }
+
+        return null;
+    }
+
+    /**
      * Lógica para verificar se a empresa está aberta
      */
     private function isAberta(): bool
@@ -141,7 +185,7 @@ class SiteEmpresaResource extends JsonResource
 
         $agora = Carbon::now('America/Sao_Paulo');
         $diaSemanaIngles = strtolower($agora->format('l'));
-        
+
         $mapaDias = [
             'monday' => 'segunda',
             'tuesday' => 'terça',
