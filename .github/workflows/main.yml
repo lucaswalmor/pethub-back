@@ -20,4 +20,5 @@ jobs:
           username: ${{ secrets.ftp_user }}
           password: ${{ secrets.ftp_password }}
           local-dir: ./
-          server-dir: /pet.lksoftware.com.br/
+          remote-dir: /pet.lksoftware.com.br/
+          # server-dir: /pet.lksoftware.com.br/
