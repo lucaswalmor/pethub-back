@@ -5,14 +5,23 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Empresa;
 use App\Models\Pedido;
+use App\Models\PedidoItems;
+use App\Models\PedidoEndereco;
+use App\Models\PedidoHistoricoStatus;
 use App\Models\NichosEmpresa;
 use App\Models\UsuarioEnderecos;
 use App\Models\UsuarioCupom;
+use App\Models\EmpresaCupom;
+use App\Models\EmpresaCupomUsado;
+use App\Models\SistemaCupom;
+use App\Models\SistemaCupomUsado;
+use App\Models\StatusPedidos;
 use App\Http\Resources\SiteEmpresaResource;
 use App\Http\Resources\Pedido\PedidoResource;
 use App\Http\Resources\Usuario\UsuarioResource;
 use App\Http\Resources\Api\ApiResourceCollection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\Categorias;
 
 class SiteClienteController extends Controller
@@ -177,7 +186,7 @@ class SiteClienteController extends Controller
     public function meusCupons()
     {
         $usuario = Auth::user();
-        
+
         // Cupons do sistema atribuídos ao usuário
         $cuponsSistema = UsuarioCupom::where('usuario_id', $usuario->id)
             ->naoUtilizados()
@@ -188,5 +197,130 @@ class SiteClienteController extends Controller
             'success' => true,
             'cupons' => $cuponsSistema
         ]);
+    }
+
+    /**
+     * Criar pedido (Privado - Cliente)
+     */
+    public function storePedido(Request $request)
+    {
+        $request->validate([
+            'empresa_id' => 'required|exists:empresas,id',
+            'pagamento_id' => 'required|exists:formas_pagamento,id',
+            'subtotal' => 'required|numeric|min:0',
+            'desconto' => 'nullable|numeric|min:0',
+            'frete' => 'nullable|numeric|min:0',
+            'total' => 'required|numeric|min:0',
+            'observacoes' => 'nullable|string',
+            'cupom_tipo' => 'nullable|in:sistema,empresa',
+            'cupom_id' => 'nullable|integer',
+            'cupom_valor' => 'nullable|numeric|min:0',
+            'itens' => 'required|array|min:1',
+            'itens.*.produto_id' => 'required|exists:produtos,id',
+            'itens.*.quantidade' => 'required|numeric|min:0.1',
+            'itens.*.preco_unitario' => 'required|numeric|min:0',
+            'itens.*.subtotal' => 'required|numeric|min:0',
+            'itens.*.observacoes' => 'nullable|string',
+            'endereco.endereco_id' => 'required|exists:usuario_enderecos,id',
+            'endereco.observacoes' => 'nullable|string',
+        ]);
+
+        $usuario = Auth::user();
+
+        // Verificar se o endereço pertence ao usuário
+        $endereco = UsuarioEnderecos::where('id', $request->endereco['endereco_id'])
+            ->where('usuario_id', $usuario->id)
+            ->first();
+
+        if (!$endereco) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Endereço inválido',
+                'message' => 'O endereço selecionado não pertence ao seu usuário.'
+            ], 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Criar pedido
+            $pedido = Pedido::create([
+                'usuario_id' => $usuario->id,
+                'empresa_id' => $request->empresa_id,
+                'status_pedido_id' => StatusPedidos::where('slug', 'pendente')->first()->id,
+                'pagamento_id' => $request->pagamento_id,
+                'subtotal' => $request->subtotal,
+                'desconto' => $request->desconto ?? 0,
+                'frete' => $request->frete ?? 0,
+                'total' => $request->total,
+                'observacoes' => $request->observacoes,
+                'cupom_tipo' => $request->cupom_tipo,
+                'cupom_id' => $request->cupom_id,
+                'cupom_valor' => $request->cupom_valor ?? 0,
+                'ativo' => true,
+            ]);
+
+            // Registrar uso do cupom se existir
+            if ($request->has('cupom_id') && $request->cupom_id) {
+                if ($request->cupom_tipo === 'sistema') {
+                    SistemaCupomUsado::create([
+                        'sistema_cupom_id' => $request->cupom_id,
+                        'usuario_id' => $usuario->id,
+                        'pedido_id' => $pedido->id,
+                    ]);
+                } elseif ($request->cupom_tipo === 'empresa') {
+                    EmpresaCupomUsado::create([
+                        'empresa_cupom_id' => $request->cupom_id,
+                        'usuario_id' => $usuario->id,
+                        'pedido_id' => $pedido->id,
+                    ]);
+                }
+            }
+
+            // Criar itens do pedido
+            if ($request->has('itens') && is_array($request->itens)) {
+                foreach ($request->itens as $item) {
+                    PedidoItems::create([
+                        'pedido_id' => $pedido->id,
+                        'produto_id' => $item['produto_id'],
+                        'quantidade' => $item['quantidade'],
+                        'preco_unitario' => $item['preco_unitario'],
+                        'preco_total' => $item['subtotal'],
+                        'observacoes' => $item['observacoes'] ?? null,
+                    ]);
+                }
+            }
+
+            // Criar endereço do pedido
+            if ($request->has('endereco')) {
+                PedidoEndereco::create([
+                    'pedido_id' => $pedido->id,
+                    'endereco_id' => $request->endereco['endereco_id'],
+                    'observacoes' => $request->endereco['observacoes'] ?? null,
+                ]);
+            }
+
+            // Criar histórico inicial
+            PedidoHistoricoStatus::create([
+                'pedido_id' => $pedido->id,
+                'status_pedido_id' => $pedido->status_pedido_id,
+                'observacoes' => 'Pedido criado via site',
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pedido criado com sucesso',
+                'pedido' => new PedidoResource($pedido),
+                'whatsapp_numero' => $pedido->empresa->configuracoes ? $pedido->empresa->configuracoes->whatsapp_pedidos_formatado : null
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'error' => 'Erro ao criar pedido',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

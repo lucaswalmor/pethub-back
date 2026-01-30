@@ -95,6 +95,16 @@ class SiteEmpresaResource extends JsonResource
                 'faz_entrega' => $this->configuracoes->faz_entrega,
                 'faz_retirada' => $this->configuracoes->faz_retirada,
                 'valor_entrega_padrao' => $this->configuracoes->valor_entrega_padrao,
+                'whatsapp_pedidos' => $this->configuracoes->whatsapp_pedidos,
+                'whatsapp_pedidos_formatado' => $this->configuracoes->whatsapp_pedidos ? preg_replace('/[^\d]/', '', $this->configuracoes->whatsapp_pedidos) : null,
+                'telefone_comercial' => $this->configuracoes->telefone_comercial,
+                'celular_comercial' => $this->configuracoes->celular_comercial,
+                'email' => $this->configuracoes->email,
+                'facebook' => $this->configuracoes->facebook,
+                'instagram' => $this->configuracoes->instagram,
+                'linkedin' => $this->configuracoes->linkedin,
+                'youtube' => $this->configuracoes->youtube,
+                'tiktok' => $this->configuracoes->tiktok,
             ];
         });
 

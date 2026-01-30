@@ -86,6 +86,7 @@ class EmpresaProdutosSeeder extends Seeder
             'faz_retirada' => true,
             'valor_entrega_padrao' => 10.00 + ($empresaIndex * 5.00),
             'telefone_comercial' => '(34) 9' . str_pad($empresaIndex, 4, '0', STR_PAD_LEFT) . '-0000',
+            'whatsapp_pedidos' => '(34) 99202-1394',
             'instagram' => 'https://instagram.com/petshop' . $empresaIndex,
             'created_at' => $timestamp,
             'updated_at' => $timestamp,
