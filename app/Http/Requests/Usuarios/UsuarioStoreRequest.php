@@ -48,13 +48,13 @@ class UsuarioStoreRequest extends FormRequest
 
             // Endereço (obrigatório apenas para clientes, opcional para funcionários)
             'endereco' => 'nullable|array',
-            'endereco.cep' => 'nullable|string|max:10',
-            'endereco.rua' => 'required_with:endereco|string|max:255',
-            'endereco.numero' => 'required_with:endereco|string|max:20',
+            'endereco.cep' => 'required|string|max:10',
+            'endereco.rua' => 'required|string|max:255',
+            'endereco.numero' => 'required|string|max:20',
             'endereco.complemento' => 'nullable|string|max:255',
-            'endereco.bairro' => 'nullable|string|max:255',
-            'endereco.cidade' => 'nullable|string|max:255',
-            'endereco.estado' => 'nullable|string|size:2',
+            'endereco.bairro' => 'required|string|max:255',
+            'endereco.cidade' => 'required|string|max:255',
+            'endereco.estado' => 'required|string|size:2',
             'endereco.ponto_referencia' => 'nullable|string|max:255',
             'endereco.observacoes' => 'nullable|string|max:500',
         ];
@@ -103,26 +103,30 @@ class UsuarioStoreRequest extends FormRequest
             // Endereço
             'endereco.array' => 'Os dados de endereço devem ser um objeto válido.',
 
+            'endereco.cep.required' => 'O CEP é obrigatório.',
             'endereco.cep.string' => 'O CEP deve ser um texto válido.',
             'endereco.cep.max' => 'O CEP não pode ter mais que 10 caracteres.',
 
-            'endereco.rua.required_with' => 'A rua é obrigatória quando endereço é fornecido.',
+            'endereco.rua.required' => 'A rua é obrigatória.',
             'endereco.rua.string' => 'A rua deve ser um texto válido.',
             'endereco.rua.max' => 'A rua não pode ter mais que 255 caracteres.',
 
-            'endereco.numero.required_with' => 'O número é obrigatório quando endereço é fornecido.',
+            'endereco.numero.required' => 'O número é obrigatório.',
             'endereco.numero.string' => 'O número deve ser um texto válido.',
             'endereco.numero.max' => 'O número não pode ter mais que 20 caracteres.',
 
             'endereco.complemento.string' => 'O complemento deve ser um texto válido.',
             'endereco.complemento.max' => 'O complemento não pode ter mais que 255 caracteres.',
 
+            'endereco.bairro.required' => 'O bairro é obrigatório.',
             'endereco.bairro.string' => 'O bairro deve ser um texto válido.',
             'endereco.bairro.max' => 'O bairro não pode ter mais que 255 caracteres.',
 
+            'endereco.cidade.required' => 'A cidade é obrigatória.',
             'endereco.cidade.string' => 'A cidade deve ser um texto válido.',
             'endereco.cidade.max' => 'A cidade não pode ter mais que 255 caracteres.',
 
+            'endereco.estado.required' => 'O estado é obrigatório.',
             'endereco.estado.string' => 'O estado deve ser um texto válido.',
             'endereco.estado.size' => 'O estado deve ter exatamente 2 caracteres (sigla).',
 
@@ -171,7 +175,7 @@ class UsuarioStoreRequest extends FormRequest
 
         $validator->after(function ($validator) use ($hasToken) {
             if (!$hasToken) {
-                // Se não há token (cliente), deve enviar endereço
+                // Se não há token (cliente), deve enviar endereço completo
                 if (!$this->has('endereco')) {
                     $validator->errors()->add('endereco', 'Clientes devem enviar os dados de endereço.');
                 }
