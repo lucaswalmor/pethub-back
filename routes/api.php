@@ -69,7 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Rotas do Site Cliente (Privadas)
     Route::controller(SiteClienteController::class)->prefix('site')->group(function () {
-        Route::get('/meu-perfil', 'getPerfil');
+        Route::get('/perfil', 'getPerfil');
         Route::get('/meus-pedidos', 'getPedidos');
         Route::get('/meu-pedido/{id}', 'getPedido');
         Route::get('/meus-enderecos', 'getEnderecos');
