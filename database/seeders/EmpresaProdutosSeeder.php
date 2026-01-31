@@ -35,6 +35,7 @@ class EmpresaProdutosSeeder extends Seeder
                 'slug' => Str::slug($dadosEmpresa['nome']),
                 'email' => 'contato@' . Str::slug($dadosEmpresa['nome']) . '.com',
                 'telefone' => '(34) 9' . str_pad($index, 4, '0', STR_PAD_LEFT) . '-0000',
+                'whatsapp_numero' => '34992021394',
                 'cnpj' => '12.345.678/000' . $index . '-' . str_pad($index * 10, 2, '0', STR_PAD_LEFT),
                 'nicho_id' => $dadosEmpresa['nicho_id'],
                 'cadastro_completo' => true,
