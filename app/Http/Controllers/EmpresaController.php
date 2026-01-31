@@ -108,6 +108,26 @@ class EmpresaController extends Controller
                 ]);
             }
 
+            // Cria as configurações da empresa
+            $configuracoes = $empresa->configuracoes()->create([
+                'empresa_id' => $empresa->id,
+                'faz_entrega' => false,
+                'faz_retirada' => true,
+                'a_combinar' => false,
+                'valor_entrega_padrao' => 10.00,
+                'valor_entrega_minimo' => 10.00,
+            ]);
+
+            // Cria o horário da empresa
+            $horario = $empresa->horarios()->create([
+                'empresa_id' => $empresa->id,
+                'dia_semana' => 'segunda',
+                'slug' => 'segunda',
+                'horario_inicio' => '08:00',
+                'horario_fim' => '18:00',
+                'padrao' => true,
+            ]);
+
             DB::commit();
 
             return response()->json([

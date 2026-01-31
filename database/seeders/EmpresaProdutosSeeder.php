@@ -82,40 +82,28 @@ class EmpresaProdutosSeeder extends Seeder
         // -----------------------------
         DB::table('empresa_configuracoes')->insert([
             'empresa_id' => $empresaId,
-            'faz_entrega' => true,
+            'faz_entrega' => false,
             'faz_retirada' => true,
-            'valor_entrega_padrao' => 10.00 + ($empresaIndex * 5.00),
-            'telefone_comercial' => '(34) 9' . str_pad($empresaIndex, 4, '0', STR_PAD_LEFT) . '-0000',
-            'whatsapp_pedidos' => '(34) 99202-1394',
-            'instagram' => 'https://instagram.com/petshop' . $empresaIndex,
+            'a_combinar' => false,
+            'valor_entrega_padrao' => 10.00,
+            'valor_entrega_minimo' => 10.00,
             'created_at' => $timestamp,
             'updated_at' => $timestamp,
         ]);
 
         // -----------------------------
-        // Criar horários da empresa
+        // Criar horário da empresa
         // -----------------------------
-        $horarios = [
-            ['dia_semana' => 'segunda', 'horario_inicio' => '08:00', 'horario_fim' => '18:00'],
-            ['dia_semana' => 'terça', 'horario_inicio' => '08:00', 'horario_fim' => '18:00'],
-            ['dia_semana' => 'quarta', 'horario_inicio' => '08:00', 'horario_fim' => '18:00'],
-            ['dia_semana' => 'quinta', 'horario_inicio' => '08:00', 'horario_fim' => '18:00'],
-            ['dia_semana' => 'sexta', 'horario_inicio' => '08:00', 'horario_fim' => '18:00'],
-            ['dia_semana' => 'sábado', 'horario_inicio' => '08:00', 'horario_fim' => '12:00'],
-        ];
-
-        foreach ($horarios as $horario) {
-            DB::table('empresa_horarios')->insert([
-                'empresa_id' => $empresaId,
-                'dia_semana' => $horario['dia_semana'],
-                'slug' => Str::slug($horario['dia_semana']),
-                'horario_inicio' => $horario['horario_inicio'],
-                'horario_fim' => $horario['horario_fim'],
-                'padrao' => true,
-                'created_at' => $timestamp,
-                'updated_at' => $timestamp,
-            ]);
-        }
+        DB::table('empresa_horarios')->insert([
+            'empresa_id' => $empresaId,
+            'dia_semana' => 'segunda',
+            'slug' => 'segunda',
+            'horario_inicio' => '08:00',
+            'horario_fim' => '18:00',
+            'padrao' => true,
+            'created_at' => $timestamp,
+            'updated_at' => $timestamp,
+        ]);
 
         // -----------------------------
         // Criar formas de pagamento da empresa
@@ -138,40 +126,17 @@ class EmpresaProdutosSeeder extends Seeder
         }
 
         // -----------------------------
-        // Criar bairros de entrega da empresa
+        // Criar bairro de entrega da empresa
         // -----------------------------
-        $bairrosEntrega = [
-            [
-                'bairro_id' => $empresaIndex,
-                'valor_entrega' => 5.00 + ($empresaIndex * 2.00),
-                'valor_entrega_minimo' => 20.00 + ($empresaIndex * 5.00),
-                'ativo' => true
-            ],
-            [
-                'bairro_id' => $empresaIndex + 1,
-                'valor_entrega' => 7.00 + ($empresaIndex * 2.00),
-                'valor_entrega_minimo' => 25.00 + ($empresaIndex * 5.00),
-                'ativo' => true
-            ],
-            [
-                'bairro_id' => 39,
-                'valor_entrega' => 12.00,
-                'valor_entrega_minimo' => 40.00,
-                'ativo' => true
-            ],
-        ];
-
-        foreach ($bairrosEntrega as $bairro) {
-            DB::table('empresa_bairros_entregas')->insert([
-                'empresa_id' => $empresaId,
-                'bairro_id' => $bairro['bairro_id'],
-                'valor_entrega' => $bairro['valor_entrega'],
-                'valor_entrega_minimo' => $bairro['valor_entrega_minimo'],
-                'ativo' => $bairro['ativo'],
-                'created_at' => $timestamp,
-                'updated_at' => $timestamp,
-            ]);
-        }
+        DB::table('empresa_bairros_entregas')->insert([
+            'empresa_id' => $empresaId,
+            'bairro_id' => 1,
+            'valor_entrega' => 0,
+            'valor_entrega_minimo' => 0,
+            'ativo' => true,
+            'created_at' => $timestamp,
+            'updated_at' => $timestamp,
+        ]);
 
         // -----------------------------
         // Criar produtos da empresa baseado no nicho
@@ -379,7 +344,7 @@ class EmpresaProdutosSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('✓ Dados criados para a empresa ' . $empresaIndex . ' (endereço, configurações, horários, formas de pagamento, bairros de entrega e 5 produtos com informações completas)!');
+        $this->command->info('✓ Dados criados para a empresa ' . $empresaIndex . ' (endereço, configurações, horário, formas de pagamento, bairro de entrega e 5 produtos com informações completas)!');
     }
 
     /**
