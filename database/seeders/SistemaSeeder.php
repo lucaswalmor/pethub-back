@@ -20,7 +20,7 @@ class SistemaSeeder extends Seeder
         $categorias = [
             [
                 'nome' => 'Rações',
-                'imagem' => 'https://i.ibb.co/pvVM29V6/racao.png'
+                'imagem' => 'https://i.ibb.co/Pz1vbP09/racao.png'
             ],
             [
                 'nome' => 'Brinquedos',
