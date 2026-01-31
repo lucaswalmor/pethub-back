@@ -138,17 +138,21 @@ class EmpresaProdutosSeeder extends Seeder
         }
 
         // -----------------------------
-        // Criar bairro de entrega da empresa
+        // Criar bairros de entrega da empresa (TODOS os bairros da tabela)
         // -----------------------------
-        DB::table('empresa_bairros_entregas')->insert([
-            'empresa_id' => $empresaId,
-            'bairro_id' => 1,
-            'valor_entrega' => 0,
-            'valor_entrega_minimo' => 0,
-            'ativo' => true,
-            'created_at' => $timestamp,
-            'updated_at' => $timestamp,
-        ]);
+        $bairros = DB::table('bairros')->select('id')->get();
+        
+        foreach ($bairros as $bairro) {
+            DB::table('empresa_bairros_entregas')->insert([
+                'empresa_id' => $empresaId,
+                'bairro_id' => $bairro->id,
+                'valor_entrega' => 0,
+                'valor_entrega_minimo' => 0,
+                'ativo' => true,
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ]);
+        }
 
         // -----------------------------
         // Criar produtos da empresa baseado no nicho
@@ -356,7 +360,8 @@ class EmpresaProdutosSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('✓ Dados criados para a empresa ' . $empresaIndex . ' (endereço, configurações, horários 24/7, formas de pagamento, bairro de entrega e 5 produtos com informações completas)!');
+        $totalBairros = $bairros->count();
+        $this->command->info('✓ Dados criados para a empresa ' . $empresaIndex . ' (endereço, configurações, horários 24/7, formas de pagamento, ' . $totalBairros . ' bairros de entrega e 5 produtos com informações completas)!');
     }
 
     /**
