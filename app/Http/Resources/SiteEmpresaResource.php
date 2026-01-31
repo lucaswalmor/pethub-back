@@ -199,11 +199,11 @@ class SiteEmpresaResource extends JsonResource
 
         $mapaDias = [
             'monday' => 'segunda',
-            'tuesday' => 'terça',
+            'tuesday' => 'terca',
             'wednesday' => 'quarta',
             'thursday' => 'quinta',
             'friday' => 'sexta',
-            'saturday' => 'sábado',
+            'saturday' => 'sabado',
             'sunday' => 'domingo',
         ];
 
