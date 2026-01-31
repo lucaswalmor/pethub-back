@@ -38,6 +38,7 @@ class UsuarioResource extends JsonResource
                         'ponto_referencia' => $endereco->ponto_referencia,
                         'observacoes' => $endereco->observacoes,
                         'ativo' => $endereco->ativo,
+                        'endereco_padrao' => $endereco->endereco_padrao,
                     ];
                 });
             }),
