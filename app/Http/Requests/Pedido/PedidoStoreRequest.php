@@ -163,7 +163,8 @@ class PedidoStoreRequest extends FormRequest
                     }
 
                     // Verificar estoque
-                    if (isset($produto->estoque) && $produto->estoque < $item['quantidade']) {
+                    $quantidadeParaValidar = $produto->vende_granel ? $item['quantidade'] / 1000 : $item['quantidade'];
+                    if (isset($produto->estoque) && $produto->estoque < $quantidadeParaValidar) {
                         $validator->errors()->add("itens.{$index}.quantidade", "Estoque insuficiente. Disponível: {$produto->estoque}");
                     }
 
