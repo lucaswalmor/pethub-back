@@ -48,6 +48,17 @@ class SiteClienteController extends Controller
             });
         }
 
+        // Filtro por bairro
+        if ($request->has('bairro') && !empty(trim($request->bairro))) {
+            $query->whereHas('bairrosEntregas', function($q) use ($request) {
+                $q->whereHas('bairro', function($qb) use ($request) {
+                    $qb->where('nome', $request->bairro)
+                       ->where('ativo', true);
+                })
+                ->where('ativo', true);
+            });
+        }
+
         $empresas = $query->paginate(20);
         $nichos = NichosEmpresa::where('ativo', true)->get(['id', 'nome', 'imagem', 'slug']);
 
@@ -63,8 +74,6 @@ class SiteClienteController extends Controller
                 'has_more_pages' => $empresas->hasMorePages(),
             ]
         ]);
-
-        return $response;
     }
 
     /**
