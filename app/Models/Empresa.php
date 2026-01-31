@@ -73,6 +73,12 @@ class Empresa extends Model
         return $this->hasMany(UsuarioEmpresas::class, 'empresa_id');
     }
 
+    // Relação com favoritos
+    public function empresaFavoritos()
+    {
+        return $this->hasMany(EmpresaFavorito::class, 'empresa_id');
+    }
+
     // Relação com produtos
     public function produtos()
     {

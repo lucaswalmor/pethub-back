@@ -76,6 +76,12 @@ class User extends Authenticatable
         return $this->hasMany(UsuarioEmpresas::class, 'usuario_id');
     }
 
+    // Relação com empresas favoritas
+    public function empresaFavoritos()
+    {
+        return $this->hasMany(EmpresaFavorito::class, 'usuario_id');
+    }
+
     // Relação many-to-many com permissões
     public function permissoes()
     {

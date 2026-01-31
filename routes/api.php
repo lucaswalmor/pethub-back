@@ -11,6 +11,7 @@ use App\Http\Controllers\EmpresaAvaliacaoController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\SiteClienteController;
 use App\Http\Controllers\UsuarioEnderecosController;
+use App\Http\Controllers\EmpresaFavoritoController;
 
 // Rotas de autenticação (não precisam de middleware)
 Route::post('/login', [AuthController::class, 'login']);
@@ -83,6 +84,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', 'update');
         Route::put('/{id}/padrao', 'setPadrao');
         Route::delete('/{id}', 'destroy');
+    });
+
+    // Gestão de Favoritos
+    Route::controller(EmpresaFavoritoController::class)->prefix('favoritos')->group(function () {
+        Route::post('/toggle/{empresaId}', 'toggleFavorito');
+        Route::get('/', 'listarFavoritos');
     });
 
     // Rotas de empresas

@@ -30,6 +30,10 @@ class SiteEmpresaResource extends JsonResource
             'empresa_nova' => $this->created_at >= now()->subMonth(),
         ];
 
+        // Verificar se a empresa está nos favoritos do usuário autenticado
+        $usuario = auth('sanctum')->user();
+        $dados['has_favorite'] = $usuario ? $this->empresaFavoritos()->where('usuario_id', $usuario->id)->exists() : false;
+
         // Média de avaliações
         if ($this->relationLoaded('avaliacoes')) {
             $media = $this->avaliacoes()->selectRaw('AVG(nota) as media, COUNT(*) as total')->first();
