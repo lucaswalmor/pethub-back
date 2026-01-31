@@ -26,10 +26,6 @@ class UsuarioLog extends Model
         'usuario_id' => 'integer', // Garante que seja sempre integer
     ];
 
-    protected $casts = [
-        'dados_adicionais' => 'array',
-    ];
-
     // Relacionamento com usuário (opcional)
     public function usuario()
     {

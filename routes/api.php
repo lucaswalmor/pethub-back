@@ -8,6 +8,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\PermissaoController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\EmpresaAvaliacaoController;
+use App\Http\Controllers\EmpresaCuponsController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\SiteClienteController;
 use App\Http\Controllers\UsuarioEnderecosController;
@@ -136,15 +137,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/estatisticas/cupons', 'estatisticas');
     });
 
-    // Estatísticas de Logs (Protegidas - apenas lojistas)
+    // Gestão de Logs (Autenticação automática via Sanctum)
     Route::controller(UsuarioLogController::class)->prefix('logs')->group(function () {
         Route::get('/estatisticas/empresa/{empresaId}', 'getEstatisticasEmpresa');
+        Route::post('/adicionar-produto-carrinho', 'salvarLogAdicionarProdutoCarrinho');
+        Route::post('/remover-produto-carrinho', 'salvarLogRemoverProdutoCarrinho');
+        Route::post('/trocar-loja', 'salvarLogTrocarLoja');
     });
-});
-
-// Rotas de Logs (Públicas - para rastrear visitantes)
-Route::controller(UsuarioLogController::class)->prefix('logs')->group(function () {
-    Route::post('/adicionar-produto-carrinho', 'salvarLogAdicionarProdutoCarrinho');
-    Route::post('/remover-produto-carrinho', 'salvarLogRemoverProdutoCarrinho');
-    Route::post('/trocar-loja', 'salvarLogTrocarLoja');
 });
