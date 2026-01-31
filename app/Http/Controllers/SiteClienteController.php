@@ -33,7 +33,7 @@ class SiteClienteController extends Controller
     {
         $query = Empresa::where('ativo', true)
             ->where('cadastro_completo', true)
-            ->with(['nicho', 'horarios', 'avaliacoes']);
+            ->with(['nicho', 'horarios', 'avaliacoes', 'bairrosEntregas.bairro']);
 
         // Filtro por nicho
         if ($request->has('nicho_id') && !empty($request->nicho_id)) {

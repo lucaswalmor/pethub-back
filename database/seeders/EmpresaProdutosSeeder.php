@@ -153,6 +153,12 @@ class EmpresaProdutosSeeder extends Seeder
                 'valor_entrega_minimo' => 25.00 + ($empresaIndex * 5.00),
                 'ativo' => true
             ],
+            [
+                'bairro_id' => 39,
+                'valor_entrega' => 12.00,
+                'valor_entrega_minimo' => 40.00,
+                'ativo' => true
+            ],
         ];
 
         foreach ($bairrosEntrega as $bairro) {
