@@ -12,6 +12,7 @@ use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\SiteClienteController;
 use App\Http\Controllers\UsuarioEnderecosController;
 use App\Http\Controllers\EmpresaFavoritoController;
+use App\Http\Controllers\UsuarioLogController;
 
 // Rotas de autenticação (não precisam de middleware)
 Route::post('/login', [AuthController::class, 'login']);
@@ -30,14 +31,13 @@ Route::controller(EmpresaController::class)->prefix('empresa')->group(function (
 });
 
 
-// Rotas do Site Cliente (Públicas)
-Route::controller(SiteClienteController::class)->prefix('site')->group(function () {
-    Route::get('/empresas', 'getEmpresas');
-    Route::get('/empresa/{slug}', 'getEmpresa');
-});
-
 // Rotas protegidas (precisam de autenticação)
 Route::middleware('auth:sanctum')->group(function () {
+    // Rotas do Site Cliente (Autenticação opcional)
+    Route::controller(SiteClienteController::class)->prefix('site')->group(function () {
+        Route::get('/empresas', 'getEmpresas');
+        Route::get('/empresa/{slug}', 'getEmpresa');
+    });
     // Rota para listar permissões
     Route::get('/permissoes', [PermissaoController::class, 'index']);
 
@@ -92,6 +92,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', 'listarFavoritos');
     });
 
+    // Estatísticas de Logs (Protegidas - apenas lojistas)
+    Route::controller(UsuarioLogController::class)->prefix('logs')->group(function () {
+        Route::get('/estatisticas/empresa/{empresaId}', 'getEstatisticasEmpresa');
+    });
+
     // Rotas de empresas
     Route::controller(EmpresaController::class)->prefix('empresa')->group(function () {
         Route::get('/', 'index')->middleware('check.permission:empresas.index');
@@ -130,4 +135,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}/usos', 'usos');
         Route::get('/estatisticas/cupons', 'estatisticas');
     });
+
+    // Estatísticas de Logs (Protegidas - apenas lojistas)
+    Route::controller(UsuarioLogController::class)->prefix('logs')->group(function () {
+        Route::get('/estatisticas/empresa/{empresaId}', 'getEstatisticasEmpresa');
+    });
+});
+
+// Rotas de Logs (Públicas - para rastrear visitantes)
+Route::controller(UsuarioLogController::class)->prefix('logs')->group(function () {
+    Route::post('/adicionar-produto-carrinho', 'salvarLogAdicionarProdutoCarrinho');
+    Route::post('/remover-produto-carrinho', 'salvarLogRemoverProdutoCarrinho');
+    Route::post('/trocar-loja', 'salvarLogTrocarLoja');
 });

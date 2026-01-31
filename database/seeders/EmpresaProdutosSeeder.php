@@ -92,18 +92,30 @@ class EmpresaProdutosSeeder extends Seeder
         ]);
 
         // -----------------------------
-        // Criar horário da empresa
+        // Criar horários da empresa (sempre abertas - 24/7)
         // -----------------------------
-        DB::table('empresa_horarios')->insert([
-            'empresa_id' => $empresaId,
-            'dia_semana' => 'segunda',
-            'slug' => 'segunda',
-            'horario_inicio' => '08:00',
-            'horario_fim' => '18:00',
-            'padrao' => true,
-            'created_at' => $timestamp,
-            'updated_at' => $timestamp,
-        ]);
+        $diasSemana = [
+            ['dia_semana' => 'segunda', 'slug' => 'segunda'],
+            ['dia_semana' => 'terca', 'slug' => 'terca'],
+            ['dia_semana' => 'quarta', 'slug' => 'quarta'],
+            ['dia_semana' => 'quinta', 'slug' => 'quinta'],
+            ['dia_semana' => 'sexta', 'slug' => 'sexta'],
+            ['dia_semana' => 'sabado', 'slug' => 'sabado'],
+            ['dia_semana' => 'domingo', 'slug' => 'domingo'],
+        ];
+
+        foreach ($diasSemana as $dia) {
+            DB::table('empresa_horarios')->insert([
+                'empresa_id' => $empresaId,
+                'dia_semana' => $dia['dia_semana'],
+                'slug' => $dia['slug'],
+                'horario_inicio' => '00:00',
+                'horario_fim' => '23:59',
+                'padrao' => true,
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ]);
+        }
 
         // -----------------------------
         // Criar formas de pagamento da empresa
@@ -344,7 +356,7 @@ class EmpresaProdutosSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('✓ Dados criados para a empresa ' . $empresaIndex . ' (endereço, configurações, horário, formas de pagamento, bairro de entrega e 5 produtos com informações completas)!');
+        $this->command->info('✓ Dados criados para a empresa ' . $empresaIndex . ' (endereço, configurações, horários 24/7, formas de pagamento, bairro de entrega e 5 produtos com informações completas)!');
     }
 
     /**

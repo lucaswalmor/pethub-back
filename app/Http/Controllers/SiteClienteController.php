@@ -23,6 +23,7 @@ use App\Http\Resources\Api\ApiResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Categorias;
+use App\Models\UsuarioLog;
 
 class SiteClienteController extends Controller
 {
@@ -101,6 +102,25 @@ class SiteClienteController extends Controller
             ->firstOrFail();
 
         $categorias = Categorias::where('ativo', true)->get();
+
+        // Registrar log de acesso à loja apenas se usuário estiver autenticado
+        $usuario = Auth::user();
+        if ($usuario) {
+            $lojaAberta = $empresa->isAberta();
+            $acao = $lojaAberta ? 'acesso_loja_aberta' : 'acesso_loja_fechada';
+
+            UsuarioLog::create([
+                'usuario_id' => $usuario->id,
+                'empresa_id' => $empresa->id,
+                'acao' => $acao,
+                'dados_adicionais' => [
+                    'horario_acesso' => now()->format('H:i:s'),
+                    'dia_semana' => now()->dayOfWeek
+                ],
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+        }
 
         return response()->json([
             'success' => true,

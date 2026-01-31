@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 
 class Empresa extends Model
 {
@@ -117,5 +118,45 @@ class Empresa extends Model
     public function cuponsAtivos()
     {
         return $this->cupons()->ativos()->get();
+    }
+
+    /**
+     * Verificar se a empresa está aberta no momento
+     */
+    public function isAberta(): bool
+    {
+        if (!$this->relationLoaded('horarios')) {
+            return false;
+        }
+
+        $agora = Carbon::now('America/Sao_Paulo');
+        $diaSemanaIngles = strtolower($agora->format('l'));
+
+        $mapaDias = [
+            'monday' => 'segunda',
+            'tuesday' => 'terca',
+            'wednesday' => 'quarta',
+            'thursday' => 'quinta',
+            'friday' => 'sexta',
+            'saturday' => 'sabado',
+            'sunday' => 'domingo',
+        ];
+
+        $diaSemana = $mapaDias[$diaSemanaIngles] ?? null;
+        $horaAtual = $agora->format('H:i:s');
+
+        if (!$diaSemana) {
+            return false;
+        }
+
+        foreach ($this->horarios as $horario) {
+            if ($horario->dia_semana === $diaSemana) {
+                if ($horaAtual >= $horario->horario_inicio && $horaAtual <= $horario->horario_fim) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
