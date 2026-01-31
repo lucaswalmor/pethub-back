@@ -165,10 +165,17 @@ class PedidoController extends Controller
                 'itens.produto'
             ]);
 
+            // Buscar número do WhatsApp da empresa (formatado, apenas números)
+            $whatsappNumero = null;
+            if ($pedido->empresa->configuracoes && $pedido->empresa->configuracoes->whatsapp_pedidos) {
+                $whatsappNumero = preg_replace('/[^\d]/', '', $pedido->empresa->configuracoes->whatsapp_pedidos);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Pedido criado com sucesso',
-                'pedido' => new PedidoResource($pedido)
+                'pedido' => new PedidoResource($pedido),
+                'whatsapp_numero' => $whatsappNumero
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
