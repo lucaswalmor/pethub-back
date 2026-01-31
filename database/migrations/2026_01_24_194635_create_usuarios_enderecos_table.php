@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('ponto_referencia')->nullable();
             $table->string('observacoes')->nullable();
             $table->boolean('ativo')->default(true);
+            $table->boolean('endereco_padrao')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });

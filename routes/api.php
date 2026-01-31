@@ -78,8 +78,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Gestão de Endereços do Cliente
     Route::controller(UsuarioEnderecosController::class)->prefix('enderecos')->group(function () {
+        Route::get('/', 'index');
         Route::post('/', 'store');
         Route::put('/{id}', 'update');
+        Route::put('/{id}/padrao', 'setPadrao');
         Route::delete('/{id}', 'destroy');
     });
 

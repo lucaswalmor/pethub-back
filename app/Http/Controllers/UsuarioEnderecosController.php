@@ -9,6 +9,23 @@ use Illuminate\Support\Facades\Auth;
 class UsuarioEnderecosController extends Controller
 {
     /**
+     * Listar endereços do usuário
+     */
+    public function index()
+    {
+        $enderecos = UsuarioEnderecos::where('usuario_id', Auth::id())
+            ->where('ativo', true)
+            ->orderBy('endereco_padrao', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'enderecos' => $enderecos
+        ]);
+    }
+
+    /**
      * Salvar novo endereço
      */
     public function store(Request $request)
@@ -23,7 +40,15 @@ class UsuarioEnderecosController extends Controller
             'estado' => 'nullable|string|max:2',
             'ponto_referencia' => 'nullable|string|max:255',
             'observacoes' => 'nullable|string|max:500',
+            'endereco_padrao' => 'boolean',
         ]);
+
+        // Se estiver definindo como padrão, remover dos outros
+        if ($request->endereco_padrao) {
+            UsuarioEnderecos::where('usuario_id', Auth::id())
+                ->where('ativo', true)
+                ->update(['endereco_padrao' => false]);
+        }
 
         $endereco = UsuarioEnderecos::create([
             'usuario_id' => Auth::id(),
@@ -63,9 +88,19 @@ class UsuarioEnderecosController extends Controller
             'ponto_referencia' => 'nullable|string|max:255',
             'observacoes' => 'nullable|string|max:500',
             'ativo' => 'sometimes|boolean',
+            'endereco_padrao' => 'sometimes|boolean',
         ]);
 
         $endereco = UsuarioEnderecos::where('usuario_id', Auth::id())->findOrFail($id);
+
+        // Se estiver definindo como padrão, remover dos outros
+        if ($request->has('endereco_padrao') && $request->endereco_padrao) {
+            UsuarioEnderecos::where('usuario_id', Auth::id())
+                ->where('ativo', true)
+                ->where('id', '!=', $id)
+                ->update(['endereco_padrao' => false]);
+        }
+
         $endereco->update($request->all());
 
         return response()->json([
@@ -86,6 +121,32 @@ class UsuarioEnderecosController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Endereço removido com sucesso'
+        ]);
+    }
+
+    /**
+     * Definir endereço como padrão
+     */
+    public function setPadrao($id)
+    {
+        $usuarioId = Auth::id();
+
+        // Remover marcação de padrão dos outros endereços
+        UsuarioEnderecos::where('usuario_id', $usuarioId)
+            ->where('ativo', true)
+            ->update(['endereco_padrao' => false]);
+
+        // Definir este endereço como padrão
+        $endereco = UsuarioEnderecos::where('usuario_id', $usuarioId)
+            ->where('ativo', true)
+            ->findOrFail($id);
+
+        $endereco->update(['endereco_padrao' => true]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Endereço padrão definido com sucesso',
+            'endereco' => $endereco
         ]);
     }
 }

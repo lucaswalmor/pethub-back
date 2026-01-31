@@ -40,6 +40,23 @@ class UsuarioLoginResource extends JsonResource
                     ];
                 });
             }, []),
+            'enderecos' => $this->whenLoaded('enderecos', function () {
+                return $this->enderecos->where('ativo', true)->map(function ($endereco) {
+                    return [
+                        'id' => $endereco->id,
+                        'cep' => $endereco->cep,
+                        'rua' => $endereco->rua,
+                        'numero' => $endereco->numero,
+                        'complemento' => $endereco->complemento,
+                        'bairro' => $endereco->bairro,
+                        'cidade' => $endereco->cidade,
+                        'estado' => $endereco->estado,
+                        'ponto_referencia' => $endereco->ponto_referencia,
+                        'observacoes' => $endereco->observacoes,
+                        'endereco_padrao' => $endereco->endereco_padrao ?? false,
+                    ];
+                });
+            }, []),
         ];
     }
 }
