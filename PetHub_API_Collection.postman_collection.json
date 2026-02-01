@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-		"name": "PetHub API",
-		"description": "Coleção de endpoints da API PetHub para gerenciamento de empresas pet",
+		"name": "PetGre API",
+		"description": "Coleção de endpoints da API PetGre para gerenciamento de empresas pet",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "12345678"
 	},

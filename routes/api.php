@@ -14,6 +14,7 @@ use App\Http\Controllers\SiteClienteController;
 use App\Http\Controllers\UsuarioEnderecosController;
 use App\Http\Controllers\EmpresaFavoritoController;
 use App\Http\Controllers\UsuarioLogController;
+use App\Http\Controllers\FaqController;
 
 // Rotas de autenticação (não precisam de middleware)
 Route::post('/login', [AuthController::class, 'login']);
@@ -39,6 +40,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/empresas', 'getEmpresas');
         Route::get('/empresa/{slug}', 'getEmpresa');
     });
+    
+    // Rotas de FAQ (Público - não precisa autenticação, mas está no grupo)
+    Route::controller(FaqController::class)->prefix('faqs')->group(function () {
+        Route::get('/', 'index');
+        Route::get('/buscar', 'buscar');
+    });
+    
     // Rota para listar permissões
     Route::get('/permissoes', [PermissaoController::class, 'index']);
 
