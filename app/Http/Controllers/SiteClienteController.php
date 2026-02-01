@@ -35,7 +35,9 @@ class SiteClienteController extends Controller
     {
         $query = Empresa::where('ativo', true)
             ->where('cadastro_completo', true)
-            ->with(['nicho', 'horarios', 'avaliacoes', 'bairrosEntregas.bairro']);
+            ->with(['nicho', 'horarios', 'avaliacoes', 'bairrosEntregas.bairro'])
+            ->withCount('avaliacoes')
+            ->withAvg('avaliacoes', 'nota');
 
         // Filtro por nicho
         if ($request->has('nicho_id') && !empty($request->nicho_id)) {
@@ -59,6 +61,46 @@ class SiteClienteController extends Controller
                 })
                 ->where('ativo', true);
             });
+        }
+
+        // Filtro por status (abertas agora)
+        if ($request->has('abertas') && $request->abertas == 'true') {
+            $query->whereHas('horarios', function($q) {
+                $diaSemana = now()->dayOfWeek;
+                $horaAtual = now()->format('H:i:s');
+                
+                $q->where('dia_semana', $diaSemana)
+                  ->where('horario_inicio', '<=', $horaAtual)
+                  ->where('horario_fim', '>=', $horaAtual);
+            });
+        }
+
+        // Filtro por avaliação mínima
+        if ($request->has('avaliacao_minima') && $request->avaliacao_minima > 0) {
+            $query->having('avaliacoes_avg_nota', '>=', $request->avaliacao_minima);
+        }
+
+        // Ordenação
+        if ($request->has('ordenacao') && !empty($request->ordenacao)) {
+            switch ($request->ordenacao) {
+                case 'avaliacao':
+                    $query->orderByDesc('avaliacoes_avg_nota');
+                    break;
+                case 'nome_asc':
+                    $query->orderBy('nome_fantasia', 'asc');
+                    break;
+                case 'nome_desc':
+                    $query->orderBy('nome_fantasia', 'desc');
+                    break;
+                default:
+                    // Relevância (padrão)
+                    $query->orderByDesc('avaliacoes_count')
+                          ->orderByDesc('avaliacoes_avg_nota');
+            }
+        } else {
+            // Ordenação padrão por relevância
+            $query->orderByDesc('avaliacoes_count')
+                  ->orderByDesc('avaliacoes_avg_nota');
         }
 
         $empresas = $query->paginate(20);
