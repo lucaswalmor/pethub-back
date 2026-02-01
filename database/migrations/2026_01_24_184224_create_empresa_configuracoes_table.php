@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('linkedin')->nullable();
             $table->string('youtube')->nullable();
             $table->string('tiktok')->nullable();
+            $table->boolean('aceita_cupons_sistema')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });

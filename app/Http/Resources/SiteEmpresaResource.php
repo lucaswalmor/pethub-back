@@ -110,6 +110,7 @@ class SiteEmpresaResource extends JsonResource
                 'linkedin' => $this->configuracoes->linkedin,
                 'youtube' => $this->configuracoes->youtube,
                 'tiktok' => $this->configuracoes->tiktok,
+                'aceita_cupons_sistema' => $this->configuracoes->aceita_cupons_sistema ?? false,
             ];
         });
 
