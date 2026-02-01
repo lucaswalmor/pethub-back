@@ -80,14 +80,14 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/api/site/meu-perfil",
+									"raw": "{{base_url}}/api/site/perfil",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"api",
 										"site",
-										"meu-perfil"
+										"perfil"
 									]
 								}
 							}
@@ -191,6 +191,29 @@
 					"name": "Endereços",
 					"item": [
 						{
+							"name": "Listar Endereços",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token_cliente}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/enderecos",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"enderecos"
+									]
+								},
+								"description": "Lista todos os endereços do usuário autenticado."
+							}
+						},
+						{
 							"name": "Cadastrar Endereço",
 							"request": {
 								"method": "POST",
@@ -249,6 +272,31 @@
 										"{{endereco_id}}"
 									]
 								}
+							}
+						},
+						{
+							"name": "Definir Endereço Padrão",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token_cliente}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/enderecos/{{endereco_id}}/padrao",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"enderecos",
+										"{{endereco_id}}",
+										"padrao"
+									]
+								},
+								"description": "Define um endereço como padrão para o usuário autenticado."
 							}
 						},
 						{
@@ -327,6 +375,29 @@
 								"logout"
 							]
 						}
+					}
+				},
+				{
+					"name": "Obter Usuário Autenticado",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"user"
+							]
+						},
+						"description": "Retorna informações do usuário autenticado com base no token fornecido."
 					}
 				}
 			]
@@ -964,6 +1035,38 @@
 					}
 				},
 				{
+					"name": "Criar Funcionário",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_empresa}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"Maria Santos\",\n  \"email\": \"maria.santos@empresa.com\",\n  \"password\": \"senha123\",\n  \"telefone\": \"34988888888\",\n  \"permissoes\": [2, 7, 9],\n  \"empresa_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/usuarios/criar-funcionario",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"usuarios",
+								"criar-funcionario"
+							]
+						},
+						"description": "Cria um novo funcionário vinculado a uma empresa.\n\n## 🔒 Validação de Isolamento:\n- Requer autenticação\n- Usuário autenticado deve pertencer à empresa especificada\n- Retorna **403 Forbidden** se não houver acesso autorizado\n\n## 📝 Campos Obrigatórios:\n- `nome`: Nome completo do funcionário\n- `email`: Email único no sistema\n- `password`: Senha de acesso\n- `telefone`: Telefone de contato\n- `empresa_id`: ID da empresa\n- `permissoes`: Array de IDs das permissões `[2, 7, 9]`\n\n## ⚠️ Importante:\n- **NÃO envie** o campo `endereco` (funcionários usam endereço da empresa)\n- Funcionário será vinculado automaticamente à empresa especificada\n\n## 🔑 Permissões Necessárias:\n- `usuarios.store`"
+					}
+				},
+				{
 					"name": "Listar Usuários",
 					"request": {
 						"method": "GET",
@@ -1420,6 +1523,186 @@
 			]
 		},
 		{
+			"name": "Favoritos",
+			"item": [
+				{
+					"name": "Listar Favoritos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/favoritos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"favoritos"
+							]
+						},
+						"description": "Lista todas as empresas favoritas do usuário autenticado.\n\n## 📋 Resposta:\n- Retorna array com empresas marcadas como favoritas\n- Inclui informações completas das empresas\n\n## 🔑 Permissões Necessárias:\n- Qualquer usuário autenticado pode listar seus favoritos"
+					}
+				},
+				{
+					"name": "Toggle Favorito",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/favoritos/toggle/{{empresa_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"favoritos",
+								"toggle",
+								"{{empresa_id}}"
+							]
+						},
+						"description": "Adiciona ou remove uma empresa dos favoritos do usuário.\n\n## 📋 Funcionamento:\n- Se empresa já está nos favoritos: remove dos favoritos\n- Se empresa não está nos favoritos: adiciona aos favoritos\n\n## 🔑 Permissões Necessárias:\n- Qualquer usuário autenticado pode gerenciar seus favoritos"
+					}
+				}
+			]
+		},
+		{
+			"name": "Logs de Usuário",
+			"item": [
+				{
+					"name": "Estatísticas da Empresa",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_empresa}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/logs/estatisticas/empresa/{{empresa_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"logs",
+								"estatisticas",
+								"empresa",
+								"{{empresa_id}}"
+							]
+						},
+						"description": "Obtém estatísticas de logs (comportamento dos usuários) para uma empresa específica.\n\n## 📊 Estatísticas Incluídas:\n- Total de produtos adicionados ao carrinho\n- Total de produtos removidos do carrinho\n- Total de trocas de loja\n- Produtos mais adicionados\n- Horários de maior atividade\n\n## 🔒 Validação de Isolamento:\n- Usuário autenticado deve pertencer à empresa solicitada\n- Retorna **403 Forbidden** se não houver acesso autorizado\n\n## 🔑 Permissões Necessárias:\n- Funcionários da empresa podem acessar"
+					}
+				},
+				{
+					"name": "Log Adicionar Produto ao Carrinho",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"empresa_id\": 1,\n  \"produto_id\": 1,\n  \"quantidade\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/logs/adicionar-produto-carrinho",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"logs",
+								"adicionar-produto-carrinho"
+							]
+						},
+						"description": "Registra um log quando o usuário adiciona um produto ao carrinho.\n\n## 📝 Campos:\n- `empresa_id`: ID da empresa do produto\n- `produto_id`: ID do produto adicionado\n- `quantidade`: Quantidade adicionada\n\n## 🔑 Permissões Necessárias:\n- Qualquer usuário autenticado pode registrar logs"
+					}
+				},
+				{
+					"name": "Log Remover Produto do Carrinho",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"empresa_id\": 1,\n  \"produto_id\": 1,\n  \"quantidade\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/logs/remover-produto-carrinho",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"logs",
+								"remover-produto-carrinho"
+							]
+						},
+						"description": "Registra um log quando o usuário remove um produto do carrinho.\n\n## 📝 Campos:\n- `empresa_id`: ID da empresa do produto\n- `produto_id`: ID do produto removido\n- `quantidade`: Quantidade removida\n\n## 🔑 Permissões Necessárias:\n- Qualquer usuário autenticado pode registrar logs"
+					}
+				},
+				{
+					"name": "Log Trocar Loja",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"empresa_antiga_id\": 1,\n  \"empresa_nova_id\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/logs/trocar-loja",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"logs",
+								"trocar-loja"
+							]
+						},
+						"description": "Registra um log quando o usuário troca de loja no carrinho.\n\n## 📝 Campos:\n- `empresa_antiga_id`: ID da empresa anterior\n- `empresa_nova_id`: ID da nova empresa selecionada\n\n## 🔑 Permissões Necessárias:\n- Qualquer usuário autenticado pode registrar logs"
+					}
+				}
+			]
+		},
+		{
 			"name": "Cupons",
 			"item": [
 				{
@@ -1684,6 +1967,11 @@
 		},
 		{
 			"key": "cupom_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "endereco_id",
 			"value": "",
 			"type": "string"
 		}
