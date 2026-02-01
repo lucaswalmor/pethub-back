@@ -22,6 +22,7 @@ use App\Http\Resources\Usuario\UsuarioResource;
 use App\Http\Resources\Api\ApiResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Categorias;
 use App\Models\UsuarioLog;
 
@@ -137,7 +138,7 @@ class SiteClienteController extends Controller
         $usuario = Auth::user();
         
         $pedidos = Pedido::where('usuario_id', $usuario->id)
-            ->with(['empresa', 'statusPedido', 'itens.produto'])
+            ->with(['empresa', 'statusPedido', 'itens.produto', 'formaPagamento', 'avaliacao'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -165,8 +166,8 @@ class SiteClienteController extends Controller
             ->with([
                 'empresa', 
                 'statusPedido', 
-                'itens.produto', 
-                'endereco', 
+                'itens.produto.unidadeMedida', 
+                'endereco.endereco', 
                 'formaPagamento', 
                 'historicoStatus.statusPedido',
                 'avaliacao'
@@ -351,5 +352,68 @@ class SiteClienteController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Atualizar perfil do usuário (Privado)
+     */
+    public function atualizarPerfil(Request $request)
+    {
+        $usuario = Auth::user();
+
+        $request->validate([
+            'nome' => 'required|string|min:3|max:255',
+            'telefone' => 'nullable|string|max:20',
+        ]);
+
+        $usuario->update([
+            'nome' => $request->nome,
+            'telefone' => $request->telefone,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Perfil atualizado com sucesso',
+            'usuario' => new UsuarioResource($usuario)
+        ]);
+    }
+
+    /**
+     * Alterar senha do usuário (Privado)
+     */
+    public function alterarSenha(Request $request)
+    {
+        $usuario = Auth::user();
+
+        $request->validate([
+            'senha_atual' => 'required|string',
+            'senha_nova' => 'required|string|min:8|different:senha_atual',
+            'senha_confirmacao' => 'required|string|same:senha_nova',
+        ], [
+            'senha_atual.required' => 'A senha atual é obrigatória',
+            'senha_nova.required' => 'A nova senha é obrigatória',
+            'senha_nova.min' => 'A nova senha deve ter no mínimo 8 caracteres',
+            'senha_nova.different' => 'A nova senha deve ser diferente da senha atual',
+            'senha_confirmacao.required' => 'A confirmação da senha é obrigatória',
+            'senha_confirmacao.same' => 'As senhas não conferem',
+        ]);
+
+        // Verificar se a senha atual está correta
+        if (!Hash::check($request->senha_atual, $usuario->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Senha atual incorreta'
+            ], 401);
+        }
+
+        // Atualizar senha
+        $usuario->update([
+            'password' => Hash::make($request->senha_nova)
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Senha alterada com sucesso'
+        ]);
     }
 }

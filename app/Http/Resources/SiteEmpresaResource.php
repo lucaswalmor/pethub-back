@@ -134,11 +134,8 @@ class SiteEmpresaResource extends JsonResource
                 return [
                     'id' => $avaliacao->id,
                     'nota' => $avaliacao->nota,
-                    'comentario' => $avaliacao->comentario,
-                    'created_at' => $avaliacao->created_at,
-                    'usuario' => [
-                        'nome' => $avaliacao->usuario->nome,
-                    ]
+                    'comentario' => $avaliacao->descricao,
+                    'created_at' => $avaliacao->created_at->format('d/m/Y H:i')
                 ];
             });
         });

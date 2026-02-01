@@ -72,11 +72,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // Rotas do Site Cliente (Privadas)
     Route::controller(SiteClienteController::class)->prefix('site')->group(function () {
         Route::get('/perfil', 'getPerfil');
+        Route::put('/atualizar-perfil', 'atualizarPerfil');
+        Route::put('/alterar-senha', 'alterarSenha');
         Route::get('/meus-pedidos', 'getPedidos');
         Route::get('/meu-pedido/{id}', 'getPedido');
         Route::get('/meus-enderecos', 'getEnderecos');
         Route::get('/meus-cupons', 'meusCupons');
     });
+
 
     // Gestão de Endereços do Cliente
     Route::controller(UsuarioEnderecosController::class)->prefix('enderecos')->group(function () {

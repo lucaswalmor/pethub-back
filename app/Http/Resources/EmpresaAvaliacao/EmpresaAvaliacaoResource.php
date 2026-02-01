@@ -29,6 +29,7 @@ class EmpresaAvaliacaoResource extends JsonResource
                     'nome_fantasia' => $this->empresa->nome_fantasia,
                     'razao_social' => $this->empresa->razao_social,
                     'slug' => $this->empresa->slug,
+                    'path_logo' => $this->empresa->path_logo ?? null,
                 ];
             }),
 
@@ -48,13 +49,14 @@ class EmpresaAvaliacaoResource extends JsonResource
                 ];
             }),
 
+            // Timestamps
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+
             // Campos calculados
             'nota_formatada' => number_format($this->nota, 1, ',', '.'),
-
             'estrelas' => str_repeat('⭐', floor($this->nota)) . (fmod($this->nota, 1) == 0.5 ? '⭐½' : ''),
-
             'data_formatada' => $this->created_at->format('d/m/Y H:i'),
-
             'dias_desde_avaliacao' => $this->created_at->diffInDays(now()),
         ];
     }

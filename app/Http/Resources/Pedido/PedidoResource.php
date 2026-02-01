@@ -48,6 +48,7 @@ class PedidoResource extends JsonResource
                     'razao_social' => $this->empresa->razao_social,
                     'slug' => $this->empresa->slug,
                     'telefone' => $this->empresa->telefone,
+                    'path_logo' => $this->empresa->path_logo ?? null,
                 ];
             }),
 
@@ -67,49 +68,72 @@ class PedidoResource extends JsonResource
                 ];
             }),
 
-            'endereco' => $this->whenLoaded('endereco.endereco', function () {
-                return [
-                    'id' => $this->endereco->id,
-                    'endereco_id' => $this->endereco->endereco_id,
-                    'cep' => $this->endereco->cep,
-                    'rua' => $this->endereco->rua,
-                    'numero' => $this->endereco->numero,
-                    'complemento' => $this->endereco->complemento,
-                    'bairro' => $this->endereco->bairro,
-                    'cidade' => $this->endereco->cidade,
-                    'estado' => $this->endereco->estado,
-                    'ponto_referencia' => $this->endereco->ponto_referencia,
-                    'observacoes' => $this->endereco->observacoes,
-                ];
+            'endereco' => $this->whenLoaded('endereco', function () {
+                // O pedido_endereco tem relação com usuario_enderecos
+                if ($this->endereco && $this->endereco->relationLoaded('endereco') && $this->endereco->endereco) {
+                    $enderecoUsuario = $this->endereco->endereco;
+                    return [
+                        'id' => $enderecoUsuario->id,
+                        'cep' => $enderecoUsuario->cep,
+                        'rua' => $enderecoUsuario->rua,
+                        'numero' => $enderecoUsuario->numero,
+                        'complemento' => $enderecoUsuario->complemento,
+                        'bairro' => $enderecoUsuario->bairro,
+                        'cidade' => $enderecoUsuario->cidade,
+                        'estado' => $enderecoUsuario->estado,
+                        'ponto_referencia' => $enderecoUsuario->ponto_referencia,
+                        'observacoes' => $this->endereco->observacoes, // Observações do pedido_endereco
+                    ];
+                }
+                return null;
             }),
 
-            'itens' => $this->whenLoaded('itens.produto', function () {
+            'itens' => $this->whenLoaded('itens', function () {
                 return $this->itens->map(function ($item) {
+                    $produtoData = null;
+                    if ($item->relationLoaded('produto') && $item->produto) {
+                        $produtoData = [
+                            'id' => $item->produto->id,
+                            'nome' => $item->produto->nome,
+                            'url_imagem' => $item->produto->url_imagem ?? null,
+                            'vende_granel' => $item->produto->vende_granel ?? false,
+                        ];
+                        
+                        if ($item->produto->relationLoaded('unidadeMedida') && $item->produto->unidadeMedida) {
+                            $produtoData['unidade_medida'] = [
+                                'id' => $item->produto->unidadeMedida->id,
+                                'nome' => $item->produto->unidadeMedida->nome,
+                                'sigla' => $item->produto->unidadeMedida->sigla,
+                            ];
+                        }
+                    }
+                    
                     return [
                         'id' => $item->id,
                         'produto_id' => $item->produto_id,
                         'quantidade' => $item->quantidade,
                         'preco_unitario' => $item->preco_unitario,
-                        'subtotal' => $item->subtotal,
+                        'preco_total' => $item->preco_total,
                         'observacoes' => $item->observacoes,
-                        'produto' => [
-                            'id' => $item->produto->id,
-                            'nome' => $item->produto->nome,
-                            'imagem' => $item->produto->imagem,
-                        ],
+                        'produto' => $produtoData,
                     ];
                 });
             }),
 
-            'historico_status' => $this->whenLoaded('historicoStatus.statusPedido', function () {
+            'historico_status' => $this->whenLoaded('historicoStatus', function () {
                 return $this->historicoStatus->map(function ($historico) {
-                    return [
-                        'id' => $historico->id,
-                        'status_pedido' => [
+                    $statusPedidoData = null;
+                    if ($historico->relationLoaded('statusPedido') && $historico->statusPedido) {
+                        $statusPedidoData = [
                             'id' => $historico->statusPedido->id,
                             'nome' => $historico->statusPedido->nome,
                             'slug' => $historico->statusPedido->slug,
-                        ],
+                        ];
+                    }
+                    
+                    return [
+                        'id' => $historico->id,
+                        'status_pedido' => $statusPedidoData,
                         'observacoes' => $historico->observacoes,
                         'created_at' => $historico->created_at,
                     ];
