@@ -232,7 +232,7 @@ class FaqSeeder extends Seeder
             [
                 'categoria' => 'Favoritos e Avaliações',
                 'pergunta' => 'Onde vejo minhas lojas favoritas?',
-                'resposta' => 'Acesse "Meu Perfil" > "Restaurantes Favoritos". Lá você vê todas as lojas que favoritou, facilitando o acesso rápido aos seus estabelecimentos preferidos.',
+                'resposta' => 'Acesse "Meu Perfil" > "Lojas Favoritas". Lá você vê todas as lojas que favoritou, facilitando o acesso rápido aos seus estabelecimentos preferidos.',
                 'ordem' => 2
             ],
             [

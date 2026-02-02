@@ -15,31 +15,18 @@ class EmpresaFavoritoController extends Controller
      */
     public function toggleFavorito(Request $request, $empresaId)
     {
-        // Validar se o empresa_id é válido
-        $empresa = Empresa::findOrFail($empresaId);
-
         $usuario = Auth::user();
 
-        // Verificar se já existe favorito
-        $favorito = EmpresaFavorito::where('usuario_id', $usuario->id)
-            ->where('empresa_id', $empresaId)
+        $empresa = Empresa::findOrFail($empresaId);
+
+        $empresaFavorita = EmpresaFavorito::withTrashed()
+            ->where('usuario_id', $usuario->id)
+            ->where('empresa_id', $empresa->id)
             ->first();
 
-        if ($favorito) {
-            // Desfavoritar - remover
-            $favorito->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Empresa removida dos favoritos',
-                'favoritado' => false
-            ]);
-        } else {
-            // Favoritar - criar
-            EmpresaFavorito::create([
-                'usuario_id' => $usuario->id,
-                'empresa_id' => $empresaId
-            ]);
+        // Existe e está deletado → restaurar
+        if ($empresaFavorita && $empresaFavorita->trashed()) {
+            $empresaFavorita->restore();
 
             return response()->json([
                 'success' => true,
@@ -47,6 +34,29 @@ class EmpresaFavoritoController extends Controller
                 'favoritado' => true
             ]);
         }
+
+        // Existe e está ativo → deletar
+        if ($empresaFavorita) {
+            $empresaFavorita->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Empresa removida dos favoritos',
+                'favoritado' => false
+            ]);
+        }
+
+        // Não existe → criar
+        EmpresaFavorito::create([
+            'usuario_id' => $usuario->id,
+            'empresa_id' => $empresa->id
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Empresa adicionada aos favoritos',
+            'favoritado' => true
+        ]);
     }
 
     /**
@@ -58,7 +68,7 @@ class EmpresaFavoritoController extends Controller
 
         $query = Empresa::where('ativo', true)
             ->where('cadastro_completo', true)
-            ->whereHas('empresaFavoritos', function($q) use ($usuario) {
+            ->whereHas('empresaFavoritos', function ($q) use ($usuario) {
                 $q->where('usuario_id', $usuario->id);
             })
             ->with(['nicho', 'horarios', 'avaliacoes', 'bairrosEntregas.bairro']);
