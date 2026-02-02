@@ -104,6 +104,7 @@ class PedidoController extends Controller
                 'cupom_id' => $request->cupom_id,
                 'cupom_valor' => $request->cupom_valor ?? 0,
                 'ativo' => true,
+                'foi_entrega' => $request->foi_entrega ?? false,
             ]);
 
             // Registrar uso do cupom se existir
@@ -137,8 +138,8 @@ class PedidoController extends Controller
                 }
             }
 
-            // Criar endereço do pedido
-            if ($request->has('endereco')) {
+            // Criar endereço do pedido (apenas se foi entrega e endereço foi enviado)
+            if ($request->boolean('foi_entrega') && $request->has('endereco') && $request->endereco['endereco_id']) {
                 PedidoEndereco::create([
                     'pedido_id' => $pedido->id,
                     'endereco_id' => $request->endereco['endereco_id'],

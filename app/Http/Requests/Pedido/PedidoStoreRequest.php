@@ -33,6 +33,7 @@ class PedidoStoreRequest extends FormRequest
             'frete' => 'nullable|numeric|min:0',
             'total' => 'required|numeric|min:0',
             'observacoes' => 'nullable|string|max:1000',
+            'foi_entrega' => 'nullable|boolean',
 
             // Cupons
             'cupom_tipo' => 'nullable|in:sistema,empresa',
@@ -47,9 +48,9 @@ class PedidoStoreRequest extends FormRequest
             'itens.*.subtotal' => 'required|numeric|min:0', // Campo do JSON, será mapeado para preco_total
             'itens.*.observacoes' => 'nullable|string|max:255',
 
-            // Endereço do pedido
-            'endereco' => 'required|array',
-            'endereco.endereco_id' => 'required|exists:usuarios_enderecos,id',
+            // Endereço do pedido (obrigatório apenas se foi_entrega = true)
+            'endereco' => 'nullable|array',
+            'endereco.endereco_id' => 'nullable|exists:usuarios_enderecos,id',
             'endereco.observacoes' => 'nullable|string|max:500',
         ];
     }
@@ -86,6 +87,8 @@ class PedidoStoreRequest extends FormRequest
             'observacoes.string' => 'As observações devem ser um texto válido.',
             'observacoes.max' => 'As observações não podem ter mais que 1000 caracteres.',
 
+            'foi_entrega.boolean' => 'O campo foi_entrega deve ser verdadeiro ou falso.',
+
             'cupom_tipo.in' => 'O tipo de cupom deve ser sistema ou empresa.',
             'cupom_id.integer' => 'O ID do cupom deve ser um número inteiro.',
             'cupom_valor.numeric' => 'O valor do cupom deve ser um número.',
@@ -115,10 +118,8 @@ class PedidoStoreRequest extends FormRequest
             'itens.*.observacoes.max' => 'As observações do item não podem ter mais que 255 caracteres.',
 
             // Endereço
-            'endereco.required' => 'O endereço de entrega é obrigatório.',
             'endereco.array' => 'Os dados de endereço devem ser um objeto válido.',
 
-            'endereco.endereco_id.required' => 'O endereço é obrigatório.',
             'endereco.endereco_id.exists' => 'O endereço selecionado não existe.',
 
             'endereco.observacoes.max' => 'As observações do endereço não podem ter mais que 500 caracteres.',
@@ -134,7 +135,14 @@ class PedidoStoreRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            // Verificar se os endereços pertencem ao usuário
+            // Verificar se o endereço é obrigatório apenas para entrega
+            $foiEntrega = $this->boolean('foi_entrega');
+
+            if ($foiEntrega && !$this->has('endereco.endereco_id')) {
+                $validator->errors()->add('endereco', 'O endereço de entrega é obrigatório para pedidos de entrega.');
+            }
+
+            // Verificar se os endereços pertencem ao usuário (apenas se foi enviado)
             if ($this->has('endereco.endereco_id')) {
                 $enderecoUsuario = \App\Models\UsuarioEnderecos::where('id', $this->input('endereco.endereco_id'))
                     ->where('usuario_id', Auth::id())

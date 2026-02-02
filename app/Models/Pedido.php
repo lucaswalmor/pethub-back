@@ -22,6 +22,7 @@ class Pedido extends Model
         'cupom_id',
         'cupom_valor',
         'ativo',
+        'foi_entrega',
     ];
 
     // Relação com usuário
