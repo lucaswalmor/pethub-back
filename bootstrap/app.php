@@ -19,18 +19,14 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         // Tratar exceções de autenticação para APIs PRIMEIRO (antes de RouteNotFoundException)
         $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, \Illuminate\Http\Request $request) {
-            // #region agent log
-            file_put_contents('c:\Users\Lucassteinbach\Desktop\projetos\pets\.cursor\debug.log', json_encode(['sessionId'=>'debug-session','runId'=>'run1','hypothesisId'=>'B','location'=>'bootstrap/app.php:20','message'=>'AuthenticationException caught','data'=>['message'=>$e->getMessage(),'request_path'=>$request->path(),'is_api'=>str_starts_with($request->path(), 'api'),'expects_json'=>$request->expectsJson()],'timestamp'=>time()*1000])."\n", FILE_APPEND);
-            // #endregion
+            // Código de debug removido - arquivo de log não existe
             // Sempre retornar JSON para rotas API (mesmo que expectsJson seja false)
             if (str_starts_with($request->path(), 'api')) {
                 return response()->json(['error' => 'Não autenticado', 'message' => 'Usuário não autenticado!'], 401);
             }
         });
         
-        // #region agent log
         $exceptions->render(function (\Symfony\Component\Routing\Exception\RouteNotFoundException $e, \Illuminate\Http\Request $request) {
-            file_put_contents('c:\Users\Lucassteinbach\Desktop\projetos\pets\.cursor\debug.log', json_encode(['sessionId'=>'debug-session','runId'=>'run1','hypothesisId'=>'C','location'=>'bootstrap/app.php:28','message'=>'RouteNotFoundException caught','data'=>['message'=>$e->getMessage(),'request_path'=>$request->path(),'is_api'=>str_starts_with($request->path(), 'api'),'expects_json'=>$request->expectsJson()],'timestamp'=>time()*1000])."\n", FILE_APPEND);
             // Sempre retornar JSON para rotas API (mesmo que expectsJson seja false)
             if (str_starts_with($request->path(), 'api')) {
                 // Se a mensagem contém "Route [login]", é uma tentativa de redirecionamento de autenticação
@@ -40,5 +36,4 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json(['error' => 'Rota não encontrada', 'message' => $e->getMessage()], 404);
             }
         });
-        // #endregion
     })->create();
