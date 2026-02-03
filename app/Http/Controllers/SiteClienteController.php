@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Categorias;
+use App\Models\User;
 use App\Models\UsuarioLog;
 
 class SiteClienteController extends Controller
@@ -78,6 +79,25 @@ class SiteClienteController extends Controller
         // Filtro por avaliação mínima
         if ($request->has('avaliacao_minima') && $request->avaliacao_minima > 0) {
             $query->having('avaliacoes_avg_nota', '>=', $request->avaliacao_minima);
+        }
+
+        // Filtro por favoritos do usuário
+        if ($request->has('has_favoritos') && $request->has_favoritos == 'true') {
+            if ($request->has('person') && !empty($request->person)) {
+                $usuario = User::find($request->person);
+                if ($usuario) {
+                    $favoritosIds = $usuario->empresaFavoritos()->pluck('empresa_id')->toArray();
+                    if (!empty($favoritosIds)) {
+                        $query->whereIn('id', $favoritosIds);
+                    } else {
+                        // Se não tem favoritos, retorna query vazia
+                        $query->where('id', 0);
+                    }
+                }
+            } else {
+                // Se não enviou o ID do usuário, retorna query vazia
+                $query->where('id', 0);
+            }
         }
 
         // Ordenação
