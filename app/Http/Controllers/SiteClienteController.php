@@ -36,7 +36,7 @@ class SiteClienteController extends Controller
     {
         $query = Empresa::where('ativo', true)
             ->where('cadastro_completo', true)
-            ->with(['nicho', 'horarios', 'avaliacoes', 'bairrosEntregas.bairro'])
+            ->with(['nicho', 'horarios', 'avaliacoes', 'bairrosEntregas.bairro', 'configuracoes'])
             ->withCount('avaliacoes')
             ->withAvg('avaliacoes', 'nota');
 
@@ -79,6 +79,19 @@ class SiteClienteController extends Controller
         // Filtro por avaliação mínima
         if ($request->has('avaliacao_minima') && $request->avaliacao_minima > 0) {
             $query->having('avaliacoes_avg_nota', '>=', $request->avaliacao_minima);
+        }
+
+        // Filtro por tipo de serviço (entrega/retirada)
+        if ($request->has('faz_entrega') && $request->faz_entrega == 'true') {
+            $query->whereHas('configuracoes', function($q) {
+                $q->where('faz_entrega', true);
+            });
+        }
+
+        if ($request->has('faz_retirada') && $request->faz_retirada == 'true') {
+            $query->whereHas('configuracoes', function($q) {
+                $q->where('faz_retirada', true);
+            });
         }
 
         // Filtro por favoritos do usuário

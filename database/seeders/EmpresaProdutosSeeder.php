@@ -100,13 +100,17 @@ class EmpresaProdutosSeeder extends Seeder
         // -----------------------------
         // Criar configurações da empresa
         // -----------------------------
+        // Empresas 1-25 fazem entrega E retirada
+        // Empresas 26-50 fazem apenas retirada
+        $fazEntrega = $empresaIndex <= 25;
+
         DB::table('empresa_configuracoes')->insert([
             'empresa_id' => $empresaId,
-            'faz_entrega' => false,
+            'faz_entrega' => $fazEntrega,
             'faz_retirada' => true,
             'a_combinar' => false,
-            'valor_entrega_padrao' => 10.00,
-            'valor_entrega_minimo' => 10.00,
+            'valor_entrega_padrao' => $fazEntrega ? 10.00 : 0.00,
+            'valor_entrega_minimo' => $fazEntrega ? 10.00 : 0.00,
             'whatsapp_pedidos' => '34992021394',
             'created_at' => $timestamp,
             'updated_at' => $timestamp,
