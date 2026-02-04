@@ -16,58 +16,78 @@ class EmpresaProdutosSeeder extends Seeder
         $timestamp = now();
 
         // -----------------------------
-        // Criar 5 empresas com nichos diferentes
+        // Criar 50 empresas com nichos variados
         // -----------------------------
-        $nichosEmpresas = [
-            1 => ['nome' => 'PetShop Central', 'nicho_id' => 1, 'nicho_nome' => 'Petshop'],
-            2 => ['nome' => 'Agropecuária São João', 'nicho_id' => 2, 'nicho_nome' => 'Agropecuária'],
-            3 => ['nome' => 'Banho & Tosa Premium', 'nicho_id' => 3, 'nicho_nome' => 'Banho e Tosa'],
-            4 => ['nome' => 'Veterinária Vida Animal', 'nicho_id' => 4, 'nicho_nome' => 'Veterinária'],
-            5 => ['nome' => 'Casa de Pesca e Caça', 'nicho_id' => 5, 'nicho_nome' => 'Caça e Pesca'],
+        $nichos = [
+            1 => 'Petshop',
+            2 => 'Agropecuária',
+            3 => 'Banho e Tosa',
+            4 => 'Veterinária',
+            5 => 'Caça e Pesca',
         ];
 
-        foreach ($nichosEmpresas as $index => $dadosEmpresa) {
-            $razaoSocial = $dadosEmpresa['nome'] . ' LTDA';
+        $nomesEmpresas = [
+            1 => ['PetShop Central', 'PetShop do Bairro', 'PetMania', 'PetCenter', 'Amigo Pet', 'PetShop Família', 'PetShop Premium', 'PetShop Express', 'PetShop Popular', 'PetShop Vila'],
+            2 => ['Agropecuária São João', 'Agropecuária Bom Pastor', 'Agropecuária Central', 'Agropecuária União', 'Agropecuária Progresso', 'Agropecuária São Francisco', 'Agropecuária Nova Era', 'Agropecuária Vale Verde', 'Agropecuária Santo Antônio', 'Agropecuária Rio Branco'],
+            3 => ['Banho & Tosa Premium', 'PetBeauty', 'Tosa & Companhia', 'Banho Chic', 'Pet Estética', 'Beauty Pet', 'Tosa Express', 'Pet Glamour', 'Banho & Tosa Vila', 'Pet Care'],
+            4 => ['Veterinária Vida Animal', 'Clínica Veterinária Central', 'VetCare', 'Veterinária São Lucas', 'Animal Health', 'VetPlus', 'Clínica Animal', 'Veterinária Bem Estar', 'Pet Hospital', 'VetCenter'],
+            5 => ['Casa de Pesca e Caça', 'Pesca & Caça Center', 'Outdoor Store', 'Caça & Pesca Express', 'Sport Fishing', 'Hunt & Fish', 'Pesca Esportiva', 'Caça & Pesca Vila', 'Outdoor Adventure', 'Pesca & Caça Premium'],
+        ];
+
+        for ($i = 1; $i <= 50; $i++) {
+            // Selecionar nicho aleatório
+            $nichoId = rand(1, 5);
+            $nichoNome = $nichos[$nichoId];
+
+            // Selecionar nome aleatório do nicho
+            $nomesDoNicho = $nomesEmpresas[$nichoId];
+            $nomeEmpresa = $nomesDoNicho[array_rand($nomesDoNicho)] . ' ' . $i;
+
+            $razaoSocial = $nomeEmpresa . ' LTDA';
 
             $empresaId = DB::table('empresas')->insertGetId([
                 'razao_social' => $razaoSocial,
-                'nome_fantasia' => $dadosEmpresa['nome'],
-                'slug' => Str::slug($dadosEmpresa['nome']),
-                'email' => 'contato@' . Str::slug($dadosEmpresa['nome']) . '.com',
-                'telefone' => '(34) 9' . str_pad($index, 4, '0', STR_PAD_LEFT) . '-0000',
-                'cnpj' => '12.345.678/000' . $index . '-' . str_pad($index * 10, 2, '0', STR_PAD_LEFT),
-                'nicho_id' => $dadosEmpresa['nicho_id'],
+                'nome_fantasia' => $nomeEmpresa,
+                'slug' => Str::slug($nomeEmpresa . '-' . $i),
+                'email' => 'contato@' . Str::slug($nomeEmpresa) . $i . '.com',
+                'telefone' => '(34) 9' . str_pad($i, 4, '0', STR_PAD_LEFT) . '-0000',
+                'cnpj' => '12.345.678/000' . str_pad($i, 2, '0', STR_PAD_LEFT) . '-' . str_pad(($i * 10) % 100, 2, '0', STR_PAD_LEFT),
+                'nicho_id' => $nichoId,
                 'cadastro_completo' => true,
                 'ativo' => true,
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
             ]);
 
-            $this->command->info('✓ Empresa "' . $dadosEmpresa['nome'] . '" (' . $dadosEmpresa['nicho_nome'] . ') criada com ID: ' . $empresaId);
+            $this->command->info('✓ Empresa "' . $nomeEmpresa . '" (' . $nichoNome . ') criada com ID: ' . $empresaId);
 
             // Criar dados relacionados para cada empresa
-            $this->criarDadosEmpresa($empresaId, $index, $dadosEmpresa['nicho_id'], $timestamp);
+            $this->criarDadosEmpresa($empresaId, $i, $nichoId, $timestamp, $i <= 30);
         }
 
-        $this->command->info('✓ 5 empresas criadas com sucesso!');
+        $this->command->info('✓ 50 empresas criadas com sucesso!');
     }
 
     /**
      * Criar dados relacionados para uma empresa específica
      */
-    private function criarDadosEmpresa($empresaId, $empresaIndex, $nichoId, $timestamp)
+    private function criarDadosEmpresa($empresaId, $empresaIndex, $nichoId, $timestamp, $todosBairros = true)
     {
-        $ruas = ['Rua das Flores', 'Avenida Brasil', 'Rua João Pessoa', 'Praça São Paulo', 'Rua Rio Branco'];
-        $bairros = ['Centro', 'Fundinho', 'Jardim Europa', 'Morada Nova', 'Santa Mônica'];
+        $ruas = ['Rua das Flores', 'Avenida Brasil', 'Rua João Pessoa', 'Praça São Paulo', 'Rua Rio Branco', 'Rua São José', 'Avenida Minas Gerais', 'Rua Paraná', 'Praça Tiradentes', 'Rua Goiás'];
+        $bairros = ['Centro', 'Fundinho', 'Jardim Europa', 'Morada Nova', 'Santa Mônica', 'Santa Clara', 'Jardim América', 'Vila Nova', 'São Jorge', 'Novo Mundo'];
+
+        // Selecionar rua e bairro de forma cíclica baseada no índice da empresa
+        $ruaIndex = ($empresaIndex - 1) % count($ruas);
+        $bairroIndex = ($empresaIndex - 1) % count($bairros);
 
         // -----------------------------
         // Criar endereço da empresa
         // -----------------------------
         DB::table('empresa_endereco')->insert([
             'empresa_id' => $empresaId,
-            'logradouro' => $ruas[$empresaIndex - 1],
+            'logradouro' => $ruas[$ruaIndex],
             'numero' => strval(100 + $empresaIndex * 50),
-            'bairro' => $bairros[$empresaIndex - 1],
+            'bairro' => $bairros[$bairroIndex],
             'cidade' => 'Uberlândia',
             'estado' => 'MG',
             'cep' => '3840' . str_pad($empresaIndex, 2, '0', STR_PAD_LEFT) . '-000',
@@ -139,11 +159,34 @@ class EmpresaProdutosSeeder extends Seeder
         }
 
         // -----------------------------
-        // Criar bairros de entrega da empresa (TODOS os bairros da tabela)
+        // Criar bairros de entrega da empresa
         // -----------------------------
         $bairros = DB::table('bairros')->select('id')->get();
-        
-        foreach ($bairros as $bairro) {
+
+        if ($todosBairros) {
+            // Empresas 1-30: TODOS os bairros da tabela
+            $bairrosSelecionados = $bairros;
+        } else {
+            // Empresas 31-50: BAIRROS ALEATÓRIOS (30-70% dos bairros disponíveis)
+            $totalBairros = $bairros->count();
+            $quantidadeBairros = rand(
+                (int)($totalBairros * 0.3), // mínimo 30%
+                (int)($totalBairros * 0.7)  // máximo 70%
+            );
+
+            // Selecionar bairros aleatórios
+            $indicesAleatorios = array_rand(range(0, $totalBairros - 1), $quantidadeBairros);
+            if (!is_array($indicesAleatorios)) {
+                $indicesAleatorios = [$indicesAleatorios];
+            }
+
+            $bairrosSelecionados = collect();
+            foreach ($indicesAleatorios as $indice) {
+                $bairrosSelecionados->push($bairros[$indice]);
+            }
+        }
+
+        foreach ($bairrosSelecionados as $bairro) {
             DB::table('empresa_bairros_entregas')->insert([
                 'empresa_id' => $empresaId,
                 'bairro_id' => $bairro->id,
@@ -361,8 +404,9 @@ class EmpresaProdutosSeeder extends Seeder
             ]);
         }
 
-        $totalBairros = $bairros->count();
-        $this->command->info('✓ Dados criados para a empresa ' . $empresaIndex . ' (endereço, configurações, horários 24/7, formas de pagamento, ' . $totalBairros . ' bairros de entrega e 5 produtos com informações completas)!');
+        $totalBairros = $bairrosSelecionados->count();
+        $tipoBairro = $todosBairros ? 'todos os bairros' : 'bairros aleatórios';
+        $this->command->info('✓ Dados criados para a empresa ' . $empresaIndex . ' (endereço, configurações, horários 24/7, formas de pagamento, ' . $totalBairros . ' ' . $tipoBairro . ' e 5 produtos com informações completas)!');
     }
 
     /**
