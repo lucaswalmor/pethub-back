@@ -16,12 +16,13 @@ class EmpresaResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'tipo_pessoa' => $this->tipo_pessoa,
             'razao_social' => $this->razao_social,
             'nome_fantasia' => $this->nome_fantasia,
             'slug' => $this->slug,
             'email' => $this->email,
             'telefone' => $this->telefone,
-            'cnpj' => $this->cnpj,
+            'cpf_cnpj' => $this->cpf_cnpj,
             'path_logo' => $this->path_logo ? asset('storage/' . $this->path_logo) : null,
             'path_banner' => $this->path_banner ? asset('storage/' . $this->path_banner) : null,
             'ativo' => $this->ativo,

@@ -13,12 +13,13 @@ class Empresa extends Model
     protected $table = 'empresas';
 
     protected $fillable = [
+        'tipo_pessoa',
         'razao_social',
         'nome_fantasia',
         'slug',
         'email',
         'telefone',
-        'cnpj',
+        'cpf_cnpj',
         'path_logo',
         'path_banner',
         'nicho_id',

@@ -49,11 +49,12 @@ class EmpresaController extends Controller
 
             // Prepara os dados da empresa
             $dadosEmpresa = $request->only([
+                'tipo_pessoa',
                 'razao_social',
                 'nome_fantasia',
                 'email',
                 'telefone',
-                'cnpj',
+                'cpf_cnpj',
                 'nicho_id'
             ]);
 

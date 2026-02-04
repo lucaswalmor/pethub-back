@@ -46,12 +46,50 @@ class EmpresaStoreRequest extends FormRequest
     {
         return [
             // Campos principais da empresa
+            'tipo_pessoa' => 'required|boolean|in:0,1',
             'razao_social' => 'required|string|max:255|unique:empresas,razao_social',
             'nome_fantasia' => 'nullable|string|max:255',
             'slug' => 'nullable|string|max:255|unique:empresas,slug',
             'email' => 'required|email|max:255',
             'telefone' => 'required|string|max:20',
-            'cnpj' => 'required|string|regex:/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/|unique:empresas,cnpj',
+            'cpf_cnpj' => [
+                'required',
+                'string',
+                'unique:empresas,cpf_cnpj',
+                function ($attribute, $value, $fail) {
+                    // Remove caracteres não numéricos
+                    $numero = preg_replace('/[^0-9]/', '', $value);
+
+                    // Verifica se é pessoa jurídica (0) ou física (1)
+                    $tipoPessoa = $this->input('tipo_pessoa', 0);
+
+                    if ($tipoPessoa === 0) {
+                        // Pessoa Jurídica - CNPJ (14 dígitos)
+                        if (strlen($numero) !== 14) {
+                            $fail('O CNPJ deve ter 14 dígitos.');
+                            return;
+                        }
+
+                        // Formato CNPJ: XX.XXX.XXX/XXXX-XX
+                        if (!preg_match('/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/', $value)) {
+                            $fail('O CNPJ deve ter o formato XX.XXX.XXX/XXXX-XX.');
+                            return;
+                        }
+                    } else {
+                        // Pessoa Física - CPF (11 dígitos)
+                        if (strlen($numero) !== 11) {
+                            $fail('O CPF deve ter 11 dígitos.');
+                            return;
+                        }
+
+                        // Formato CPF: XXX.XXX.XXX-XX
+                        if (!preg_match('/^\d{3}\.\d{3}\.\d{3}-\d{2}$/', $value)) {
+                            $fail('O CPF deve ter o formato XXX.XXX.XXX-XX.');
+                            return;
+                        }
+                    }
+                },
+            ],
             'path_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'path_banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
             'nicho_id' => 'required|integer|exists:nichos_empresa,id',
@@ -155,9 +193,12 @@ class EmpresaStoreRequest extends FormRequest
             'telefone.string' => 'O telefone deve ser um texto válido.',
             'telefone.max' => 'O telefone não pode ter mais que 20 caracteres.',
 
-            'cnpj.required' => 'O CNPJ da empresa é obrigatório.',
-            'cnpj.regex' => 'O CNPJ deve ter o formato XX.XXX.XXX/XXXX-XX.',
-            'cnpj.unique' => 'Este CNPJ já está sendo usado por outra empresa.',
+            'tipo_pessoa.required' => 'O tipo de pessoa é obrigatório.',
+            'tipo_pessoa.boolean' => 'O tipo de pessoa deve ser 0 (Jurídica) ou 1 (Física).',
+            'tipo_pessoa.in' => 'O tipo de pessoa deve ser 0 (Jurídica) ou 1 (Física).',
+
+            'cpf_cnpj.required' => 'O CPF/CNPJ da empresa é obrigatório.',
+            'cpf_cnpj.unique' => 'Este CPF/CNPJ já está sendo usado por outra empresa.',
 
             'path_logo.image' => 'A logo deve ser uma imagem válida.',
             'path_logo.mimes' => 'A logo deve ser um arquivo do tipo: jpeg, png, jpg, gif.',
