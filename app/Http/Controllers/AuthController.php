@@ -18,7 +18,21 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         try {
-            $user = User::with(['permissoes', 'empresas', 'enderecos'])->where('email', $request->email)->first();
+            // Validar tipo_login
+            if (!$request->has('tipo_login') || !in_array($request->tipo_login, ['lojista', 'cliente'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tipo de login inválido.',
+                ], 400);
+            }
+
+            // Determinar o tipo_cadastro esperado baseado no tipo_login
+            $tipoCadastroEsperado = $request->tipo_login === 'lojista' ? 0 : 1;
+
+            // Buscar usuário pelo email E tipo_cadastro
+            $user = User::where('email', $request->email)
+                       ->where('tipo_cadastro', $tipoCadastroEsperado)
+                       ->first();
 
             if (!$user || !Hash::check($request->password, $user->password)) {
                 return response()->json([
@@ -32,6 +46,15 @@ class AuthController extends Controller
                     'success' => false,
                     'message' => 'Sua conta está desativada. Entre em contato com o administrador.',
                 ], 403);
+            }
+
+            // Carregar dados específicos baseado no tipo_login
+            if ($request->tipo_login === 'lojista') {
+                // Para lojistas, carregar permissões e empresas
+                $user->load(['permissoes', 'empresas', 'enderecos']);
+            } else {
+                // Para clientes, carregar apenas endereços
+                $user->load(['enderecos']);
             }
 
             // Revogar tokens anteriores
@@ -85,9 +108,20 @@ class AuthController extends Controller
     public function user(Request $request)
     {
         try {
+            $user = $request->user();
+
+            // Carregar dados específicos baseado no tipo de usuário
+            if ($user->isLojista()) {
+                // Para lojistas, carregar permissões e empresas
+                $user->load(['permissoes', 'empresas', 'enderecos']);
+            } else {
+                // Para clientes, carregar apenas endereços
+                $user->load(['enderecos']);
+            }
+
             return response()->json([
                 'success' => true,
-                'user' => new UsuarioLoginResource($request->user()->load(['permissoes', 'empresas'])),
+                'user' => new UsuarioLoginResource($user),
             ]);
 
         } catch (\Exception $e) {

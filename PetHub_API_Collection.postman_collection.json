@@ -339,9 +339,10 @@
 								"value": "application/json"
 							}
 						],
+						"description": "Realiza login no sistema. IMPORTANTE: O campo 'tipo_login' é obrigatório e deve ser 'lojista' para aplicação do lojista ou 'cliente' para aplicação do cliente. Um mesmo email pode ter duas contas distintas (lojista e cliente).",
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"lucaswsb52@gmail.com\",\n  \"password\": \"32329585\"\n}"
+							"raw": "{\n  \"email\": \"lucaswsb52@gmail.com\",\n  \"password\": \"32329585\",\n  \"tipo_login\": \"cliente\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/login",
@@ -353,6 +354,33 @@
 								"login"
 							]
 						}
+					}
+				},
+				{
+					"name": "Login - Lojista",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"lojista@exemplo.com\",\n  \"password\": \"senha123\",\n  \"tipo_login\": \"lojista\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						},
+						"description": "Exemplo de login para aplicação do lojista. Retorna dados da empresa, permissões e produtos."
 					}
 				},
 				{

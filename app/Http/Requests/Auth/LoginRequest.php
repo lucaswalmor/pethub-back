@@ -25,6 +25,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => 'required|email',
             'password' => 'required|string|min:6',
+            'tipo_login' => 'required|in:lojista,cliente',
         ];
     }
 
@@ -41,6 +42,8 @@ class LoginRequest extends FormRequest
             'password.required' => 'A senha é obrigatória.',
             'password.string' => 'A senha deve ser um texto válido.',
             'password.min' => 'A senha deve ter pelo menos 6 caracteres.',
+            'tipo_login.required' => 'O tipo de login é obrigatório.',
+            'tipo_login.in' => 'O tipo de login deve ser lojista ou cliente.',
         ];
     }
 
