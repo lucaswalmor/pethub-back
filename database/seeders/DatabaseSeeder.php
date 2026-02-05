@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             'telefone' => '(11) 99999-9999',
             'ativo' => true,
             'is_master' => true, // Usuário master para testes
+            'tipo_cadastro' => 0, // 0 = Empresa (para teste)
         ]);
 
         // Atribuir todas as permissões ao usuário de teste

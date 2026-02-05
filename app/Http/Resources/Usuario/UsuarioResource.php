@@ -21,6 +21,7 @@ class UsuarioResource extends JsonResource
             'telefone' => $this->telefone,
             'ativo' => $this->ativo,
             'is_master' => $this->is_master,
+            'tipo_cadastro' => $this->tipo_cadastro,
             'email_verified_at' => $this->email_verified_at,
 
             // Relacionamentos

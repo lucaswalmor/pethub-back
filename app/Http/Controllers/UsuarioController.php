@@ -94,6 +94,7 @@ class UsuarioController extends Controller
                 'telefone' => $request->telefone,
                 'ativo' => true,
                 'is_master' => false, // Sempre false - master só no EmpresaController
+                'tipo_cadastro' => 1, // 1 = Cliente
             ]);
 
             // Vincular à empresa se foi especificada (para funcionários)

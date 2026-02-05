@@ -48,7 +48,29 @@ class UsuarioUpdateRequest extends FormRequest
         return [
             // Campos principais do usuário (todos opcionais para update)
             'nome' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255|unique:usuarios,email,' . $this->route('usuario'),
+            'email' => [
+                'sometimes',
+                'required',
+                'string',
+                'email',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    $usuarioId = $this->route('usuario');
+                    $usuario = User::find($usuarioId);
+
+                    if ($usuario) {
+                        // Verificar se já existe outro usuário com este email e mesmo tipo_cadastro
+                        $exists = User::where('email', $value)
+                            ->where('tipo_cadastro', $usuario->tipo_cadastro)
+                            ->where('id', '!=', $usuarioId)
+                            ->exists();
+
+                        if ($exists) {
+                            $fail('Este email já está sendo usado por outro usuário.');
+                        }
+                    }
+                },
+            ],
             'password' => 'sometimes|nullable|string|min:8',
             'telefone' => 'sometimes|required|string|max:20',
             'permissoes' => 'sometimes|nullable|array',

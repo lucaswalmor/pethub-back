@@ -46,12 +46,13 @@ class EmpresaProdutosSeeder extends Seeder
             $razaoSocial = $nomeEmpresa . ' LTDA';
 
             $empresaId = DB::table('empresas')->insertGetId([
+                'tipo_pessoa' => 0, // 0 = Pessoa Jurídica (CNPJ)
                 'razao_social' => $razaoSocial,
                 'nome_fantasia' => $nomeEmpresa,
                 'slug' => Str::slug($nomeEmpresa . '-' . $i),
                 'email' => 'contato@' . Str::slug($nomeEmpresa) . $i . '.com',
                 'telefone' => '(34) 9' . str_pad($i, 4, '0', STR_PAD_LEFT) . '-0000',
-                'cnpj' => '12.345.678/000' . str_pad($i, 2, '0', STR_PAD_LEFT) . '-' . str_pad(($i * 10) % 100, 2, '0', STR_PAD_LEFT),
+                'cpf_cnpj' => '12.345.678/000' . str_pad($i, 2, '0', STR_PAD_LEFT) . '-' . str_pad(($i * 10) % 100, 2, '0', STR_PAD_LEFT),
                 'nicho_id' => $nichoId,
                 'cadastro_completo' => true,
                 'ativo' => true,

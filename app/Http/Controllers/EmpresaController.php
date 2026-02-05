@@ -82,6 +82,7 @@ class EmpresaController extends Controller
             $dadosUsuario['password'] = Hash::make($dadosUsuario['password']);
             $dadosUsuario['telefone'] = FormatHelper::formatOnlyNumbers($dadosUsuario['telefone']);
             $dadosUsuario['is_master'] = true; // Usuário criado junto com empresa é master
+            $dadosUsuario['tipo_cadastro'] = 0; // 0 = Empresa
 
             // Cria o usuário administrador
             $usuario = User::create($dadosUsuario);

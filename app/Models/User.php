@@ -27,6 +27,7 @@ class User extends Authenticatable
         'telefone',
         'ativo',
         'is_master',
+        'tipo_cadastro',
     ];
 
     /**
@@ -114,6 +115,18 @@ class User extends Authenticatable
     public function isMaster()
     {
         return $this->is_master;
+    }
+
+    // Verifica se o usuário é lojista (tipo_cadastro = 0)
+    public function isLojista()
+    {
+        return $this->tipo_cadastro === 0;
+    }
+
+    // Verifica se o usuário é cliente (tipo_cadastro = 1)
+    public function isCliente()
+    {
+        return $this->tipo_cadastro === 1;
     }
 
     // Relação com avaliações feitas pelo usuário

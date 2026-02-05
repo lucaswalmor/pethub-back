@@ -39,7 +39,18 @@ class UsuarioStoreRequest extends FormRequest
         $rules = [
             // Campos principais do usuário
             'nome' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:usuarios,email',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    // Verificar se já existe usuário com este email e tipo_cadastro = 1 (Cliente)
+                    if (\App\Models\User::where('email', $value)->where('tipo_cadastro', 1)->exists()) {
+                        $fail('Este email já está sendo usado por outro usuário.');
+                    }
+                },
+            ],
             'password' => 'required|string|min:8',
             'telefone' => 'required|string|max:20',
             'permissoes' => 'sometimes|nullable|array',

@@ -156,7 +156,17 @@ class EmpresaStoreRequest extends FormRequest
             'usuario_admin' => 'required|array',
             'usuario_admin.nome' => 'required|string|max:255',
             'usuario_admin.telefone' => 'required|string|max:255',
-            'usuario_admin.email' => 'required|email|max:255|unique:usuarios,email',
+            'usuario_admin.email' => [
+                'required',
+                'email',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    // Verificar se já existe usuário com este email e tipo_cadastro = 0 (Empresa)
+                    if (\App\Models\User::where('email', $value)->where('tipo_cadastro', 0)->exists()) {
+                        $fail('Este email já está sendo usado por outro usuário.');
+                    }
+                },
+            ],
             'usuario_admin.password' => 'required|string|min:8|max:255',
             'usuario_admin.password_confirmation' => 'required|string|same:usuario_admin.password',
             'usuario_admin.permissoes' => 'required|array',
