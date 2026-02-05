@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Empresa;
 use App\Models\User;
 use App\Models\EmpresaEndereco;
+use App\Models\Bairro;
 use App\Helpers\FormatHelper;
 use App\Http\Resources\Usuario\UsuarioResource;
 use App\Models\UsuarioEnderecos;
@@ -496,6 +497,56 @@ class EmpresaController extends Controller
                 'success' => false,
                 'message' => 'Erro interno do servidor',
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Retorna todos os bairros disponíveis para entrega na cidade da empresa
+     */
+    public function bairrosDisponiveis(Request $request, string $empresaId)
+    {
+        try {
+            // Verificar se o usuário autenticado tem acesso a esta empresa
+            if (!VerificaEmpresa::verificaEmpresaPertenceAoUsuario((int)$empresaId)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Acesso negado',
+                    'message' => 'Você não tem permissão para acessar esta empresa.'
+                ], 403);
+            }
+
+            $empresa = Empresa::with('endereco')->findOrFail($empresaId);
+
+            // Verifica se a empresa tem endereço cadastrado
+            if (!$empresa->endereco) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Empresa não possui endereço cadastrado'
+                ], 400);
+            }
+
+            // Busca todos os bairros da cidade da empresa
+            $bairros = Bairro::where('cidade', $empresa->endereco->cidade)
+                ->where('estado', $empresa->endereco->estado)
+                ->orderBy('nome')
+                ->get(['id', 'nome']);
+
+            return response()->json([
+                'success' => true,
+                'bairros' => $bairros
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Empresa não encontrada'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Erro interno do servidor',
+                'message' => $e->getMessage()
             ], 500);
         }
     }

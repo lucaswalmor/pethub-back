@@ -117,6 +117,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(EmpresaController::class)->prefix('empresa')->group(function () {
         Route::get('/', 'index')->middleware('check.permission:empresas.index');
         Route::get('/{id}/verificar-cadastro', 'verificarCadastro')->middleware('check.permission:empresas.verificar_cadastro');
+        Route::get('/{empresaId}/bairros-disponiveis', 'bairrosDisponiveis')->middleware('check.permission:empresas.show');
         Route::put('/{id}', 'update')->middleware('check.permission:empresas.update');
         Route::get('/{id}', 'show')->middleware('check.permission:empresas.show');
         Route::post('/{id}/upload-image', 'uploadImage')->middleware('check.permission:empresas.upload_image');
