@@ -133,6 +133,7 @@ class EmpresaController extends Controller
             DB::commit();
 
             return response()->json([
+                'success' => true,
                 'message' => 'Empresa criada com sucesso',
                 'empresa' => new EmpresaResource($empresa),
                 'usuario' => new UsuarioResource($usuario),
