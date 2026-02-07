@@ -173,33 +173,39 @@ class EmpresaController extends Controller
             if ($tipo === 'banner' && $request->hasFile('banner')) {
                 // Remove banner anterior se existir
                 if ($empresa->path_banner) {
-                    Storage::disk('public')->delete($empresa->path_banner);
+                    $bannerPathRelativo = str_replace(env('CLOUDFLARE_R2_PUBLIC_URL') . '/', '', $empresa->path_banner);
+                    Storage::disk('r2')->delete($bannerPathRelativo);
                 }
 
-                $bannerPath = $request->file('banner')->store("empresas/banners/{$id}", 'public');
-                $dadosAtualizacao['path_banner'] = $bannerPath;
+                $bannerPath = $request->file('banner')->store("empresas/banners/{$id}/banner", 'r2');
+                $dadosAtualizacao['path_banner'] = env('CLOUDFLARE_R2_PUBLIC_URL') . '/' . $bannerPath;
             } elseif ($tipo === 'logo' && $request->hasFile('logo')) {
                 // Remove logo anterior se existir
                 if ($empresa->path_logo) {
-                    Storage::disk('public')->delete($empresa->path_logo);
+                    $logoPathRelativo = str_replace(env('CLOUDFLARE_R2_PUBLIC_URL') . '/', '', $empresa->path_logo);
+                    Storage::disk('r2')->delete($logoPathRelativo);
                 }
 
-                $logoPath = $request->file('logo')->store("empresas/logos/{$id}", 'public');
-                $dadosAtualizacao['path_logo'] = $logoPath;
+                $logoPath = $request->file('logo')->store("empresas/logos/{$id}/logo", 'r2');
+                $dadosAtualizacao['path_logo'] = env('CLOUDFLARE_R2_PUBLIC_URL') . '/' . $logoPath;
             } elseif (!$tipo) {
                 // Upload de ambos se nenhum tipo específico foi informado
                 if ($request->hasFile('banner')) {
                     if ($empresa->path_banner) {
-                        Storage::disk('public')->delete($empresa->path_banner);
+                        $bannerPathRelativo = str_replace(env('CLOUDFLARE_R2_PUBLIC_URL') . '/', '', $empresa->path_banner);
+                        Storage::disk('r2')->delete($bannerPathRelativo);
                     }
-                    $dadosAtualizacao['path_banner'] = $request->file('banner')->store("empresas/banners/{$id}", 'public');
+                    $bannerPath = $request->file('banner')->store("empresas/banners/{$id}/banner", 'r2');
+                    $dadosAtualizacao['path_banner'] = env('CLOUDFLARE_R2_PUBLIC_URL') . '/' . $bannerPath;
                 }
 
                 if ($request->hasFile('logo')) {
                     if ($empresa->path_logo) {
-                        Storage::disk('public')->delete($empresa->path_logo);
+                        $logoPathRelativo = str_replace(env('CLOUDFLARE_R2_PUBLIC_URL') . '/', '', $empresa->path_logo);
+                        Storage::disk('r2')->delete($logoPathRelativo);
                     }
-                    $dadosAtualizacao['path_logo'] = $request->file('logo')->store("empresas/logos/{$id}", 'public');
+                    $logoPath = $request->file('logo')->store("empresas/logos/{$id}/logo", 'r2');
+                    $dadosAtualizacao['path_logo'] = env('CLOUDFLARE_R2_PUBLIC_URL') . '/' . $logoPath;
                 }
             }
 

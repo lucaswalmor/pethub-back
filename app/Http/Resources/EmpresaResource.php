@@ -23,8 +23,8 @@ class EmpresaResource extends JsonResource
             'email' => $this->email,
             'telefone' => $this->telefone,
             'cpf_cnpj' => $this->cpf_cnpj,
-            'path_logo' => $this->path_logo ? asset('storage/' . $this->path_logo) : null,
-            'path_banner' => $this->path_banner ? asset('storage/' . $this->path_banner) : null,
+            'path_logo' => $this->path_logo,
+            'path_banner' => $this->path_banner,
             'ativo' => $this->ativo,
 
             // Relacionamentos
