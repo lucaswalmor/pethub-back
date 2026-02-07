@@ -85,19 +85,19 @@ class UsuarioController extends Controller
     {
         DB::beginTransaction();
         try {
-            // Criar o usuário (sempre como não-master)
-            // Usuários master são criados APENAS no EmpresaController
+            $isFuncionario = $request->has('empresa_id') && $request->empresa_id && $request->has('permissoes') && is_array($request->permissoes);
+            $tipoCadastro = $isFuncionario ? 0 : 1; // 0 = Funcionário, 1 = Cliente
+
             $usuario = User::create([
                 'nome' => $request->nome,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'telefone' => $request->telefone,
                 'ativo' => true,
-                'is_master' => false, // Sempre false - master só no EmpresaController
-                'tipo_cadastro' => 1, // 1 = Cliente
+                'is_master' => false,
+                'tipo_cadastro' => $tipoCadastro,
             ]);
 
-            // Vincular à empresa se foi especificada (para funcionários)
             if ($request->has('empresa_id') && $request->empresa_id) {
                 UsuarioEmpresas::create([
                     'usuario_id' => $usuario->id,
@@ -107,15 +107,27 @@ class UsuarioController extends Controller
 
             // Sincronizar permissões se foram enviadas (para funcionários)
             if ($request->has('permissoes') && is_array($request->permissoes)) {
-                $usuario->permissoes()->sync($request->permissoes);
-            }
+                // Garantir que apenas IDs sejam passados para o sync
+                $permissoes = $request->permissoes;
 
-            // Lógica de criação de endereço baseada no tipo de usuário
-            $isFuncionario = $request->has('permissoes') && $request->has('empresa_id') && $request->empresa_id;
+                // Verificar se é array de objetos com permissao_id ou apenas array de IDs
+                if (count($permissoes) > 0 && is_array($permissoes[0])) {
+                    // É array de objetos, extrair os permissao_id
+                    $permissoesIds = array_map(function ($permissao) {
+                        return isset($permissao['permissao_id']) ? intval($permissao['permissao_id']) : intval($permissao);
+                    }, $permissoes);
+                } else {
+                    // É array simples de IDs
+                    $permissoesIds = array_map('intval', $permissoes);
+                }
+
+
+                $usuario->permissoes()->sync($permissoesIds);
+            }
 
             if ($isFuncionario) {
                 // Para funcionários: usar endereço da empresa, ignorar endereço enviado no body
-                $empresa = \App\Models\Empresa::with('endereco')->find($request->empresa_id);
+                $empresa = Empresa::with('endereco')->find($request->empresa_id);
                 if ($empresa && $empresa->endereco) {
                     UsuarioEnderecos::create([
                         'usuario_id' => $usuario->id,
@@ -174,7 +186,8 @@ class UsuarioController extends Controller
      */
     public function show(string $id)
     {
-        $usuarioAutenticado = auth()->user()->load('empresas');
+        $usuarioAutenticado = Auth::user();
+        $usuarioAutenticado->load('empresas');
         $usuario = User::with(['permissoes', 'enderecos', 'empresas'])->findOrFail($id);
 
         // Verificar se o usuário autenticado e o usuário sendo buscado pertencem à mesma empresa
@@ -206,14 +219,6 @@ class UsuarioController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(UsuarioUpdateRequest $request, string $id)
@@ -239,9 +244,23 @@ class UsuarioController extends Controller
         // Atualizar usuário
         $usuario->update($updateData);
 
-        // Sincronizar permissões se foram enviadas
+        // Sincronizar permissões se foram enviadas (para funcionários)
         if ($request->has('permissoes') && is_array($request->permissoes)) {
-            $usuario->permissoes()->sync($request->permissoes);
+            // Garantir que apenas IDs sejam passados para o sync
+            $permissoes = $request->permissoes;
+
+            // Verificar se é array de objetos com permissao_id ou apenas array de IDs
+            if (count($permissoes) > 0 && is_array($permissoes[0])) {
+                // É array de objetos, extrair os permissao_id
+                $permissoesIds = array_map(function ($permissao) {
+                    return isset($permissao['permissao_id']) ? intval($permissao['permissao_id']) : intval($permissao);
+                }, $permissoes);
+            } else {
+                // É array simples de IDs
+                $permissoesIds = array_map('intval', $permissoes);
+            }
+
+            $usuario->permissoes()->sync($permissoesIds);
         }
 
         // Recarregar com relacionamentos
@@ -259,6 +278,14 @@ class UsuarioController extends Controller
     public function destroy(string $id)
     {
         $usuario = User::findOrFail($id);
+        $usuarioAutenticado = Auth::user();
+
+        // Verificar se o usuário está tentando deletar a si mesmo
+        if ($usuarioAutenticado->id === (int)$id) {
+            return response()->json([
+                'error' => 'Não é possível deletar seu próprio usuário.'
+            ], 403);
+        }
 
         // Verificar se é usuário master
         if ($usuario->isMaster()) {

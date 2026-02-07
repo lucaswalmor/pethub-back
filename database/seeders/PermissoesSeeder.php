@@ -27,8 +27,6 @@ class PermissoesSeeder extends Seeder
             ['nome' => 'Deletar Usuários', 'slug' => 'usuarios.destroy'],
 
             // Empresas
-            ['nome' => 'Listar Empresas', 'slug' => 'empresas.index'],
-            ['nome' => 'Criar Empresas', 'slug' => 'empresas.store'],
             ['nome' => 'Visualizar Empresa', 'slug' => 'empresas.show'],
             ['nome' => 'Editar Empresas', 'slug' => 'empresas.update'],
             ['nome' => 'Deletar Empresas', 'slug' => 'empresas.destroy'],

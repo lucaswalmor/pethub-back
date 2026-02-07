@@ -81,7 +81,7 @@ class EmpresaController extends Controller
 
             // Criptografa a senha e formata o telefone (remove caracteres especiais)
             $dadosUsuario['password'] = Hash::make($dadosUsuario['password']);
-            $dadosUsuario['telefone'] = FormatHelper::formatOnlyNumbers($dadosUsuario['telefone']);
+            $dadosUsuario['telefone'] = $dadosUsuario['telefone'];
             $dadosUsuario['is_master'] = true; // Usuário criado junto com empresa é master
             $dadosUsuario['tipo_cadastro'] = 0; // 0 = Empresa
 
@@ -89,7 +89,13 @@ class EmpresaController extends Controller
             $usuario = User::create($dadosUsuario);
 
             // Sincronizar permissões do usuário administrador
-            $usuario->permissoes()->sync($request->input('usuario_admin.permissoes'));
+            $permissoes = $request->input('usuario_admin.permissoes', []);
+            // Se for array associativo, extrair apenas os valores
+            if (count($permissoes) > 0 && is_string(array_keys($permissoes)[0])) {
+                $permissoes = array_values($permissoes);
+            }
+            $permissoesIds = array_map('intval', $permissoes);
+            $usuario->permissoes()->sync($permissoesIds);
 
             // Associa o usuário à empresa
             $usuario->empresas()->attach($empresa->id);

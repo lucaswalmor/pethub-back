@@ -36,6 +36,8 @@ class UsuarioStoreRequest extends FormRequest
     public function rules(): array
     {
         $hasToken = $this->bearerToken() !== null;
+        $isFuncionario = $this->has('permissoes') && $this->has('empresa_id') && $this->empresa_id;
+
         $rules = [
             // Campos principais do usuário
             'nome' => 'required|string|max:255',
@@ -59,16 +61,31 @@ class UsuarioStoreRequest extends FormRequest
 
             // Endereço (obrigatório apenas para clientes, opcional para funcionários)
             'endereco' => 'nullable|array',
-            'endereco.cep' => 'required|string|max:10',
-            'endereco.rua' => 'required|string|max:255',
-            'endereco.numero' => 'required|string|max:20',
-            'endereco.complemento' => 'nullable|string|max:255',
-            'endereco.bairro' => 'required|string|max:255',
-            'endereco.cidade' => 'required|string|max:255',
-            'endereco.estado' => 'required|string|size:2',
-            'endereco.ponto_referencia' => 'nullable|string|max:255',
-            'endereco.observacoes' => 'nullable|string|max:500',
         ];
+
+        // Validações de endereço condicionais
+        if (!$isFuncionario) {
+            // Para clientes: endereço é obrigatório
+            $rules['endereco.cep'] = 'required|string|max:10';
+            $rules['endereco.rua'] = 'required|string|max:255';
+            $rules['endereco.numero'] = 'required|string|max:20';
+            $rules['endereco.bairro'] = 'required|string|max:255';
+            $rules['endereco.cidade'] = 'required|string|max:255';
+            $rules['endereco.estado'] = 'required|string|size:2';
+        } else {
+            // Para funcionários: endereço é opcional (usarão endereço da empresa)
+            $rules['endereco.cep'] = 'sometimes|nullable|string|max:10';
+            $rules['endereco.rua'] = 'sometimes|nullable|string|max:255';
+            $rules['endereco.numero'] = 'sometimes|nullable|string|max:20';
+            $rules['endereco.bairro'] = 'sometimes|nullable|string|max:255';
+            $rules['endereco.cidade'] = 'sometimes|nullable|string|max:255';
+            $rules['endereco.estado'] = 'sometimes|nullable|string|size:2';
+        }
+
+        // Campos sempre opcionais no endereço
+        $rules['endereco.complemento'] = 'nullable|string|max:255';
+        $rules['endereco.ponto_referencia'] = 'nullable|string|max:255';
+        $rules['endereco.observacoes'] = 'nullable|string|max:500';
 
         if ($hasToken) {
             // Se há token, é funcionário: empresa_id e permissoes são obrigatórios
@@ -165,13 +182,6 @@ class UsuarioStoreRequest extends FormRequest
                 $this->merge(['endereco' => $data['endereco']]);
             }
         }
-
-        // Se for funcionário (empresa_id presente), remova o endereço enviado
-        if ($this->input('empresa_id') && $this->has('endereco')) {
-            $data = $this->all();
-            unset($data['endereco']);
-            $this->replace($data);
-        }
     }
 
     /**
@@ -182,16 +192,7 @@ class UsuarioStoreRequest extends FormRequest
      */
     public function withValidator($validator)
     {
-        $hasToken = $this->bearerToken() !== null;
-
-        $validator->after(function ($validator) use ($hasToken) {
-            if (!$hasToken) {
-                // Se não há token (cliente), deve enviar endereço completo
-                if (!$this->has('endereco')) {
-                    $validator->errors()->add('endereco', 'Clientes devem enviar os dados de endereço.');
-                }
-            }
-        });
+        // Validações adicionais podem ser implementadas aqui se necessário
     }
 
     /**
